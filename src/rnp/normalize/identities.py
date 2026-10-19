@@ -51,13 +51,17 @@ def _read_registry(path: Path) -> list[dict[str, str]]:
     return rows
 
 
-def _next_id(rows: list[dict[str, str]]) -> str:
+def _allocate_id(used_ids: set[str]) -> str:
+    """Next free ``CMPnnnn`` that is not already used or reserved."""
     maximum = 0
-    for row in rows:
-        match = _ID_PATTERN.match(clean_text(row.get("compound_id")))
+    for value in used_ids:
+        match = _ID_PATTERN.match(clean_text(value))
         if match:
             maximum = max(maximum, int(match.group(1)))
-    return f"CMP{maximum + 1:04d}"
+    candidate = maximum + 1
+    while f"CMP{candidate:04d}" in used_ids:
+        candidate += 1
+    return f"CMP{candidate:04d}"
 
 
 def register_compounds(
@@ -88,10 +92,18 @@ def register_compounds(
         for row in registry_rows
     }
     by_file = {clean_text(row.get("stp_file")): row for row in registry_rows if row.get("stp_file")}
+    reserved_explicit = {
+        clean_text(row.get("compound_id"))
+        for row in compounds
+        if clean_text(row.get("compound_id"))
+    }
+    used_ids = {
+        clean_text(row.get("compound_id")) for row in registry_rows if row.get("compound_id")
+    } | reserved_explicit
 
     notes: list[dict[str, str]] = []
     records: list[CompoundRecord] = []
-    seen_ids: set[str] = set()
+    explicit_seen: set[str] = set()
     seen_names: set[tuple[str, str]] = set()
     seen_files: set[str] = set()
     for row in compounds:
@@ -125,22 +137,48 @@ def register_compounds(
         identity_basis = "new"
         record: dict[str, str] | None = by_name.get(name_key_pair)
         if explicit_id:
-            if explicit_id in seen_ids:
+            if explicit_id in explicit_seen:
                 raise InputError(f"compound_id repeated in input: {explicit_id}")
+            explicit_seen.add(explicit_id)
             existing = next(
                 (item for item in registry_rows if item.get("compound_id") == explicit_id), None
             )
-            if existing and (
-                clean_text(existing.get("name")) != name
-                or (clean_text(existing.get("group")) or "all") != group
-            ):
+            if existing is not None:
+                registered_name = clean_text(existing.get("name"))
+                registered_group = clean_text(existing.get("group")) or "all"
+                if registered_name != name or registered_group != group:
+                    raise InputError(
+                        f"compound_id {explicit_id} is already registered as "
+                        f"{registered_name!r} in group {registered_group!r}",
+                        details=[
+                            "choose a different compound_id or reconcile the registry;",
+                            "an existing identity is not silently reassigned",
+                        ],
+                    )
+                existing["stp_file"] = stp_file or clean_text(existing.get("stp_file"))
+                existing["submission_id"] = submission_id or clean_text(
+                    existing.get("submission_id")
+                )
+                existing["last_seen_utc"] = utc_now_iso()
+            else:
+                registry_rows.append(
+                    {
+                        "compound_id": explicit_id,
+                        "group": group,
+                        "name": name,
+                        "stp_file": stp_file,
+                        "submission_id": submission_id,
+                        "identity_basis": "explicit",
+                        "rule_version": RULE_VERSION,
+                        "first_seen_utc": utc_now_iso(),
+                        "last_seen_utc": utc_now_iso(),
+                        "status": "active",
+                    }
+                )
                 notes.append(
                     {
-                        "code": "explicit_id_conflict",
-                        "message": (
-                            f"{explicit_id} is registered as "
-                            f"{existing.get('name')!r} in group {existing.get('group')!r}"
-                        ),
+                        "code": "compound_registered_explicit",
+                        "message": f"{name!r} registered with explicit id {explicit_id}",
                     }
                 )
             identity_basis = "explicit"
@@ -170,7 +208,7 @@ def register_compounds(
                 }
             )
         else:
-            compound_id = _next_id(registry_rows)
+            compound_id = _allocate_id(used_ids)
             identity_basis = "new"
             registry_rows.append(
                 {
@@ -192,7 +230,7 @@ def register_compounds(
                     "message": f"{name!r} registered as {compound_id} (name-based identity)",
                 }
             )
-        seen_ids.add(compound_id)
+        used_ids.add(compound_id)
         registered = next(
             (item for item in registry_rows if item.get("compound_id") == compound_id), None
         )

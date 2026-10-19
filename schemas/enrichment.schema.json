@@ -72,12 +72,13 @@
     },
     "universe": {
       "type": "object",
-      "required": ["source", "input", "mapped"],
+      "required": ["source", "input", "mapped", "statistical"],
       "properties": {
         "source": { "enum": ["explicit"] },
         "input": { "type": "integer", "minimum": 0 },
         "mapped": { "type": ["integer", "null"], "minimum": 0 },
-        "unmapped": { "type": ["integer", "null"], "minimum": 0 }
+        "unmapped": { "type": ["integer", "null"], "minimum": 0 },
+        "statistical": { "type": ["integer", "null"], "minimum": 0 }
       }
     },
     "groups": {
@@ -92,7 +93,8 @@
           "terms_tested",
           "significant",
           "result_sha256",
-          "meta_sha256"
+          "meta_sha256",
+          "significant_sha256"
         ],
         "properties": {
           "status": {
@@ -111,6 +113,7 @@
           "significant": { "type": "integer", "minimum": 0 },
           "result_sha256": { "type": ["string", "null"] },
           "meta_sha256": { "type": ["string", "null"] },
+          "significant_sha256": { "type": ["string", "null"] },
           "r_exit_code": { "type": ["integer", "null"] },
           "message": { "type": "string" }
         }

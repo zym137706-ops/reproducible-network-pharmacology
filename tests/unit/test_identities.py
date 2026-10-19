@@ -141,3 +141,76 @@ def test_filename_compatibility_mode_is_recorded(tmp_path: Path) -> None:
     assert set(bindings) == {"Alpha.csv"}
     assert unbound == []
     assert any(note["code"] == "filename_compatibility_match" for note in notes)
+
+
+def _seed_registry(tmp_path: Path, rows: list[dict[str, str]]) -> Path:
+    registry = tmp_path / "registry.tsv"
+    write_table(registry, rows, REGISTRY_COLUMNS)
+    return registry
+
+
+def test_explicit_id_does_not_collide_with_auto_id(tmp_path: Path) -> None:
+    registry = _seed_registry(
+        tmp_path,
+        [
+            {
+                "compound_id": "CMP0001",
+                "group": "all",
+                "name": "Alpha",
+                "stp_file": "a.csv",
+                "submission_id": "S",
+                "identity_basis": "new",
+                "rule_version": "v0.1.0-name-registry",
+                "first_seen_utc": "2026-01-01T00:00:00Z",
+                "last_seen_utc": "2026-01-01T00:00:00Z",
+                "status": "active",
+            }
+        ],
+    )
+    records, _, _ = register_compounds(
+        _compounds(
+            tmp_path,
+            "compound_id\tname\tstp_file\nCMP0002\tBeta\tb.csv\n\tGamma\tc.csv\n",
+        ),
+        registry,
+    )
+    assert [record.compound_id for record in records] == ["CMP0002", "CMP0003"]
+
+
+def test_new_explicit_id_is_persisted_and_blocks_auto_assignment(tmp_path: Path) -> None:
+    records, registry_rows, _ = register_compounds(
+        _compounds(
+            tmp_path,
+            "compound_id\tname\tstp_file\nCMP0050\tAlpha\ta.csv\n\tBeta\tb.csv\n",
+        ),
+        tmp_path / "registry.tsv",
+    )
+    assert [record.compound_id for record in records] == ["CMP0050", "CMP0051"]
+    persisted = {row["compound_id"] for row in registry_rows}
+    assert {"CMP0050", "CMP0051"} <= persisted
+
+
+def test_explicit_id_conflict_with_registered_identity_raises(tmp_path: Path) -> None:
+    registry = _seed_registry(
+        tmp_path,
+        [
+            {
+                "compound_id": "CMP0001",
+                "group": "all",
+                "name": "Alpha",
+                "stp_file": "a.csv",
+                "submission_id": "S",
+                "identity_basis": "new",
+                "rule_version": "v0.1.0-name-registry",
+                "first_seen_utc": "2026-01-01T00:00:00Z",
+                "last_seen_utc": "2026-01-01T00:00:00Z",
+                "status": "active",
+            }
+        ],
+    )
+    with pytest.raises(InputError) as excinfo:
+        register_compounds(
+            _compounds(tmp_path, "compound_id\tname\tstp_file\nCMP0001\tBeta\tb.csv\n"),
+            registry,
+        )
+    assert "already registered" in excinfo.value.render()

@@ -23,14 +23,14 @@
 
 ```bash
 # 需要 Python 3.10+；富集功能另需 R 4.3+（clusterProfiler / org.Hs.eg.db）
-uv venv && uv pip install -e ".[dev]"
+uv sync --locked --extra dev
 
-uv run rnp validate --config tests/fixtures/run/run.yaml
-uv run rnp ingest stp --config tests/fixtures/run/run.yaml --run-id quickstart
-uv run rnp intersect --config tests/fixtures/run/run.yaml --targets results/quickstart/targets.tsv
-uv run rnp network --config tests/fixtures/run/run.yaml --intersect results/quickstart/intersect
-uv run rnp enrich --config tests/fixtures/run/run.yaml --intersect results/quickstart/intersect
-uv run rnp report --config tests/fixtures/run/run.yaml --run-dir results/quickstart
+uv run rnp validate --config examples/quickstart/run.yaml
+uv run rnp ingest stp --config examples/quickstart/run.yaml --run-id quickstart
+uv run rnp intersect --config examples/quickstart/run.yaml --targets results/quickstart/targets.tsv
+uv run rnp network --config examples/quickstart/run.yaml --intersect results/quickstart/intersect
+uv run rnp enrich --config examples/quickstart/run.yaml --intersect results/quickstart/intersect
+uv run rnp report --config examples/quickstart/run.yaml --run-dir results/quickstart
 uv run rnp manifest --run-dir results/quickstart --check-inputs
 uv run python scripts/synthetic_demo.py --out .demo
 uv run pytest -q

@@ -208,3 +208,60 @@ def test_report_cli(run_config_path: Path, tmp_path: Path, capsys) -> None:
     payload = json.loads(capsys.readouterr().out)
     assert payload["stages"]["network"] == "complete"
     assert (run_dir / "report" / "report.md").is_file()
+
+
+def test_report_refuses_tampered_intersection_side_artifacts(
+    run_config_path: Path, tmp_path: Path
+) -> None:
+    run_dir = _chain(run_config_path)
+    config = load_config(run_config_path)
+    for name in ("target_exclusions.tsv", "gene_mapping_conflicts.tsv", "venn.json"):
+        path = run_dir / "intersect" / name
+        original = path.read_bytes()
+        path.write_bytes(original + b"\n")
+        with pytest.raises(InputError):
+            run_report(config, run_dir, tmp_path / f"report-{name}")
+        path.write_bytes(original)
+
+
+def test_report_refuses_stale_parent_link(
+    run_config_path: Path, tmp_path: Path
+) -> None:
+    run_dir = _chain(run_config_path)
+    audit_path = run_dir / "intersect" / "intersect_audit.json"
+    audit_path.write_text(audit_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+    with pytest.raises(InputError) as excinfo:
+        run_report(load_config(run_config_path), run_dir, tmp_path / "report")
+    assert "parent" in excinfo.value.render().lower()
+
+
+def test_report_audit_lists_verified_artifacts(
+    run_config_path: Path, tmp_path: Path
+) -> None:
+    run_dir = _chain(run_config_path)
+    run_report(load_config(run_config_path), run_dir, tmp_path / "report")
+    audit = json.loads(
+        (tmp_path / "report" / "report_audit.json").read_text(encoding="utf-8")
+    )
+    roles = {entry["role"] for entry in audit["artifacts"]}
+    assert {"targets", "compounds", "edges", "intersection", "disease"} <= roles
+    assert {"exclusions", "conflicts", "venn"} <= roles
+    for entry in audit["artifacts"]:
+        assert Path(entry["path"]).is_file()
+
+
+@pytest.mark.skipif(_rscript() is None, reason="Rscript not available")
+def test_report_refuses_tampered_enrichment_view(
+    run_config_path: Path, tmp_path: Path
+) -> None:
+    run_dir = _chain(run_config_path)
+    config = load_config(run_config_path)
+    run_enrich(config, run_dir / "intersect", run_dir / "enrichment", rscript=_rscript())
+    significant = run_dir / "enrichment" / "all" / "enrichment_significant.tsv"
+    original = significant.read_bytes()
+    significant.write_bytes(original + b"\n")
+    try:
+        with pytest.raises(InputError):
+            run_report(config, run_dir, tmp_path / "report")
+    finally:
+        significant.write_bytes(original)

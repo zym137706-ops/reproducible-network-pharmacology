@@ -58,28 +58,28 @@ flowchart LR
 ## Quickstart
 
 ```bash
-# Python 3.10+ and R 4.3+ (R only needed for enrichment)
-uv venv && uv pip install -e ".[dev]"
+# Python 3.10+ and R 4.3+ (R only needed for the enrichment step)
+uv sync --locked --extra dev
 
-# 1. check a config against the JSON Schema
-uv run rnp validate --config tests/fixtures/run/run.yaml
+# 1. check the quickstart config against the JSON Schema
+uv run rnp validate --config examples/quickstart/run.yaml
 
 # 2. bind compounds to exports and parse them into one audited table
 #    (writes results/quickstart/ and results/registry/compound_registry.tsv)
-uv run rnp ingest stp --config tests/fixtures/run/run.yaml --run-id quickstart
+uv run rnp ingest stp --config examples/quickstart/run.yaml --run-id quickstart
 
 # 3. map genes, intersect with the disease set, and write Cytoscape tables
-uv run rnp intersect --config tests/fixtures/run/run.yaml \
+uv run rnp intersect --config examples/quickstart/run.yaml \
   --targets results/quickstart/targets.tsv
-uv run rnp network --config tests/fixtures/run/run.yaml \
+uv run rnp network --config examples/quickstart/run.yaml \
   --intersect results/quickstart/intersect
 
 # 4. enrich with an explicit background (Rscript required)
-uv run rnp enrich --config tests/fixtures/run/run.yaml \
+uv run rnp enrich --config examples/quickstart/run.yaml \
   --intersect results/quickstart/intersect
 
 # 5. render a Markdown report from the verified stage audits
-uv run rnp report --config tests/fixtures/run/run.yaml \
+uv run rnp report --config examples/quickstart/run.yaml \
   --run-dir results/quickstart
 
 # 6. verify provenance
@@ -168,15 +168,22 @@ Implemented in this slice:
    downstream stages refuse incomplete upstream runs unless an override is recorded.
 3. Separate **code identity** (this repository's version/commit) and **config identity** (config path,
    SHA-256, and the config repository's state).
-4. Stable `compound_id` via a persistent registry; a rename keeps identity through the export binding.
+4. Stable `compound_id` via a persistent registry; explicit IDs are reserved before automatic
+   assignment, persisted, and conflicting reassignment is refused.
 5. Full-precision probabilities in machine-readable tables; presentation rounding is separate.
 6. An offline synthetic demo with hand-computed expectations and failure scenarios.
+7. `rnp report` re-verifies every artifact it reads (targets, compounds, edges, intersection,
+   disease, exclusions, conflicts, Venn data, enrichment views, universe) and the parent-stage audit
+   hashes before rendering; missing stages are "not run" and partial stages need an override.
+8. Python dependencies are locked (`uv.lock`, `uv sync --locked`); CI installs from that lock file.
 
 Still required before calling v0.1 released:
 
-- a generated Python lock file and a controlled R/Bioconductor/annotation environment record;
 - a public scientific case (checklist in [docs/public-case-checklist.md](docs/public-case-checklist.md));
-- recorded CI results and a wheel-install resource check (workflow is defined; it must run on GitHub).
+- the Skill layer;
+- an R-side lock (`renv.lock` or dated container) if byte-level enrichment reproducibility is
+  required; current R versions are recorded per run in `enrichment_meta.json`
+  ([docs/environment.md](docs/environment.md)).
 
 See [architecture](docs/architecture.md) for current gaps and target contracts.
 

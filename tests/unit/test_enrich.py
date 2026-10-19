@@ -150,7 +150,13 @@ def test_live_enrichment_writes_complete_table_and_audit(tmp_path: Path) -> None
         (tmp_path / "enrichment" / "enrichment_audit.json").read_text(encoding="utf-8")
     )
     jsonschema.validate(audit, load_schema("enrichment"))
-    assert audit["universe"] == {"source": "explicit", "input": 30, "mapped": 30, "unmapped": 0}
+    assert audit["universe"] == {
+        "source": "explicit",
+        "input": 30,
+        "mapped": 30,
+        "unmapped": 0,
+        "statistical": 30,
+    }
     assert audit["parents"][0]["stage"] == "intersect"
     assert audit["environment"]["packages"]["clusterProfiler"]
 

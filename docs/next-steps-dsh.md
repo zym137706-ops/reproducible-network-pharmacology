@@ -3,6 +3,10 @@
 日期：2026-10-19。此任务依据已修订规划；下面的要求是待实施工作，不是已完成声明。
 本次 Codex 仅修改文档，现有代码行为和既有测试结果未因此改变。
 
+> **执行状态（2026-10-19 晚，历史记录）**：本任务已完成并超出最小切片——v0.1 加固（身份注册、
+> stage 状态传播、report 哈希/父链校验）、`rnp enrich`、`rnp report`、Quickstart 与 CI 锁文件统一
+> 均已落地；当前状态请以 README、CHANGELOG 和源码为准。本文保留为当时的任务说明。
+
 ## 可直接粘贴的 prompt
 
 请在 C:\DSH\reproducible-network-pharmacology 中继续工作。先读 AGENTS.md、

@@ -1,15 +1,17 @@
 # Enrichment: acceptance criteria
 
 Status: **implemented 2026-10-19** as `rnp enrich` + `R/ora.R`, with tests listed below.
-CI execution evidence on GitHub is still pending; local results are recorded in the changelog.
-The command refuses an incomplete intersection stage by default (`--allow-partial` records an
-override).
+GitHub Actions execution is recorded in the repository's Actions history (latest green run is noted
+in `CHANGELOG.md`). The command refuses an incomplete intersection stage by default
+(`--allow-partial` records an override).
 
 ## Contract
 
 1. Input is the intersection gene table plus an explicit background/universe; both are recorded.
 2. Output contains the **complete** tested-term table (not only significant rows), the actual
    background used, gene-set source/release, and the mapping loss (input → mapped → unmapped).
+   The audit distinguishes the **mapped background** from the **statistical background** actually
+   passed to the engine (annotation coverage or term-gene union can be smaller).
 3. The result table is deterministic: fixed ordering, full precision, no wall-clock values.
 4. A manifest records: R version, `clusterProfiler`, `DOSE`, OrgDb and gene-set versions, the
    universe, correction method and cutoffs.
@@ -18,7 +20,7 @@ override).
 
 | Situation | Required behaviour |
 |---|---|
-| Background/universe cannot be mapped | stop with exit 2; do **not** fall back to all annotated genes |
+| Background/universe cannot be mapped | stop with exit 2; do **not** fall back to all annotated genes; count every input symbol as unmapped and record `statistical: null` |
 | Foreground genes partially unmapped | continue only with the mapped subset, report the unmapped list and counts in the audit |
 | R package missing / R service error | exit 2 or 3 with the R stderr; not "no significant terms" |
 | Analysis completed, zero significant terms | exit 0 with `status: completed_no_significant_terms`, complete table present |
@@ -51,6 +53,8 @@ override).
 - [x] zero-significant run exits 0 and says so explicitly (`completed_no_significant_terms`).
 - [x] synthetic hypergeometric/BH benchmark passes against an independent Python calculation;
       live GO contract test remains green.
-- [x] manifest/audit contain R/annotation versions, actual background counts and mapping loss.
-- [x] CI execution on GitHub recorded: [run 39247312505](https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/runs/39247312505)
-      — all four jobs green (Python 3.10/3.11/3.12 + R 4.5 enrichment bridge).
+- [x] manifest/audit contain R/annotation versions, actual background counts, statistical
+      background and mapping loss.
+- [x] background failure/partial-mapping/statistical-background regression tests exist.
+- [x] CI execution on GitHub recorded (repository Actions history; latest green run in
+      `CHANGELOG.md`).

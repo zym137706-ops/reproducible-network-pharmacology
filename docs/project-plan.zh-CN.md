@@ -12,7 +12,10 @@
 > 同日接通 `rnp enrich`：显式背景强制、完整检验表 + 显著性子表、无命中/服务失败分离、映射损失与 R 版本记录，
 > 并有独立超几何/BH 数值基准；并接通 `rnp report`：校验各阶段哈希后渲染 Markdown，缺失阶段明确写"未运行"，
 > partial 需显式 override 并记录。
-> 仍未实现：Skill 层、公开科学案例；CI 工作流与运行记录见 CHANGELOG。验收项见
+> 发布前加固（同日）：显式 compound_id 预留/持久化/冲突拒绝；report 追加侧产物与父阶段审计哈希校验；
+> 富集区分映射背景与统计背景并修正全映射失败计数；README/CI 共用 `examples/quickstart/run.yaml`；
+> CI 使用 `uv.lock`；新增 `docs/environment.md` 记录 Windows R/DOSE 退出行为。
+> 仍未实现：Skill 层、公开科学案例、R 侧锁文件（renv/容器）。验收项见
 > `docs/enrich-acceptance.md` 与 `docs/public-case-checklist.md`。
 
 ## 1. 定位与当前状态

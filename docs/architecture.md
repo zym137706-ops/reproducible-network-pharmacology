@@ -198,12 +198,16 @@ Still pending (do not claim released):
 
 - the Skill layer and a public scientific case with verified data terms
   ([checklist](public-case-checklist.md));
-- generated Python lock file and a recorded R/Bioconductor/annotation environment;
-- recorded CI results and a wheel-install smoke test in CI (workflow exists; execution evidence is
-  tracked in the changelog);
+- an R-side lock (renv/container) for byte-level enrichment reproducibility; Python is locked by
+  `uv.lock`, observed R versions are recorded in [environment.md](environment.md);
 - docking/upstream contracts (design only).
 
-Closed with enrichment: explicit background enforcement, complete tested-term tables, no-hit vs
-failure separation, per-group mapping loss, and an independent synthetic hypergeometric/BH
-benchmark ([acceptance evidence](enrich-acceptance.md)). Closed with report: hash-verified stage
-readings, "not run" handling, partial override, and evidence-bound wording.
+Closed with enrichment: explicit background enforcement, mapped-vs-statistical background
+recording, complete tested-term tables, no-hit vs failure separation, mapping loss, and an
+independent synthetic hypergeometric/BH benchmark ([acceptance evidence](enrich-acceptance.md)).
+Closed with report: hash-verified stage readings **and parent links**, hash-verified side artifacts
+it actually reads (exclusions/conflicts/Venn/enrichment views), artifact list in the audit, "not
+run" handling, partial override, and evidence-bound wording.
+Closed with release hardening: explicit compound IDs are reserved before automatic allocation,
+persisted, and conflicting IDs are refused; CI installs from `uv.lock`, and README/CI share one
+quickstart config (`examples/quickstart/run.yaml`).

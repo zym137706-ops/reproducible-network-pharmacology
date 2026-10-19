@@ -179,7 +179,13 @@ def run_enrich(
                     "universe_sha256": sha256_file(universe_file),
                 },
                 "parents": parents,
-                "universe": {"source": "explicit", "input": len(universe_genes), "mapped": None},
+                "universe": {
+                    "source": "explicit",
+                    "input": len(universe_genes),
+                    "mapped": None,
+                    "unmapped": None,
+                    "statistical": None,
+                },
                 "groups": {},
                 "warnings": warnings
                 + [
@@ -239,6 +245,7 @@ def run_enrich(
         "input": len(universe_genes),
         "mapped": None,
         "unmapped": None,
+        "statistical": None,
     }
     service_failure = False
 
@@ -285,6 +292,7 @@ def run_enrich(
                 universe_meta = meta.get("universe") or {}
                 universe_summary["mapped"] = universe_meta.get("mapped")
                 universe_summary["unmapped"] = universe_meta.get("unmapped")
+                universe_summary["statistical"] = universe_meta.get("statistical")
                 environment = meta.get("environment") or {}
             if status == "background_mapping_failed":
                 raise InputError(
@@ -345,6 +353,9 @@ def run_enrich(
                 "significant": len(significant),
                 "result_sha256": sha256_file(result_path) if result_path.is_file() else None,
                 "meta_sha256": sha256_file(meta_path),
+                "significant_sha256": sha256_file(
+                    group_dir / "enrichment_significant.tsv"
+                ),
                 "r_exit_code": completed.returncode,
             }
 

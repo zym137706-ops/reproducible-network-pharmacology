@@ -118,13 +118,14 @@ if (key_type == "SYMBOL") {
     unmapped <- setdiff(genes, as.character(mapping$SYMBOL))
   } else {
     entrez <- character(0)
+    unmapped <- genes
   }
 } else {
   entrez <- genes
   mapping <- data.frame(SYMBOL = genes, ENTREZID = entrez, stringsAsFactors = FALSE)
 }
 
-# ---- explicit background ---------------------------------------------------
+# ---- explicit background and statistical background ------------------------
 universe <- NULL
 universe_source <- "all_annotated"
 universe_input <- 0L
@@ -144,12 +145,44 @@ if (!is.null(cfg$universe) && length(cfg$universe) > 0L) {
       universe <- unique(as.character(mapped_universe$ENTREZID))
       universe_mapped <- length(universe)
       universe_unmapped <- setdiff(universe_genes, as.character(mapped_universe$SYMBOL))
+    } else {
+      universe <- NULL
+      universe_mapped <- 0L
+      universe_unmapped <- universe_genes
     }
   } else {
     universe <- universe_genes
     universe_mapped <- length(universe)
   }
 }
+
+# Frozen synthetic sets are also parsed here so the statistical background can
+# be computed before any early exit.
+synthetic <- cfg$synthetic_gene_sets
+term2gene <- NULL
+if (!is.null(synthetic) && length(synthetic) > 0L) {
+  term2gene <- do.call(rbind, lapply(names(synthetic), function(term) {
+    data.frame(term = term, gene = as.character(synthetic[[term]]), stringsAsFactors = FALSE)
+  }))
+}
+
+# The background the engine actually conditions on may be smaller than the
+# mapped background (annotation coverage or term-gene union). Record both.
+statistical_universe <- NULL
+statistical_size <- NA_integer_
+if (universe_source == "explicit" && universe_mapped == 0L) {
+  # The explicit background failed to map: there is no statistical background.
+  statistical_universe <- NULL
+} else if (!is.null(term2gene)) {
+  term_genes <- unique(as.character(term2gene$gene))
+  statistical_universe <- if (is.null(universe)) term_genes else intersect(universe, term_genes)
+} else if (gene_sets == "KEGG") {
+  statistical_universe <- universe
+} else {
+  annotated <- AnnotationDbi::keys(orgdb, keytype = "ENTREZID")
+  statistical_universe <- if (is.null(universe)) annotated else intersect(universe, annotated)
+}
+statistical_size <- if (is.null(statistical_universe)) NA_integer_ else length(statistical_universe)
 
 write.table(
   mapping, file.path(output_dir, "entrez_to_symbol.tsv"),
@@ -182,7 +215,7 @@ make_meta <- function(status) {
       input = universe_input,
       mapped = universe_mapped,
       unmapped = length(universe_unmapped),
-      used = if (is.null(universe)) NA_integer_ else length(universe)
+      statistical = statistical_size
     ),
     unmapped_genes = head(unmapped, 100L),
     environment = list(
@@ -205,7 +238,7 @@ write_meta <- function(status, extra = list()) {
   meta <- c(meta, extra)
   jsonlite::write_json(
     meta, file.path(output_dir, "enrichment_meta.json"),
-    auto_unbox = TRUE, pretty = TRUE, digits = NA, null = "null"
+    auto_unbox = TRUE, pretty = TRUE, digits = NA, na = "null", null = "null"
   )
   invisible(meta)
 }
@@ -244,14 +277,10 @@ if (length(entrez) == 0L) {
 # ---- run ORA on the complete tested-term table ------------------------------
 status <- "ok"
 result <- NULL
-synthetic <- cfg$synthetic_gene_sets
-if (!is.null(synthetic) && length(synthetic) > 0L) {
-  term2gene <- do.call(rbind, lapply(names(synthetic), function(term) {
-    data.frame(term = term, gene = as.character(synthetic[[term]]), stringsAsFactors = FALSE)
-  }))
+if (!is.null(term2gene)) {
   result <- tryCatch(
     suppressWarnings(clusterProfiler::enricher(
-      gene = entrez, universe = universe, TERM2GENE = term2gene,
+      gene = entrez, universe = statistical_universe, TERM2GENE = term2gene,
       pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = requested_p_adjust,
       minGSSize = min_gssize, maxGSSize = max_gssize
     )),
@@ -267,7 +296,7 @@ if (!is.null(synthetic) && length(synthetic) > 0L) {
     suppressWarnings(clusterProfiler::enrichKEGG(
       gene = entrez, organism = species$organism, keyType = "kegg",
       pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = requested_p_adjust,
-      minGSSize = min_gssize, maxGSSize = max_gssize, universe = universe
+      minGSSize = min_gssize, maxGSSize = max_gssize, universe = statistical_universe
     )),
     error = function(e) {
       status <<- "kegg_unavailable"
@@ -282,7 +311,7 @@ if (!is.null(synthetic) && length(synthetic) > 0L) {
       gene = entrez, OrgDb = orgdb, keyType = "ENTREZID", ont = ont,
       pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = requested_p_adjust,
       minGSSize = min_gssize, maxGSSize = max_gssize,
-      universe = universe, readable = FALSE
+      universe = statistical_universe, readable = FALSE
     )),
     error = function(e) {
       status <<- "analysis_failed"

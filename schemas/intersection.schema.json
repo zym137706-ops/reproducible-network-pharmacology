@@ -58,11 +58,21 @@
     },
     "outputs": {
       "type": "object",
-      "required": ["edges_sha256", "intersection_sha256", "disease_sha256"],
+      "required": [
+        "edges_sha256",
+        "intersection_sha256",
+        "disease_sha256",
+        "exclusions_sha256",
+        "conflicts_sha256",
+        "venn_sha256"
+      ],
       "properties": {
         "edges_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
         "intersection_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-        "disease_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        "disease_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "exclusions_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "conflicts_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "venn_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
       }
     },
     "parents": {

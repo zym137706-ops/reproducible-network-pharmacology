@@ -13,6 +13,7 @@
     "config",
     "stages",
     "groups",
+    "artifacts",
     "warnings",
     "report_sha256"
   ],
@@ -43,6 +44,18 @@
       }
     },
     "groups": { "type": "array", "items": { "type": "string" } },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["role", "path", "sha256"],
+        "properties": {
+          "role": { "type": "string" },
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
     "warnings": {
       "type": "array",
       "items": {

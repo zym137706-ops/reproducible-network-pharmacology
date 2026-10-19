@@ -106,3 +106,65 @@ def test_synthetic_hypergeom_and_bh_match_independent_calculation(tmp_path: Path
     assert meta["status"] == "ok"
     assert meta["gene_sets"] == "SYNTHETIC"
     assert meta["universe"]["source"] == "explicit"
+    assert meta["universe"]["statistical"] == len(universe)
+    for row in rows:
+        denominator = int(row["BgRatio"].split("/")[1])
+        assert denominator == meta["universe"]["statistical"], row["ID"]
+
+
+def _run_ora_request(
+    tmp_path: Path, *, genes: list[str], universe: list[str]
+) -> tuple[int, str, dict]:
+    request = {
+        "genes": genes,
+        "gene_id_type": "SYMBOL",
+        "species": "Homo_sapiens",
+        "gene_sets": "GO_BP",
+        "p_adjust": "BH",
+        "pvalue_cutoff": 0.05,
+        "qvalue_cutoff": 0.2,
+        "min_gssize": 5,
+        "max_gssize": 500,
+        "universe": universe,
+        "output_dir": str(tmp_path / "out"),
+    }
+    request_path = tmp_path / "request.json"
+    request_path.write_text(json.dumps(request), encoding="utf-8")
+    completed = subprocess.run(
+        [RSCRIPT, str(ROOT / "R" / "ora.R"), str(request_path), str(tmp_path / "out")],
+        capture_output=True,
+        text=True,
+        timeout=600,
+    )
+    meta_path = tmp_path / "out" / "enrichment_meta.json"
+    meta = json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.is_file() else {}
+    return completed.returncode, completed.stderr, meta
+
+
+@pytest.mark.skipif(RSCRIPT is None, reason="Rscript not available")
+def test_full_background_mapping_failure_counts_every_symbol(tmp_path: Path) -> None:
+    code, stderr, meta = _run_ora_request(
+        tmp_path,
+        genes=["TNF"],
+        universe=["NOSUCHGENE1", "NOSUCHGENE2"],
+    )
+    assert code == 2, stderr
+    assert meta["status"] == "background_mapping_failed"
+    assert meta["universe"]["input"] == 2
+    assert meta["universe"]["mapped"] == 0
+    assert meta["universe"]["unmapped"] == 2
+    assert meta["universe"]["statistical"] is None
+
+
+@pytest.mark.skipif(RSCRIPT is None, reason="Rscript not available")
+def test_partial_background_mapping_records_statistical_background(tmp_path: Path) -> None:
+    code, stderr, meta = _run_ora_request(
+        tmp_path,
+        genes=["TNF"],
+        universe=["TNF", "NOSUCHGENE1"],
+    )
+    assert code == 0, stderr
+    assert meta["status"] == "ok"
+    assert meta["universe"]["mapped"] == 1
+    assert meta["universe"]["unmapped"] == 1
+    assert meta["universe"]["statistical"] == 1

@@ -5,6 +5,28 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Release hardening — 2026-10-19
+
+- Compound identity: explicit IDs are reserved before automatic allocation, new explicit IDs are
+  persisted to the registry, and reusing a registered ID for a different name/group is now a hard
+  error instead of a note. Regression tests cover explicit/auto collision, persistence and conflict.
+- Report: verifies every artifact it reads (targets, compounds, edges, intersection, disease,
+  exclusions, conflicts, Venn data, enrichment result/meta/significant views, universe) and checks
+  each stage's parent-audit hash/status/directory link. `report_audit.json` now lists verified
+  artifacts; missing hashes are errors, not silent skips.
+- Enrichment: `universe` now separates mapping input/mapped/unmapped from the **statistical
+  background** actually passed to the engine; a full mapping failure records every input symbol as
+  unmapped and `statistical: null`; foreground full failure likewise counts all genes as unmapped.
+  The R bridge passes the statistical background to clusterProfiler and records it.
+- Quickstart: one config `examples/quickstart/run.yaml` is used by both README and CI; the README
+  paths (`results/quickstart/...`) are now real. Makefile installs with `uv sync --locked`.
+- CI: installs from `uv.lock` via `uv sync --locked --extra dev`; the smoke job runs the same
+  quickstart config, and the R job runs the full quickstart including enrichment and report.
+- Added `docs/environment.md` recording the actual Windows/R/DOSE environment, the R exit-status
+  behavior (DOSE stderr is not a failure), and CI versions; added R exit-status regression tests.
+- Stale docs cleaned: public-case/demo notices, next-steps task marked historical, enrichment
+  acceptance updated (mapped vs statistical background, CI evidence).
+
 ### Report command — 2026-10-19
 
 - Added `rnp report`: renders Markdown from a run directory's audited stages after verifying the

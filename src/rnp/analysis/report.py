@@ -78,27 +78,43 @@ def _stage_paths(run_dir: Path) -> dict[str, dict[str, Path]]:
     }
 
 
-def _verify_ingest(run_dir: Path, audit: dict[str, Any]) -> None:
-    for field, path in (
-        ("targets_sha256", run_dir / "targets.tsv"),
-        ("compounds_registered_sha256", run_dir / "compounds_registered.tsv"),
-    ):
-        if not path.is_file():
-            raise InputError(f"required artifact not found: {path}")
-        if sha256_file(path) != audit[field]:
-            raise InputError(f"artifact changed since ingest: {path.name}")
+def _verify_artifact(path: Path, expected: str | None, role: str) -> dict[str, str]:
+    if not path.is_file():
+        raise InputError(f"artifact not found: {path}")
+    if not expected:
+        raise InputError(f"no recorded hash for {role}: {path.name}")
+    actual = sha256_file(path)
+    if actual != expected:
+        raise InputError(f"artifact changed since upstream stage: {path.name}")
+    return {"role": role, "path": str(path), "sha256": actual}
 
 
-def _verify_intersect(run_dir: Path, audit: dict[str, Any]) -> None:
+def _verify_ingest(run_dir: Path, audit: dict[str, Any]) -> list[dict[str, str]]:
+    return [
+        _verify_artifact(run_dir / "targets.tsv", audit["targets_sha256"], "targets"),
+        _verify_artifact(
+            run_dir / "compounds_registered.tsv",
+            audit["compounds_registered_sha256"],
+            "compounds",
+        ),
+    ]
+
+
+def _verify_intersect(run_dir: Path, audit: dict[str, Any]) -> list[dict[str, str]]:
     intersect_dir = run_dir / "intersect"
-    for field, name in (
-        ("edges_sha256", "edges.tsv"),
-        ("intersection_sha256", "intersection_genes.tsv"),
-        ("disease_sha256", "disease_genes.tsv"),
+    artifacts = []
+    for field, name, role in (
+        ("edges_sha256", "edges.tsv", "edges"),
+        ("intersection_sha256", "intersection_genes.tsv", "intersection"),
+        ("disease_sha256", "disease_genes.tsv", "disease"),
+        ("exclusions_sha256", "target_exclusions.tsv", "exclusions"),
+        ("conflicts_sha256", "gene_mapping_conflicts.tsv", "conflicts"),
+        ("venn_sha256", "venn.json", "venn"),
     ):
-        path = intersect_dir / name
-        if not path.is_file() or sha256_file(path) != audit["outputs"][field]:
-            raise InputError(f"artifact changed since intersect: {path.name}")
+        artifacts.append(
+            _verify_artifact(intersect_dir / name, audit["outputs"].get(field), role)
+        )
+    return artifacts
 
 
 def _verify_network(run_dir: Path, audit: dict[str, Any]) -> None:
@@ -116,8 +132,9 @@ def _verify_network(run_dir: Path, audit: dict[str, Any]) -> None:
         raise InputError("artifact changed since network: compounds_registered.tsv")
 
 
-def _verify_enrichment(run_dir: Path, audit: dict[str, Any]) -> None:
+def _verify_enrichment(run_dir: Path, audit: dict[str, Any]) -> list[dict[str, str]]:
     intersect_dir = run_dir / "intersect"
+    artifacts = []
     for field, path in (
         ("intersection_sha256", intersect_dir / "intersection_genes.tsv"),
         ("disease_sha256", intersect_dir / "disease_genes.tsv"),
@@ -125,6 +142,61 @@ def _verify_enrichment(run_dir: Path, audit: dict[str, Any]) -> None:
     ):
         if not path.is_file() or sha256_file(path) != audit["inputs"][field]:
             raise InputError(f"artifact changed since enrichment: {path.name}")
+    artifacts.append(
+        _verify_artifact(
+            Path(audit["inputs"]["universe_file"]),
+            audit["inputs"]["universe_sha256"],
+            "universe",
+        )
+    )
+    for group, entry in (audit.get("groups") or {}).items():
+        group_dir = run_dir / "enrichment" / _safe_group(group)
+        for role, filename, field in (
+            ("enrichment_result", "enrichment_result.tsv", "result_sha256"),
+            ("enrichment_meta", "enrichment_meta.json", "meta_sha256"),
+            ("enrichment_significant", "enrichment_significant.tsv", "significant_sha256"),
+        ):
+            artifacts.append(
+                _verify_artifact(group_dir / filename, entry.get(field), f"{role}:{group}")
+            )
+    return artifacts
+
+
+def _verify_parent_links(
+    stages: dict[str, dict[str, Any]], paths: dict[str, dict[str, Path]]
+) -> None:
+    expected_parent = {
+        "intersect": "ingest",
+        "network": "intersect",
+        "enrichment": "intersect",
+    }
+    ingest_parents = (stages.get("ingest", {}).get("audit") or {}).get("parents") or []
+    if ingest_parents:
+        raise InputError("ingest audit unexpectedly declares a parent stage")
+    for stage, parent in expected_parent.items():
+        if stage not in stages:
+            continue
+        if parent not in stages:
+            raise InputError(
+                f"{stage} references parent {parent!r}, but that audit is missing"
+            )
+        parents = (stages[stage]["audit"].get("parents") or [])
+        entry = next((item for item in parents if item.get("stage") == parent), None)
+        if entry is None:
+            raise InputError(f"{stage} audit has no parent record for {parent!r}")
+        parent_audit = paths[parent]["audit"]
+        actual = sha256_file(parent_audit)
+        if entry.get("audit_sha256") != actual:
+            raise InputError(
+                f"{stage} parent link is stale: {parent} audit hash mismatch"
+            )
+        if entry.get("stage_status") != stages[parent]["status"]:
+            raise InputError(
+                f"{stage} parent link records {entry.get('stage_status')!r}, "
+                f"but {parent} is {stages[parent]['status']!r}"
+            )
+        if entry.get("dir") != str(paths[parent]["dir"]):
+            raise InputError(f"{stage} parent link points at an unexpected directory")
 
 
 def _safe_group(group: str) -> str:
@@ -181,6 +253,7 @@ def run_report(
         )
 
     stages: dict[str, dict[str, Any]] = {}
+    artifacts: list[dict[str, str]] = []
     warnings: list[dict[str, str]] = []
     for stage in STAGE_ORDER:
         audit_path = paths[stage]["audit"]
@@ -200,13 +273,15 @@ def run_report(
             "status": str(audit.get("stage_status", "unknown")),
         }
         if stage == "ingest":
-            _verify_ingest(run_dir, audit)
+            artifacts.extend(_verify_ingest(run_dir, audit))
         elif stage == "intersect":
-            _verify_intersect(run_dir, audit)
+            artifacts.extend(_verify_intersect(run_dir, audit))
         elif stage == "network":
             _verify_network(run_dir, audit)
         elif stage == "enrichment":
-            _verify_enrichment(run_dir, audit)
+            artifacts.extend(_verify_enrichment(run_dir, audit))
+
+    _verify_parent_links(stages, paths)
 
     incomplete = {
         stage: entry["status"]
@@ -439,7 +514,8 @@ def run_report(
         universe = enrichment_audit.get("universe") or {}
         lines.append(
             f"- Background: explicit, input {universe.get('input', 'n/a')}, "
-            f"mapped {universe.get('mapped', 'n/a')}, unmapped {universe.get('unmapped', 'n/a')}"
+            f"mapped {universe.get('mapped', 'n/a')}, unmapped {universe.get('unmapped', 'n/a')}, "
+            f"statistical {universe.get('statistical', 'n/a')}"
         )
     lines.append("")
 
@@ -512,6 +588,7 @@ def run_report(
                 if stage in stages
             },
             "groups": groups,
+            "artifacts": artifacts,
             "warnings": warnings,
             "report_sha256": report_sha,
         }
