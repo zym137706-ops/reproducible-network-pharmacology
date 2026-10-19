@@ -1,0 +1,93 @@
+# Reference-data registry
+#
+# One entry per upstream source this project can use. The repository does not
+# redistribute restricted data: a source with `redistribute: false` is obtained
+# by the user, and only its version/URL/license is recorded here.
+#
+# When a snapshot is downloaded, record `retrieved`, `release` and `sha256` so a
+# run manifest can pin it.
+
+hgnc:
+  name: HGNC gene nomenclature
+  url: https://www.genenames.org/download/archive/
+  license: "free to use with attribution (see genenames.org)"
+  redistribute: false
+  release: "2026-09"
+  retrieved: null
+  sha256: null
+
+go:
+  name: Gene Ontology
+  url: https://geneontology.org/docs/download-ontology/
+  license: CC-BY-4.0
+  redistribute: false
+  release: "2026-09-01"
+  retrieved: null
+  sha256: null
+
+reactome:
+  name: Reactome pathways
+  url: https://reactome.org/download-data
+  license: CC0-1.0
+  redistribute: false
+  release: null
+  retrieved: null
+  sha256: null
+
+string:
+  name: STRING protein-protein interactions
+  url: https://string-db.org/cgi/download
+  license: CC-BY-4.0
+  redistribute: false
+  release: "12.0"
+  retrieved: null
+  sha256: null
+
+ctd:
+  name: Comparative Toxicogenomics Database
+  url: https://ctdbase.org/downloads/
+  license: "academic use, cite CTD"
+  redistribute: false
+  release: null
+  retrieved: null
+  sha256: null
+
+kegg:
+  name: KEGG pathways
+  url: https://www.kegg.jp/kegg/download/
+  license: "proprietary; academic use via license"
+  redistribute: false
+  release: null
+  retrieved: null
+  sha256: null
+  note: "Results derived from KEGG must not be redistributed."
+
+genecards:
+  name: GeneCards
+  url: https://www.genecards.org/
+  license: "commercial terms"
+  redistribute: false
+  release: null
+  retrieved: null
+  sha256: null
+  note: "Never commit GeneCards exports."
+
+omim:
+  name: OMIM
+  url: https://www.omim.org/downloads
+  license: "Johns Hopkins terms"
+  redistribute: false
+  release: null
+  retrieved: null
+  sha256: null
+  note: "Never commit OMIM exports."
+
+swisstargetprediction:
+  name: SwissTargetPrediction
+  url: https://www.swisstargetprediction.ch/
+  license: "public academic service; manual submission only"
+  redistribute: false
+  release: null
+  retrieved: null
+  sha256: null
+  note: "Cached demo exports may be committed with a retrieval date; never automate submissions."

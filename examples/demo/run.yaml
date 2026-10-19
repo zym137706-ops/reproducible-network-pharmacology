@@ -1,0 +1,29 @@
+project: demo-public-compounds
+description: Public-data end-to-end demo (week 2); inputs filled manually
+species: Homo_sapiens
+inputs:
+  compounds: inputs/compounds.tsv
+  stp_dir: inputs/stp
+  disease_genes: inputs/disease_genes.txt
+  disease_source: CTD
+  disease_retrieval_date: "2026-10-01"
+  hgnc_map: inputs/hgnc_map.tsv
+thresholds:
+  stp_probability: 0.10
+  note: recorded analysis choice; a sensitivity run at 0.05 is reported alongside
+enrichment:
+  engine: r
+  gene_sets: GO_BP
+  p_adjust: BH
+  pvalue_cutoff: 0.05
+  qvalue_cutoff: 0.2
+  min_gssize: 10
+  max_gssize: 500
+network:
+  disease_label: Demo disease
+references:
+  hgnc: "2026-09"
+  go: "2026-09-01"
+  string: "12.0"
+outputs:
+  dir: results

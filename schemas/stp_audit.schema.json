@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/stp_audit.schema.json",
+  "title": "SwissTargetPrediction ingest audit",
+  "description": "Per-file parse status, binding, quarantine and stage status. Distinguishes no predictions, below-threshold, invalid rows and partial runs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_by",
+    "stage_status",
+    "config",
+    "thresholds",
+    "files",
+    "quarantine",
+    "missing_exports",
+    "summary",
+    "registry",
+    "notes",
+    "targets_sha256",
+    "compounds_registered_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.1" },
+    "generated_by": { "type": "string" },
+    "stage_status": { "enum": ["complete", "partial", "failed"] },
+    "config": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "required": ["stp_probability"],
+      "properties": {
+        "stp_probability": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "format",
+          "sha256",
+          "status",
+          "rows_total",
+          "rows_valid",
+          "rows_invalid",
+          "rows_below_threshold",
+          "rows_used",
+          "warnings",
+          "errors"
+        ],
+        "properties": {
+          "path": { "type": "string" },
+          "format": { "enum": ["csv", "xlsx"] },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "status": {
+            "enum": [
+              "ok",
+              "partial",
+              "below_threshold",
+              "invalid_rows",
+              "no_predictions",
+              "error",
+              "quarantined"
+            ]
+          },
+          "reason": { "type": "string" },
+          "compound_id": { "type": "string" },
+          "group": { "type": "string" },
+          "submission_id": { "type": "string" },
+          "header_row_index": { "type": ["integer", "null"], "minimum": 0 },
+          "columns_detected": { "type": "object", "additionalProperties": { "type": "string" } },
+          "rows_total": { "type": "integer", "minimum": 0 },
+          "rows_valid": { "type": "integer", "minimum": 0 },
+          "rows_invalid": { "type": "integer", "minimum": 0 },
+          "rows_below_threshold": { "type": "integer", "minimum": 0 },
+          "rows_used": { "type": "integer", "minimum": 0 },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["code", "message"],
+              "properties": {
+                "code": { "type": "string" },
+                "row": { "type": ["integer", "null"], "minimum": 1 },
+                "message": { "type": "string" }
+              }
+            }
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["code", "message"],
+              "properties": {
+                "code": { "type": "string" },
+                "row": { "type": ["integer", "null"], "minimum": 1 },
+                "message": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "quarantine": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256", "reason"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "missing_exports": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["compound_id", "stp_file", "status", "reason"],
+        "properties": {
+          "compound_id": { "type": "string" },
+          "stp_file": { "type": "string" },
+          "status": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "files",
+        "files_bound",
+        "files_quarantined",
+        "files_missing",
+        "rows_total",
+        "rows_valid",
+        "rows_invalid",
+        "rows_below_threshold",
+        "rows_used",
+        "compounds_registered",
+        "warnings",
+        "errors"
+      ],
+      "properties": {
+        "files": { "type": "integer", "minimum": 0 },
+        "files_bound": { "type": "integer", "minimum": 0 },
+        "files_quarantined": { "type": "integer", "minimum": 0 },
+        "files_missing": { "type": "integer", "minimum": 0 },
+        "rows_total": { "type": "integer", "minimum": 0 },
+        "rows_valid": { "type": "integer", "minimum": 0 },
+        "rows_invalid": { "type": "integer", "minimum": 0 },
+        "rows_below_threshold": { "type": "integer", "minimum": 0 },
+        "rows_used": { "type": "integer", "minimum": 0 },
+        "compounds_registered": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 },
+        "errors": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "registry": {
+      "type": "object",
+      "required": ["path", "rule_version", "entries"],
+      "properties": {
+        "path": { "type": "string" },
+        "rule_version": { "type": "string" },
+        "entries": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "targets_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "compounds_registered_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

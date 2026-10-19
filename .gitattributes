@@ -1,0 +1,5 @@
+# Text files are normalized to LF; Excel fixtures are binary.
+* text=auto eol=lf
+*.xlsx binary
+*.png binary
+*.pdf binary

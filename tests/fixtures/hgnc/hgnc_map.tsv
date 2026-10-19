@@ -1,0 +1,18 @@
+hgnc_id	symbol	status	prev_symbol	alias_symbol	uniprot_ids	entrez_id	locus_group
+HGNC:1383	CA2	Approved			P00918	760	protein-coding gene
+HGNC:3467	ESR1	Approved			P03372	2099	protein-coding gene
+HGNC:11892	TNF	Approved		TNFA|TNF-alpha	P01375	7124	protein-coding gene
+HGNC:9604	PTGS2	Approved		COX2|COX-2	P35354	5743	protein-coding gene
+HGNC:6018	IL6	Approved		IFNB2|BSF2	P05231	3569	protein-coding gene
+HGNC:1775	CDK5R1	Approved		p35|NCK5A	Q15078	8851	protein-coding gene
+HGNC:1774	CDK5	Approved			Q00535	1020	protein-coding gene
+HGNC:6871	MAPK1	Approved		ERK|ERK2|PRKM1	P28482	5594	protein-coding gene
+HGNC:6877	MAPK3	Approved		ERK|ERK1|PRKM3	P27361	5595	protein-coding gene
+HGNC:6025	CXCL8	Approved	IL8	IL-8|NAP1	P10145	3576	protein-coding gene
+HGNC:7794	NFKB1	Approved			P19838	4790	protein-coding gene
+HGNC:5344	ICAM1	Approved			P05362	3383	protein-coding gene
+HGNC:2468	VCAM1	Approved			P19320	7412	protein-coding gene
+HGNC:10698	CCL2	Approved	SCYA2	MCP1|MCP-1	P13500	6347	protein-coding gene
+HGNC:5962	IL10	Approved		CSIF	P22301	3586	protein-coding gene
+HGNC:5992	IL1B	Approved		IL1F2	P01584	3553	protein-coding gene
+HGNC:9999	RETIREDGENE	Retired		OLD1	P99999	9999	protein-coding gene

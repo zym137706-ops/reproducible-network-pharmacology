@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/intersection.schema.json",
+  "title": "Intersection audit",
+  "description": "What was mapped, what was excluded, per-group set counts, and the parent stage identity. This file is the evidence that no target silently disappeared.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_by",
+    "stage_status",
+    "config",
+    "thresholds",
+    "inputs",
+    "outputs",
+    "parents",
+    "disease_label",
+    "groups",
+    "exclusions",
+    "warnings",
+    "venn_plots"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.1" },
+    "generated_by": { "type": "string" },
+    "stage_status": { "enum": ["complete", "partial_override"] },
+    "config": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "required": ["stp_probability"],
+      "properties": {
+        "stp_probability": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "required": [
+        "targets",
+        "targets_sha256",
+        "compounds_sha256",
+        "disease_genes_sha256",
+        "hgnc_map_sha256"
+      ],
+      "properties": {
+        "targets": { "type": "string" },
+        "targets_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "compounds_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "disease_genes_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "hgnc_map_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "required": ["edges_sha256", "intersection_sha256", "disease_sha256"],
+      "properties": {
+        "edges_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "intersection_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "disease_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "parents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "stage",
+          "dir",
+          "audit",
+          "audit_sha256",
+          "stage_status",
+          "status_override"
+        ],
+        "properties": {
+          "stage": { "type": "string" },
+          "dir": { "type": "string" },
+          "audit": { "type": "string" },
+          "audit_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "stage_status": { "type": "string" },
+          "status_override": { "type": "boolean" }
+        }
+      }
+    },
+    "disease_label": { "type": "string" },
+    "groups": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/group" }
+    },
+    "exclusions": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "venn_plots": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "group": {
+      "type": "object",
+      "required": [
+        "compounds",
+        "compounds_linked",
+        "edges",
+        "targets",
+        "disease",
+        "intersection",
+        "target_only",
+        "disease_only",
+        "union",
+        "compounds_without_edges"
+      ],
+      "properties": {
+        "compounds": { "type": "integer", "minimum": 0 },
+        "compounds_linked": { "type": "integer", "minimum": 0 },
+        "edges": { "type": "integer", "minimum": 0 },
+        "targets": { "type": "integer", "minimum": 0 },
+        "disease": { "type": "integer", "minimum": 0 },
+        "intersection": { "type": "integer", "minimum": 0 },
+        "target_only": { "type": "integer", "minimum": 0 },
+        "disease_only": { "type": "integer", "minimum": 0 },
+        "union": { "type": "integer", "minimum": 0 },
+        "compounds_without_edges": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

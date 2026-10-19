@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/run.schema.json",
+  "title": "rnp run configuration",
+  "description": "One file fully describes a network-pharmacology run. Relative paths are resolved against the config file directory.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["project", "species", "inputs", "thresholds", "enrichment", "outputs"],
+  "properties": {
+    "project": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "description": { "type": "string" },
+    "species": { "type": "string", "enum": ["Homo_sapiens", "Mus_musculus"] },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["compounds", "stp_dir", "disease_genes"],
+      "properties": {
+        "compounds": { "type": "string", "minLength": 1 },
+        "stp_dir": { "type": "string", "minLength": 1 },
+        "disease_genes": { "type": "string", "minLength": 1 },
+        "disease_source": { "type": "string" },
+        "disease_retrieval_date": { "type": "string", "format": "date" },
+        "hgnc_map": { "type": "string", "minLength": 1 },
+        "compound_registry": { "type": "string", "minLength": 1 },
+        "allow_filename_match": {
+          "type": "boolean",
+          "description": "Compatibility mode: bind exports by filename when no explicit stp_file is given. Recorded in the audit."
+        },
+        "mcode_dir": { "type": "string" }
+      }
+    },
+    "network": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "disease_label": { "type": "string", "minLength": 1 },
+        "disease_code": { "type": "string", "minLength": 1 }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stp_probability"],
+      "properties": {
+        "stp_probability": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "note": { "type": "string" }
+      }
+    },
+    "enrichment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["engine", "gene_sets"],
+      "properties": {
+        "engine": { "const": "r" },
+        "gene_sets": { "enum": ["GO_BP", "GO_MF", "GO_CC", "KEGG"] },
+        "p_adjust": { "enum": ["BH", "BY", "bonferroni", "none"] },
+        "pvalue_cutoff": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "qvalue_cutoff": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+        "min_gssize": { "type": "integer", "minimum": 1 },
+        "max_gssize": { "type": "integer", "minimum": 1 },
+        "universe": { "type": ["string", "null"] },
+        "universe_file": {
+          "type": "string",
+          "description": "Explicit background gene list for enrichment (one identifier per line). Required by `rnp enrich`."
+        }
+      }
+    },
+    "references": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dir"],
+      "properties": {
+        "dir": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

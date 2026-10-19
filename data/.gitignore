@@ -1,0 +1,9 @@
+# Keep reference snapshots out of git
+data/reference/*
+!data/reference/.gitkeep
+data/local/*
+!data/local/README.md
+
+# Keep fixture output out of git
+tests/fixtures/run/_out/*
+!tests/fixtures/run/_out/.gitkeep

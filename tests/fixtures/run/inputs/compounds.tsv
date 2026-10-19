@@ -1,0 +1,3 @@
+name	pubchem_cid	smiles	source	stp_file
+Quercetin	5280343		PubChem	compound_a.csv
+Kaempferol	5280863		PubChem	compound_b.csv

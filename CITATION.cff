@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "reproducible-network-pharmacology"
+abstract: >-
+  A command-line toolkit and agent skill for reproducible network-pharmacology
+  analysis: audited parsing of SwissTargetPrediction exports, gene-symbol
+  normalization, compound–target–disease intersection, Cytoscape network tables,
+  enrichment via R clusterProfiler, module analysis, and per-run provenance.
+type: software
+authors:
+  - family-names: "Zhu"
+    given-names: "Yiming"
+license: MIT
+version: "0.0.1"
+date-released: "2026-10-18"
+repository-code: "https://github.com/zym137706-ops/reproducible-network-pharmacology"
+keywords:
+  - network pharmacology
+  - bioinformatics
+  - reproducibility
+  - agent skills
+  - drug target

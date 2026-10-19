@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/run_manifest.schema.json",
+  "title": "rnp run manifest",
+  "description": "Everything needed to explain and re-run one run. Code identity and config-repository identity are separate; parent stages are recorded with their audit hashes.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "tool",
+    "code",
+    "config",
+    "python",
+    "dependencies",
+    "command",
+    "args",
+    "parents",
+    "inputs",
+    "stage_status",
+    "started_at_utc",
+    "finished_at_utc",
+    "exit_code",
+    "overwritten"
+  ],
+  "properties": {
+    "schema_version": { "const": "2.0" },
+    "run_id": { "type": "string", "minLength": 1 },
+    "tool": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "reproducible-network-pharmacology" },
+        "version": { "type": "string" }
+      }
+    },
+    "code": {
+      "type": "object",
+      "required": ["version", "commit", "dirty", "root"],
+      "properties": {
+        "version": { "type": "string" },
+        "commit": { "type": ["string", "null"] },
+        "dirty": { "type": ["boolean", "null"] },
+        "root": { "type": "string" }
+      }
+    },
+    "config": {
+      "type": "object",
+      "required": ["path", "sha256", "repository"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "repository": {
+          "type": "object",
+          "required": ["commit", "dirty"],
+          "properties": {
+            "commit": { "type": ["string", "null"] },
+            "dirty": { "type": ["boolean", "null"] }
+          }
+        }
+      }
+    },
+    "python": { "type": "string" },
+    "dependencies": { "type": "object", "additionalProperties": { "type": "string" } },
+    "command": { "type": "string" },
+    "args": { "type": "object" },
+    "parents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "stage",
+          "dir",
+          "audit",
+          "audit_sha256",
+          "stage_status",
+          "status_override"
+        ],
+        "properties": {
+          "stage": { "type": "string" },
+          "dir": { "type": "string" },
+          "audit": { "type": "string" },
+          "audit_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "stage_status": { "type": "string" },
+          "status_override": { "type": "boolean" }
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "bytes": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "references": { "type": "object", "additionalProperties": { "type": "string" } },
+    "r_version": { "type": ["string", "null"] },
+    "platform": { "type": "string" },
+    "started_at_utc": { "type": "string" },
+    "finished_at_utc": { "type": "string" },
+    "exit_code": { "type": "integer" },
+    "stage_status": {
+      "enum": ["complete", "partial", "failed", "partial_override", "empty"]
+    },
+    "overwritten": { "type": "boolean" }
+  }
+}

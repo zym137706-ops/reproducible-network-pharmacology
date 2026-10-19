@@ -1,0 +1,3 @@
+Target,Common name,Uniprot ID,ChEMBL ID,Target Class,Probability*,Known actives (3D/2D)
+Integrin alpha-V/beta-3 complex,N/A,P06756&O00570,,Membrane receptor,0.5120,No
+Tubulin, TUBA1A & TUBB,P68371&Q13509,,Structural protein,0.1833,Yes

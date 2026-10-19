@@ -1,0 +1,6 @@
+Target,Common name,Uniprot ID,ChEMBL ID,Target Class,Probability*,Known actives (3D/2D)
+Valid row,CA2,P00918,,Unclassified protein,0.31,No
+Bad numeric,ESR1,P03372,,Kinase,abc,No
+Out of range,PTGS2,P35354,,Oxidoreductase,1.4,Yes
+Empty probability,IL6,P05231,,Secreted protein,,No
+Comma decimal,TNF,P01375,,Secreted protein,"0,27",No

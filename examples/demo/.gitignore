@@ -1,0 +1,6 @@
+# Demo outputs are generated, never committed
+results/
+
+# Fixture run output (created when running the CLI against the fixture config)
+tests/fixtures/run/_out/*
+!tests/fixtures/run/_out/.gitkeep

@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/enrichment.schema.json",
+  "title": "Enrichment stage audit",
+  "description": "Per-group enrichment status, the explicit background actually used, mapping loss and the parent intersection identity. 'No significant term' is separate from a failed analysis.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_by",
+    "stage_status",
+    "config",
+    "inputs",
+    "parents",
+    "universe",
+    "groups",
+    "warnings",
+    "environment"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "generated_by": { "type": "string" },
+    "stage_status": {
+      "enum": ["complete", "empty", "partial", "partial_override"]
+    },
+    "config": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "required": [
+        "intersect_dir",
+        "intersection_sha256",
+        "disease_sha256",
+        "universe_file",
+        "universe_sha256"
+      ],
+      "properties": {
+        "intersect_dir": { "type": "string" },
+        "intersection_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "disease_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "universe_file": { "type": "string" },
+        "universe_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "parents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "stage",
+          "dir",
+          "audit",
+          "audit_sha256",
+          "stage_status",
+          "status_override"
+        ],
+        "properties": {
+          "stage": { "type": "string" },
+          "dir": { "type": "string" },
+          "audit": { "type": "string" },
+          "audit_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "stage_status": { "type": "string" },
+          "status_override": { "type": "boolean" }
+        }
+      }
+    },
+    "universe": {
+      "type": "object",
+      "required": ["source", "input", "mapped"],
+      "properties": {
+        "source": { "enum": ["explicit"] },
+        "input": { "type": "integer", "minimum": 0 },
+        "mapped": { "type": ["integer", "null"], "minimum": 0 },
+        "unmapped": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "status",
+          "foreground_input",
+          "foreground_mapped",
+          "foreground_unmapped",
+          "terms_tested",
+          "significant",
+          "result_sha256",
+          "meta_sha256"
+        ],
+        "properties": {
+          "status": {
+            "enum": [
+              "ok",
+              "completed_no_significant_terms",
+              "no_mapped_foreground",
+              "service_unavailable",
+              "analysis_failed"
+            ]
+          },
+          "foreground_input": { "type": "integer", "minimum": 0 },
+          "foreground_mapped": { "type": ["integer", "null"], "minimum": 0 },
+          "foreground_unmapped": { "type": ["integer", "null"], "minimum": 0 },
+          "terms_tested": { "type": "integer", "minimum": 0 },
+          "significant": { "type": "integer", "minimum": 0 },
+          "result_sha256": { "type": ["string", "null"] },
+          "meta_sha256": { "type": ["string", "null"] },
+          "r_exit_code": { "type": ["integer", "null"] },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

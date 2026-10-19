@@ -1,0 +1,31 @@
+# Self-contained fixture used by the test suite.
+# It contains synthetic probability values: never use it as scientific evidence.
+project: fixture-run
+description: Test fixture for rnp ingest stp / intersect / network
+species: Homo_sapiens
+inputs:
+  compounds: inputs/compounds.tsv
+  stp_dir: inputs/stp
+  disease_genes: inputs/disease_genes.txt
+  disease_source: CTD
+  disease_retrieval_date: "2026-10-01"
+  hgnc_map: ../hgnc/hgnc_map.tsv
+thresholds:
+  stp_probability: 0.10
+  note: fixture threshold, not a recommendation
+enrichment:
+  engine: r
+  gene_sets: GO_BP
+  p_adjust: BH
+  pvalue_cutoff: 0.05
+  qvalue_cutoff: 0.2
+  min_gssize: 5
+  max_gssize: 500
+  universe_file: inputs/universe.txt
+network:
+  disease_label: Fixture disease
+references:
+  hgnc: "2026-09"
+  go: "2026-09-01"
+outputs:
+  dir: _out

@@ -1,0 +1,39 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.Rcheck/
+
+# Pipeline outputs (never commit results)
+results/
+.demo/
+tests/fixtures/run/_out/
+*.log
+
+# Local data (never commit project data)
+data/local/*
+!data/local/README.md
+*.xlsx.local
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Secrets
+.env
+.env.*

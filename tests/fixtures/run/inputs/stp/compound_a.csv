@@ -1,0 +1,6 @@
+Target,Common name,Uniprot ID,ChEMBL ID,Target Class,Probability*,Known actives (3D/2D)
+Carbonic anhydrase II,CA2,P00918,CHEMBL205,Unclassified protein,0.4231,No
+Estrogen receptor alpha,ESR1,P03372,CHEMBL206,Kinase,0.3512,Yes
+Tumor necrosis factor,TNF,P01375,CHEMBL1825,Secreted protein,0.2744,No
+Prostaglandin G/H synthase 2,PTGS2,P35354,CHEMBL230,Oxidoreductase,0.1987,Yes
+Interleukin-6,IL6,P05231,,Secreted protein,0.0612,No

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/network.schema.json",
+  "title": "Network build audit",
+  "description": "Per-group node/edge counts, invariant checks and the parent intersection identity. An empty intersection produces a valid empty network audit, not fabricated edges.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_by",
+    "stage_status",
+    "disease_label",
+    "inputs",
+    "parents",
+    "groups"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.1" },
+    "generated_by": { "type": "string" },
+    "stage_status": { "enum": ["complete", "empty", "partial_override"] },
+    "disease_label": { "type": "string" },
+    "inputs": {
+      "type": "object",
+      "required": [
+        "intersect_dir",
+        "edges_sha256",
+        "intersection_sha256",
+        "disease_sha256",
+        "compounds_sha256"
+      ],
+      "properties": {
+        "intersect_dir": { "type": "string" },
+        "edges_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "intersection_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "disease_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "compounds_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "parents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "stage",
+          "dir",
+          "audit",
+          "audit_sha256",
+          "stage_status",
+          "status_override"
+        ],
+        "properties": {
+          "stage": { "type": "string" },
+          "dir": { "type": "string" },
+          "audit": { "type": "string" },
+          "audit_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "stage_status": { "type": "string" },
+          "status_override": { "type": "boolean" }
+        }
+      }
+    },
+    "groups": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["checks", "edges", "nodes"],
+        "properties": {
+          "checks": {
+            "type": "object",
+            "additionalProperties": { "type": "boolean" }
+          },
+          "edges": { "type": "integer", "minimum": 0 },
+          "nodes": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  }
+}

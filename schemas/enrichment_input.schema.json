@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/enrichment_input.schema.json",
+  "title": "R enrichment bridge contract",
+  "description": "The JSON written by the Python side and consumed by R/ora.R. Keeping this as a schema means the R bridge can be tested without the Python layer.",
+  "type": "object",
+  "required": ["genes", "gene_id_type", "species", "gene_sets", "output_dir"],
+  "additionalProperties": false,
+  "properties": {
+    "genes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "gene_id_type": { "enum": ["SYMBOL", "ENTREZID"] },
+    "species": { "enum": ["Homo_sapiens", "Mus_musculus"] },
+    "gene_sets": { "enum": ["GO_BP", "GO_MF", "GO_CC", "KEGG"] },
+    "p_adjust": { "enum": ["BH", "BY", "bonferroni", "none"] },
+    "pvalue_cutoff": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+    "qvalue_cutoff": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+    "min_gssize": { "type": "integer", "minimum": 1 },
+    "max_gssize": { "type": "integer", "minimum": 1 },
+    "universe": {
+      "type": ["array", "null"],
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "synthetic_gene_sets": {
+      "type": "object",
+      "description": "Optional frozen term -> gene list for an independent hypergeometric/BH benchmark. Engineering use only.",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string", "minLength": 1 }
+      }
+    },
+    "output_dir": { "type": "string", "minLength": 1 },
+    "seed": { "type": ["integer", "null"] }
+  }
+}
