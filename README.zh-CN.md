@@ -6,7 +6,8 @@
 输出：可追溯的交集表、Cytoscape 网络表、富集结果、报告，以及一份记录输入哈希、参考库版本、参数与工具版本的运行清单。
 
 > 当前状态：**未发布的 v0.1 开发中**（包版本 0.0.1）。2026-10-19 已加固导入/交集/网络，并接通 `rnp enrich`
-> （显式背景、完整检验表、状态分离）与离线合成 demo；报告、Skill 与公开科学案例仍待接通。测试状态以实际执行记录为准。
+> （显式背景、完整检验表、状态分离）、`rnp report`（哈希校验的报告渲染）与离线合成 demo；Skill 与公开科学案例仍待接通。
+> 测试状态以实际执行记录为准。
 > 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[下一步任务](docs/next-steps-dsh.md)。
 
 ## 为什么做这个
@@ -29,6 +30,7 @@ uv run rnp ingest stp --config tests/fixtures/run/run.yaml --run-id quickstart
 uv run rnp intersect --config tests/fixtures/run/run.yaml --targets results/quickstart/targets.tsv
 uv run rnp network --config tests/fixtures/run/run.yaml --intersect results/quickstart/intersect
 uv run rnp enrich --config tests/fixtures/run/run.yaml --intersect results/quickstart/intersect
+uv run rnp report --config tests/fixtures/run/run.yaml --run-dir results/quickstart
 uv run rnp manifest --run-dir results/quickstart --check-inputs
 uv run python scripts/synthetic_demo.py --out .demo
 uv run pytest -q
@@ -49,7 +51,7 @@ Windows 注意：确认 `python` 指向 Python 3。装了分子模拟工具的�
 | `rnp network` | ✅ v0.1 | Cytoscape 节点/边/MOLlist 表 + Venny 数据；`--venn-plot` 可选出图 |
 | `rnp enrich` | ✅ v0.1 | 基于 R `clusterProfiler` 的分组 ORA，**必须显式背景**；完整检验表 + 显著性子表；无命中与服务失败分开 |
 | `rnp mcode` | 🚧 后续独立扩展 | MCODE 模块富集；不由 hub/RRA 排名替代 |
-| `rnp report` | 🚧 v0.1 | 由结果与清单生成报告 |
+| `rnp report` | ✅ v0.1 | 由已校验的阶段审计与表格生成 Markdown 报告；哈希校验；不超出证据作结论 |
 | `rnp metabolites import` | 🚧 v0.2 设计 | 已处理代谢组注释导入；同时支持已确认成分清单 |
 | `rnp structures resolve` | 🚧 v0.2 设计 | 结构注册、来源核验与转换历史 |
 | `rnp compounds annotate/select` | 🚧 v0.2 设计 | 性质标注与显式选择；保留全部候选 |

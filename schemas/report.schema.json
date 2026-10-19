@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/report.schema.json",
+  "title": "Report audit",
+  "description": "Which stage audits the report was built from, their hashes and statuses, and the hash of the rendered Markdown.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_by",
+    "stage_status",
+    "run_dir",
+    "config",
+    "stages",
+    "groups",
+    "warnings",
+    "report_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "generated_by": { "type": "string" },
+    "stage_status": { "enum": ["complete", "empty", "partial_override"] },
+    "run_dir": { "type": "string" },
+    "config": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "stages": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status", "audit", "audit_sha256", "manifest_sha256"],
+        "properties": {
+          "status": { "type": "string" },
+          "audit": { "type": "string" },
+          "audit_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "manifest_sha256": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "groups": { "type": "array", "items": { "type": "string" } },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    },
+    "report_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

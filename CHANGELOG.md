@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Report command — 2026-10-19
+
+- Added `rnp report`: renders Markdown from a run directory's audited stages after verifying the
+  recorded hashes (targets, compounds, edges, intersection, disease, universe) and the config
+  identity of every stage.
+- Missing stages are rendered as "not run"; partial stages are refused by default and only included
+  with `--allow-partial`, with the override recorded in the report and the manifest.
+- Added `report.schema.json` and `report_audit.json` (stage statuses, audit hashes, report SHA-256),
+  plus a per-report manifest chaining the stage audits.
+- The report contains only evidence-bound numbers: per-group intersection/network counts, exclusion
+  and mapping-conflict counts, enrichment mapping loss and top filtered terms, provenance and
+  explicit limitations. It does not claim mechanism, direction, or efficacy.
+- Added 9 report tests (ingest-only, full chain, enrichment, tampered hash, overwrite, partial
+  override, zero result, CLI) and added report rendering to the CI smoke test.
+
 ### Enrichment CLI — 2026-10-19
 
 - Added `rnp enrich`: per-group ORA through the R `clusterProfiler` bridge with an explicit

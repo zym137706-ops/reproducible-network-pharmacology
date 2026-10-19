@@ -12,9 +12,9 @@ and hashes, and every output can be regenerated from a single config file.
 > commands have implementations hardened on 2026-10-19: explicit compound↔export binding, quarantine
 > of unbound exports, separate parse-status taxonomy, upstream stage-state enforcement, stable
 > compound IDs, code/config identity separation, an offline synthetic demo with hand-computed
-> expectations, and the `rnp enrich` CLI with an explicit background and complete tested-term table.
-> The report command, Skill and the **public scientific case** are still pending. Test/release status
-> requires dated execution evidence. See the
+> expectations, and the `rnp enrich` + `rnp report` CLIs (explicit background, complete tested-term
+> table, hash-checked report rendering). The Skill and the **public scientific case** are still
+> pending. Test/release status requires dated execution evidence. See the
 > [maintained plan](docs/project-plan.zh-CN.md) and [next implementation slice](docs/next-steps-dsh.md).
 
 ---
@@ -78,13 +78,17 @@ uv run rnp network --config tests/fixtures/run/run.yaml \
 uv run rnp enrich --config tests/fixtures/run/run.yaml \
   --intersect results/quickstart/intersect
 
-# 5. verify provenance
+# 5. render a Markdown report from the verified stage audits
+uv run rnp report --config tests/fixtures/run/run.yaml \
+  --run-dir results/quickstart
+
+# 6. verify provenance
 uv run rnp manifest --run-dir results/quickstart --check-inputs
 
-# 4. offline synthetic demo: 5 scenarios with hand-computed expected tables
+# 7. offline synthetic demo: 5 scenarios with hand-computed expected tables
 uv run python scripts/synthetic_demo.py --out .demo
 
-# 5. tests
+# 8. tests
 uv run pytest -q
 ```
 
@@ -113,7 +117,7 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 | `rnp network` | ✅ v0.1 | Cytoscape node/edge/MOLlist tables + Venny data; optional R Venn plot (`--venn-plot`); valid empty network for zero hits |
 | `rnp enrich` | ✅ v0.1 | ORA via R `clusterProfiler` per group with an **explicit background**; complete tested-term table + significant view; distinct statuses for no-hit vs failure |
 | `rnp mcode` | 🚧 later extension | Module enrichment from Cytoscape MCODE exports; independent of hub ranking |
-| `rnp report` | 🚧 v0.1 | Markdown report from results + manifest |
+| `rnp report` | ✅ v0.1 | Markdown report from verified stage audits + tables; hash-checked; no claims beyond the evidence |
 | `rnp metabolites import` | 🚧 v0.2 | Import processed metabolomics annotations; confirmed compound lists also supported |
 | `rnp structures resolve` | 🚧 v0.2.0 | Resolve names / InChIKeys to structures (PubChem cache) |
 | `rnp compounds annotate/select` | 🚧 v0.2 design | Properties plus explicit inclusion/exclusion decisions; all original candidates retained |
@@ -194,7 +198,7 @@ instructions and an adapter; users obtain the data under their own license. See
 | Release | Scope | State |
 |---|---|---|
 | v0.0.1 | Scaffold: package, schemas, CLI, tests, CI, docs | ✅ done |
-| **v0.1** | Core hardening (binding/quarantine, stage status, identity, synthetic demo) ✅; `enrich` ✅; `report` · Skill · public case 🚧 | 🚧 current |
+| **v0.1** | Core hardening (binding/quarantine, stage status, identity, synthetic demo) ✅; `enrich` ✅; `report` ✅; Skill · public case 🚧 | 🚧 current |
 | v0.2 | Confirmed lists / metabolomics → structure registry → annotation → explicit selection | planned |
 | v0.3 | Minimal docking: reviewed pairs, preparation, controls, redocking and pose QC | planned |
 | Later | PPI topology/RRA, MCODE, predicted receptors and historical batch migration | independently scoped |

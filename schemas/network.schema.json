@@ -9,6 +9,7 @@
     "schema_version",
     "generated_by",
     "stage_status",
+    "config",
     "disease_label",
     "inputs",
     "parents",
@@ -18,6 +19,14 @@
     "schema_version": { "const": "1.1" },
     "generated_by": { "type": "string" },
     "stage_status": { "enum": ["complete", "empty", "partial_override"] },
+    "config": {
+      "type": "object",
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
     "disease_label": { "type": "string" },
     "inputs": {
       "type": "object",

@@ -61,6 +61,7 @@ The skill may not re-implement it in prose or in a snippet.
 | `rnp.analysis.intersect` | compound–target edges, disease intersection, exclusion audit, Venn data |
 | `rnp.analysis.network` | Cytoscape node/edge/MOLlist tables and their invariants |
 | `rnp.analysis.enrich` | explicit-background ORA via the R bridge; complete table + significant view |
+| `rnp.analysis.report` | Markdown rendering from hash-verified stage audits; no re-computation |
 | `rnp.analysis.parents` | parent-stage status/hash checks and refusal semantics |
 | `rnp.output` | staged, atomic output directories; no silent overwrite |
 | `rnp.resources` | packaged resource lookup (schemas/R scripts) in source tree and wheel |
@@ -80,7 +81,8 @@ The skill may not re-implement it in prose or in a snippet.
    explicit background; complete tested-term table, significant view, function-loss and R versions
    recorded. STRING/PPI import, topology and MCODE are optional downstream branches; PPI edges are
    not an input prerequisite for gene-set intersection.
-6. `rnp report` — planned; assembles Markdown (and optionally docx) from results + manifest.
+6. `rnp report --config run.yaml --run-dir results/<id>` — verifies stage audits/hashes and renders
+   Markdown; missing stages are "not run", partial stages need an explicit override.
 7. `rnp manifest --run-dir results/<id> --check-inputs` — verify nothing drifted.
 
 `run_id` = UTC timestamp + first 8 hex of the config SHA-256, e.g. `20261018T051500Z_6f037817`.
@@ -194,12 +196,14 @@ Closed:
 
 Still pending (do not claim released):
 
-- `rnp report` and the Skill layer;
+- the Skill layer and a public scientific case with verified data terms
+  ([checklist](public-case-checklist.md));
 - generated Python lock file and a recorded R/Bioconductor/annotation environment;
-- public scientific case with verified data terms ([checklist](public-case-checklist.md));
-- recorded CI results and a wheel-install smoke test in CI;
+- recorded CI results and a wheel-install smoke test in CI (workflow exists; execution evidence is
+  tracked in the changelog);
 - docking/upstream contracts (design only).
 
 Closed with enrichment: explicit background enforcement, complete tested-term tables, no-hit vs
 failure separation, per-group mapping loss, and an independent synthetic hypergeometric/BH
-benchmark ([acceptance evidence](enrich-acceptance.md)).
+benchmark ([acceptance evidence](enrich-acceptance.md)). Closed with report: hash-verified stage
+readings, "not run" handling, partial override, and evidence-bound wording.

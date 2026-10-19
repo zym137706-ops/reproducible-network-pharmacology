@@ -20,6 +20,7 @@ from .analysis.enrich import run_enrich
 from .analysis.ingest import run_ingest
 from .analysis.intersect import run_intersect
 from .analysis.network import run_network
+from .analysis.report import run_report
 from .config import RunConfig, load_config, validate_document
 from .errors import InputError, RnpError, exit_code_for
 from .provenance import sha256_file
@@ -142,6 +143,26 @@ def cmd_enrich(args: argparse.Namespace) -> int:
     return 0 if summary["stage_status"] in {"complete", "empty", "partial_override"} else 3
 
 
+def cmd_report(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    run_dir = Path(args.run_dir).resolve()
+    if not (run_dir / "stp_audit.json").is_file():
+        raise InputError(
+            f"not an rnp run directory (missing stp_audit.json): {run_dir}",
+            details=["pass the results/<run-id> directory produced by 'rnp ingest stp'"],
+        )
+    out_dir = Path(args.out).resolve() if args.out else run_dir / "report"
+    summary = run_report(
+        config,
+        run_dir,
+        out_dir,
+        allow_partial=args.allow_partial,
+        force=args.force,
+    )
+    _emit(summary)
+    return 0
+
+
 def cmd_manifest(args: argparse.Namespace) -> int:
     run_dir = Path(args.run_dir).resolve()
     manifest_path = run_dir / "run_manifest.json"
@@ -249,6 +270,19 @@ def build_parser() -> argparse.ArgumentParser:
     enrich.add_argument(
         "--rscript", default=None, help="path to Rscript (default: RNP_RSCRIPT or PATH)"
     )
+
+    report = sub.add_parser(
+        "report", help="render a Markdown report from audited stage artifacts"
+    )
+    report.add_argument("--config", required=True, help="path to run.yaml")
+    report.add_argument("--run-dir", required=True, help="results/<run-id> directory")
+    report.add_argument("--out", default=None, help="output directory")
+    report.add_argument(
+        "--allow-partial",
+        action="store_true",
+        help="render a report that includes explicitly partial stages",
+    )
+    report.add_argument("--force", action="store_true", help="replace an existing output dir")
     return parser
 
 
@@ -258,6 +292,7 @@ _DISPATCH = {
     ("intersect", None): cmd_intersect,
     ("network", None): cmd_network,
     ("enrich", None): cmd_enrich,
+    ("report", None): cmd_report,
     ("manifest", None): cmd_manifest,
 }
 

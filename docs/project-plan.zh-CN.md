@@ -10,9 +10,10 @@
 > stage_status 与父阶段哈希/配置身份校验、下游默认拒绝 partial、稳定 compound_id 注册表、
 > 代码/配置身份分离的 manifest v2、原子输出与防覆盖、零交集空网络、合成 demo（5 场景、手算预期）。
 > 同日接通 `rnp enrich`：显式背景强制、完整检验表 + 显著性子表、无命中/服务失败分离、映射损失与 R 版本记录，
-> 并有独立超几何/BH 数值基准。
-> 仍未实现：report、Skill 层、公开科学案例、CI 实测记录。验收项见 `docs/enrich-acceptance.md` 与
-> `docs/public-case-checklist.md`。
+> 并有独立超几何/BH 数值基准；并接通 `rnp report`：校验各阶段哈希后渲染 Markdown，缺失阶段明确写"未运行"，
+> partial 需显式 override 并记录。
+> 仍未实现：Skill 层、公开科学案例；CI 工作流与运行记录见 CHANGELOG。验收项见
+> `docs/enrich-acceptance.md` 与 `docs/public-case-checklist.md`。
 
 ## 1. 定位与当前状态
 

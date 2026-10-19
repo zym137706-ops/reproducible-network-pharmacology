@@ -248,6 +248,7 @@ def run_network(
             "schema_version": "1.1",
             "generated_by": "rnp network",
             "stage_status": stage_status,
+            "config": {"path": str(config.path), "sha256": config.sha256},
             "disease_label": label,
             "inputs": {
                 "intersect_dir": str(intersect_dir),

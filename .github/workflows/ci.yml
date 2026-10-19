@@ -40,6 +40,8 @@ jobs:
             --targets tests/fixtures/run/_out/ci-smoke/targets.tsv
           rnp network --config tests/fixtures/run/run.yaml \
             --intersect tests/fixtures/run/_out/ci-smoke/intersect
+          rnp report --config tests/fixtures/run/run.yaml \
+            --run-dir tests/fixtures/run/_out/ci-smoke
           rnp manifest --run-dir tests/fixtures/run/_out/ci-smoke --check-inputs
       - name: Offline synthetic demo
         run: python scripts/synthetic_demo.py --out .demo
@@ -102,4 +104,5 @@ jobs:
           pytest -q \
             tests/unit/test_ora_contract.py \
             tests/unit/test_enrich.py \
-            tests/unit/test_enrich_benchmark.py
+            tests/unit/test_enrich_benchmark.py \
+            tests/unit/test_report.py
