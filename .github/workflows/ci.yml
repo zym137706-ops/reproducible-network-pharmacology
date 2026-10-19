@@ -37,10 +37,10 @@ jobs:
           rnp validate --config tests/fixtures/run/run.yaml
           rnp ingest stp --config tests/fixtures/run/run.yaml --run-id ci-smoke
           rnp intersect --config tests/fixtures/run/run.yaml \
-            --targets results/ci-smoke/targets.tsv
+            --targets tests/fixtures/run/_out/ci-smoke/targets.tsv
           rnp network --config tests/fixtures/run/run.yaml \
-            --intersect results/ci-smoke/intersect
-          rnp manifest --run-dir results/ci-smoke --check-inputs
+            --intersect tests/fixtures/run/_out/ci-smoke/intersect
+          rnp manifest --run-dir tests/fixtures/run/_out/ci-smoke --check-inputs
       - name: Offline synthetic demo
         run: python scripts/synthetic_demo.py --out .demo
       - name: Build wheel and check packaged resources
@@ -72,6 +72,10 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
+      - name: Install system libraries for R packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglpk-dev libcurl4-openssl-dev libxml2-dev libssl-dev
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
