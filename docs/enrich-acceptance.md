@@ -52,4 +52,5 @@ override).
 - [x] synthetic hypergeometric/BH benchmark passes against an independent Python calculation;
       live GO contract test remains green.
 - [x] manifest/audit contain R/annotation versions, actual background counts and mapping loss.
-- [ ] CI execution on GitHub recorded (workflow step exists; needs a push).
+- [x] CI execution on GitHub recorded: [run 39247312505](https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/runs/39247312505)
+      — all four jobs green (Python 3.10/3.11/3.12 + R 4.5 enrichment bridge).

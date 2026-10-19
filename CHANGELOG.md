@@ -23,6 +23,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
   values independently in Python.
 - Updated README (quickstart, command table), architecture, enrichment acceptance notes and CI
   R job to include the new stage.
+- CI: [run 39247312505](https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/runs/39247312505)
+  completed green for all four jobs (Python 3.10/3.11/3.12 lint+tests+demo+wheel, R 4.5 bridge tests).
 
 ### Hardening — 2026-10-19 (v0.1 slice)
 

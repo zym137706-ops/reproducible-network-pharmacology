@@ -1,5 +1,7 @@
 # reproducible-network-pharmacology
 
+[![ci](https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/workflows/ci.yml)
+
 **Reproducible network-pharmacology workflows — as a command-line tool and an agent skill.**
 
 Turn a folder of prediction exports and a disease gene list into a **traceable, re-runnable**
