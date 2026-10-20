@@ -27,6 +27,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
   `49f0996` + dirty worktree) executed normal/missing/partial/tamper/zero: 5/5 passed, enrichment
   skipped due the Windows R `0xC0000005`, no pytest used. Full report:
   `docs/skill-agent-acceptance-2026-10-20.md`.
+- Linux CI run 39415883483: 4/4 jobs success; the R job called `scripts/restore_r.sh`, checked the
+  absolute `R_LIBS` path, verified a Python-launched `Rscript` saw that library, and ran the full
+  synthetic chain.
 
 ### v0.1 case freeze and Skill acceptance — 2026-10-20
 

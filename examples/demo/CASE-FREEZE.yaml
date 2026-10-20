@@ -180,7 +180,7 @@ blocked_reason:
 verification_environment:
   linux_ci:
     workflow: .github/workflows/ci.yml
-    run: https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/runs/39393951056
+    run: https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/runs/39415883483
     result: 4/4 jobs success; renv restore and full synthetic quickstart passed
     caveat: this verifies machinery, not the public scientific case
   windows:

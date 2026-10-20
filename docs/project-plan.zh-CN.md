@@ -18,7 +18,7 @@
 > 2026-10-20 继续加固：包装层对 R 非零退出码全部传播（含"meta 正常但进程异常"模拟回归）；
 > engine 实际前景/背景集合落盘并记录哈希/数量，新增"映射成功但无本体注释"状态；
 > 用隔离的 pak 干净 R 库复现并通过 25 个 R 相关测试，再由该库生成 `renv.lock`。
-> **Linux CI 已验证**：run 39393951056 的 4/4 jobs 通过，含 `renv.lock` 恢复与完整合成 quickstart。
+> **Linux CI 已验证**：run 39415883483 的 4/4 jobs 通过，含 `renv.lock` 恢复与完整合成 quickstart。
 > **Windows 尚未验证**：Codex 在 commit `0cf3584` 的隔离库复测为 119 passed / 11 failed，R 子进程
 > `0xC0000005`（3221225477）；保留非零退出保护，不通过忽略退出码消除失败，Windows 根因另行排查。
 > 公开案例冻结为 **BLOCKED**：已复用 8 个 PubChem CID、0.10/0.05 阈值、GO_BP/BH 等已记录决定；
