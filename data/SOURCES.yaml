@@ -16,6 +16,16 @@ hgnc:
   retrieved: null
   sha256: null
 
+pubchem:
+  name: PubChem compound structures
+  url: https://pubchem.ncbi.nlm.nih.gov/
+  license: "verify PubChem terms before redistribution; fetched structures stay in data/local"
+  redistribute: false
+  release: "retrieved 2026-10-20"
+  retrieved: "2026-10-20T11:22:04Z"
+  sha256: "5a679e787bea28649bdf29683872de80a29747167c1c3b66844422d2ad85c828"
+  note: "local derivation only; regenerate with scripts/fetch_pubchem_structures.py"
+
 go:
   name: Gene Ontology
   url: https://geneontology.org/docs/download-ontology/

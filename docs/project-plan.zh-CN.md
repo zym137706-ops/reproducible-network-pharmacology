@@ -21,10 +21,15 @@
 > **Linux CI 已验证**：run 39393951056 的 4/4 jobs 通过，含 `renv.lock` 恢复与完整合成 quickstart。
 > **Windows 尚未验证**：Codex 在 commit `0cf3584` 的隔离库复测为 119 passed / 11 failed，R 子进程
 > `0xC0000005`（3221225477）；保留非零退出保护，不通过忽略退出码消除失败，Windows 根因另行排查。
-> 公开案例冻结为 **BLOCKED**：已复用 8 个 PubChem CID、0.10/0.05 阈值、GO_BP/BH 等已记录决定，
-> 但疾病基因集、8 个手工 STP 导出、HGNC 快照及许可证据缺失，未编造来源、未自动提交 STP。
-> Skill 行为已用 CLI 场景覆盖 normal/missing/partial/tamper/zero，尚未完成真实 agent 会话验收。
-> 仍未完成：公开科学案例真实计算、Skill 的正式验证声明、Windows native exit 根因。
+> 公开案例冻结为 **BLOCKED**：已复用 8 个 PubChem CID、0.10/0.05 阈值、GO_BP/BH 等已记录决定；
+> 已补 `stp_file` 显式绑定、提交日志模板与交接清单，并在 `data/local/` 本地抓取 PubChem 结构
+> （8 行，哈希已记录，未入库）；疾病基因集、8 个手工 STP 导出、HGNC 快照、背景与许可证据仍缺，
+> 未编造来源、未自动提交 STP。
+> R 恢复入口已修复：PowerShell 每次 R 调用检查 `$LASTEXITCODE`，失败非零退出；默认/显式库均解析
+> 精确绝对路径；`restore_r.sh` 为可执行模式；CI 改为调用项目脚本并验证 Python 启动的 R 使用该库。
+> Skill 已完成一次真实 Agent 会话验收（DeepSeek Harness/`deepseek-flash`，5/5 场景通过，enrichment
+> 因 Windows native exit 跳过，未用 pytest 冒充）；报告见 `docs/skill-agent-acceptance-2026-10-20.md`。
+> 仍未完成：公开科学案例真实计算、Skill 在最终修订版上的复测、Windows native exit 根因。
 
 ## 1. 定位与当前状态
 

@@ -1,5 +1,5 @@
 project: demo-public-compounds
-description: Public-data end-to-end demo (week 2); inputs filled manually
+description: Public-data end-to-end case (inputs blocked); recorded decisions only
 species: Homo_sapiens
 inputs:
   compounds: inputs/compounds.tsv
@@ -19,6 +19,7 @@ enrichment:
   qvalue_cutoff: 0.2
   min_gssize: 10
   max_gssize: 500
+  universe_file: inputs/universe.txt
 network:
   disease_label: Demo disease
 references:

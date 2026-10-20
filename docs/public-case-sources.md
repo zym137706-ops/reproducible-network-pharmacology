@@ -26,6 +26,20 @@ URL is not by itself permission to redistribute.
 | Enrichment sets (excluded) | KEGG | — | KEGG is not redistributable in this repository; keep it user-provided | excluded |
 | Target prediction | SwissTargetPrediction export | one export per compound, submission log, species | Produced manually by the researcher; no automatic submission; check site terms before committing exports | manual gate |
 
+## Local data preparation (not committed)
+
+The recorded eight PubChem CIDs can be fetched reproducibly into the ignored local data directory:
+
+```bash
+uv run python scripts/fetch_pubchem_structures.py --out data/local/case
+```
+
+This writes `data/local/case/pubchem_structures.tsv` and a metadata file with the retrieval
+timestamp and SHA-256. The current local retrieval is `2026-10-20T11:22:04Z`, 8 rows, SHA-256
+`5a679e787bea28649bdf29683872de80a29747167c1c3b66844422d2ad85c828`. It is **not committed**:
+PubChem terms must be checked for the intended redistribution use. STP submission still requires
+the researcher's manual exports and submission log.
+
 ## Evidence that must be recorded for every input
 
 1. Landing-page URL and exact release/version.

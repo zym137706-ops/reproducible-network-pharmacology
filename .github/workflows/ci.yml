@@ -92,30 +92,43 @@ jobs:
         with:
           r-version: "4.5"
           use-public-rspm: true
-      - name: Restore R library from renv.lock
+      - name: Restore R library from renv.lock via project script
         run: |
-          install.packages("renv", repos = "https://cloud.r-project.org")
-          dir.create("rlib", showWarnings = FALSE)
-          renv::restore(
-            lockfile = "renv.lock",
-            library = "rlib",
-            prompt = FALSE,
-            clean = TRUE
-          )
-        shell: Rscript {0}
-      - name: Record restored R environment
-        run: |
-          Rscript -e 'cat(R.version.string, "\n"); cat(.libPaths(), sep = "\n"); suppressMessages(library(clusterProfiler)); cat("clusterProfiler", as.character(packageVersion("clusterProfiler")), "\n")'
-        env:
-          R_LIBS: ${{ github.workspace }}/rlib
+          set -o pipefail
+          bash scripts/restore_r.sh "$RUNNER_TEMP/rlib" | tee "$RUNNER_TEMP/r-restore.log"
+          LIB="$(sed -n 's/^R_LIBS=//p' "$RUNNER_TEMP/r-restore.log" | tail -n 1)"
+          test -n "$LIB"
+          case "$LIB" in /*) ;; *) echo "not an absolute library: $LIB"; exit 1 ;; esac
+          echo "R_LIBS=$LIB" >> "$GITHUB_ENV"
       - name: Install from lock file
         run: |
           uv venv --python 3.12
           uv sync --locked --extra dev
+      - name: Record restored R environment
+        run: |
+          Rscript -e 'cat(R.version.string, "\n"); cat(.libPaths(), sep = "\n"); suppressMessages(library(clusterProfiler)); cat("clusterProfiler", as.character(packageVersion("clusterProfiler")), "\n")'
+      - name: Verify Python-launched R uses the restored library
+        env:
+          RNP_RSCRIPT: Rscript
+        run: |
+          uv run python - <<'PY'
+          import os
+          import subprocess
+
+          completed = subprocess.run(
+              [os.environ["RNP_RSCRIPT"], "-e", "cat(.libPaths()[1])"],
+              capture_output=True,
+              text=True,
+              check=False,
+          )
+          assert completed.returncode == 0, completed.stderr
+          actual = completed.stdout.strip()
+          assert actual == os.environ["R_LIBS"], (actual, os.environ["R_LIBS"])
+          print("python-launched R library:", actual)
+          PY
       - name: Live bridge, enrichment and report tests
         env:
           RNP_RSCRIPT: Rscript
-          R_LIBS: ${{ github.workspace }}/rlib
         run: |
           uv run pytest -q \
             tests/unit/test_ora_contract.py \
@@ -129,7 +142,6 @@ jobs:
       - name: Full quickstart including enrichment
         env:
           RNP_RSCRIPT: Rscript
-          R_LIBS: ${{ github.workspace }}/rlib
         run: |
           uv run rnp ingest stp --config examples/quickstart/run.yaml --run-id quickstart-r
           uv run rnp intersect --config examples/quickstart/run.yaml \

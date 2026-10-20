@@ -1,0 +1,9 @@
+compound	pubchem_cid	stp_file	submitted_structure	structure_source	species	submitted_date	result_file	retrieved_date	operator	result_sha256	notes
+Quercetin	5280343	quercetin.csv									
+Kaempferol	5280863	kaempferol.csv									
+Luteolin	5280445	luteolin.csv									
+Apigenin	5280443	apigenin.csv									
+Naringenin	932	naringenin.csv									
+Catechin	9064	catechin.csv									
+Gallic acid	370	gallic-acid.csv									
+Chlorogenic acid	1794427	chlorogenic-acid.csv									

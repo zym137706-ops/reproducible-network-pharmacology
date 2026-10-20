@@ -103,8 +103,10 @@ root cause is fixed; keep the failures visible.
 ## GitHub Actions
 
 - `lint-test`: Ubuntu, Python 3.10/3.11/3.12, `uv sync --locked --extra dev`.
-- `r-contract`: Ubuntu, R 4.5; `renv::restore` from `renv.lock`; system libraries installed; restored
-  library exposed via `R_LIBS`; live bridge/enrichment/report tests plus the full quickstart.
+- `r-contract`: Ubuntu, R 4.5; **calls `bash scripts/restore_r.sh "$RUNNER_TEMP/rlib"`** from
+  `renv.lock`, exports the exact absolute path it prints as `R_LIBS`, verifies a Python-launched
+  `Rscript` sees that library, then runs live bridge/enrichment/report tests and the full quickstart.
+  The CI path is the same script documented for users, not a separate inline restore.
 
 CI records the observed R versions in `enrichment_meta.json` on every run; `renv.lock` is the
 declared version set.

@@ -14,7 +14,8 @@ and hashes, and every output can be regenerated from a single config file.
 > Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
 > guard is intentionally kept. The public case is **frozen but BLOCKED** on disease genes, manual STP
 > exports, HGNC snapshot and licence evidence; no public scientific result exists. The thin Skill
-> draft has CLI scenario tests, not a validated agent claim. See the
+> has a real-agent 5/5 scenario acceptance (enrichment skipped; report linked from
+> `docs/skill-acceptance.md`), not a general validation. See the
 > [maintained plan](docs/project-plan.zh-CN.md),
 > [case freeze](examples/demo/CASE-FREEZE.yaml),
 > [public-case sources](docs/public-case-sources.md) and
@@ -61,9 +62,12 @@ flowchart LR
 ## Quickstart
 
 ```bash
-# Python 3.10+ and R 4.3+ (R only needed for the enrichment step)
+# Python 3.10+ and R 4.5.x (R only needed for the enrichment step)
 uv sync --locked --extra dev
-Rscript -e 'renv::restore(lockfile="renv.lock", prompt=FALSE)'  # R lock
+
+# restore the R lock and use the exact absolute library it prints
+bash scripts/restore_r.sh
+export R_LIBS="<the R_LIBS path printed above>"
 
 # 1. check the quickstart config against the JSON Schema
 uv run rnp validate --config examples/quickstart/run.yaml

@@ -9,8 +9,8 @@
 > engine 实际前景/背景集合与哈希已加固。Python 用 `uv.lock`、R 用 `renv.lock` 锁定，Linux CI
 > （run 39393951056）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
 > exit `0xC0000005` 导致 11 个 R 相关测试失败，非零退出保护保留、不忽略。公开案例**已冻结但 BLOCKED**：
-> 缺疾病基因集、手工 STP 导出、HGNC 快照与许可证据，尚无公开科学结果。Skill 仅有薄草稿与 CLI 场景测试，
-> 尚未完成真实 agent 验收。
+> 缺疾病基因集、手工 STP 导出、HGNC 快照与许可证据，尚无公开科学结果。Skill 已完成一次真实 Agent
+> 5/5 场景验收（enrichment 因 Windows R 未执行；见 `docs/skill-acceptance.md`），不等同通用验证。
 > 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[案例冻结](examples/demo/CASE-FREEZE.yaml)；
 > [公开案例来源清单](docs/public-case-sources.md)；[环境记录](docs/environment.md)。
 
@@ -26,9 +26,12 @@
 ## 快速开始
 
 ```bash
-# 需要 Python 3.10+；富集功能另需 R 4.3+（clusterProfiler / org.Hs.eg.db）
+# 需要 Python 3.10+；富集功能另需 R 4.5.x（clusterProfiler / org.Hs.eg.db）
 uv sync --locked --extra dev
-Rscript -e 'renv::restore(lockfile="renv.lock", prompt=FALSE)'
+
+# 恢复 R 锁，并使用脚本打印的精确绝对库路径
+bash scripts/restore_r.sh
+export R_LIBS="<上一步打印的 R_LIBS 路径>"
 
 uv run rnp validate --config examples/quickstart/run.yaml
 uv run rnp ingest stp --config examples/quickstart/run.yaml --run-id quickstart

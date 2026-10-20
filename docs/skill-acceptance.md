@@ -1,18 +1,22 @@
 # Skill behavior acceptance
 
-Scope: the thin `skills/np-workflow/SKILL.md` layer, exercised through the **existing CLI only**.
-This is not a real-agent transcript and is not a claim that the Skill is validated generally.
+Scope: the thin `skills/np-workflow/SKILL.md` layer. Two layers exist:
+
+1. CLI scenario tests in `tests/skill/test_skill_scenarios.py` (deterministic pytest coverage).
+2. A **real-agent session** (2026-10-20) that followed the SKILL and executed the same five
+   scenarios through the CLI; report:
+   [`skill-agent-acceptance-2026-10-20.md`](skill-agent-acceptance-2026-10-20.md).
+
+The real session passed 5/5 scenarios (normal, missing, partial, tamper, zero) on
+DeepSeek Harness/`deepseek-flash`, Windows 11, commit `49f0996` plus a dirty worktree. Enrichment was
+intentionally skipped because Windows R exits `0xC0000005`; no enrichment result is claimed. This is
+one model/session and is not a general validation claim.
 
 ## Recorded decisions reused
 
-The scenario tests do not ask for new scientific decisions. They reuse the decisions recorded in
-`examples/demo/run.yaml` / `CASE-FREEZE.yaml`:
-
-- 8 PubChem-CID compounds, STP exports submitted manually;
-- `stp_probability: 0.10`, separate `0.05` sensitivity run;
-- GO BP, BH correction, explicit `enrichment.universe_file`;
-- disease source/date from the config; no invented disease term;
-- predictions are hypotheses, not validation.
+The scenarios reuse the decisions recorded in the supplied config / `examples/demo/CASE-FREEZE.yaml`
+without re-asking. Only missing, conflicting or scientifically changed decisions are questions. The
+8 compounds/CTD/0.10 thresholds are **case configuration**, not generic Skill defaults.
 
 ## Scenario matrix
 
@@ -29,6 +33,10 @@ Executable evidence: `tests/skill/test_skill_scenarios.py` (all pass in the norm
 
 ## Explicit non-claims
 
-- The Skill draft is not validated against a live agent/model run; the table above is CLI behavior.
+- The real session verifies the five scenarios for one model/run; it does not prove every agent will
+  behave the same, and enrichment was not exercised.
 - No public scientific case exists yet; `examples/demo/CASE-FREEZE.yaml` is `blocked`.
-- Windows R native exit `0xC0000005` is unresolved; Linux CI is the verified environment.
+- Windows R native exit `0xC0000005` is unresolved; Linux CI is the verified case environment.
+- The current SKILL.md was edited after/around the session (decision-reuse wording and environment
+  entry); the CLI behavior scenarios are unchanged, but a fresh session against the exact final
+  revision is still a reasonable follow-up.

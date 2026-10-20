@@ -1,9 +1,9 @@
-name	pubchem_cid	smiles	source
-Quercetin	5280343		PubChem
-Kaempferol	5280863		PubChem
-Luteolin	5280445		PubChem
-Apigenin	5280443		PubChem
-Naringenin	932		PubChem
-Catechin	9064		PubChem
-Gallic acid	370		PubChem
-Chlorogenic acid	1794427		PubChem
+name	pubchem_cid	smiles	stp_file	submission_id	source
+Quercetin	5280343		quercetin.csv	STP-quercetin	PubChem
+Kaempferol	5280863		kaempferol.csv	STP-kaempferol	PubChem
+Luteolin	5280445		luteolin.csv	STP-luteolin	PubChem
+Apigenin	5280443		apigenin.csv	STP-apigenin	PubChem
+Naringenin	932		naringenin.csv	STP-naringenin	PubChem
+Catechin	9064		catechin.csv	STP-catechin	PubChem
+Gallic acid	370		gallic-acid.csv	STP-gallic-acid	PubChem
+Chlorogenic acid	1794427		chlorogenic-acid.csv	STP-chlorogenic-acid	PubChem

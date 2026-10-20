@@ -5,6 +5,29 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### v0.1 restore entry, case handoff and real-agent Skill acceptance — 2026-10-20
+
+- Fixed `scripts/restore_r.ps1`: every Rscript call now checks `$LASTEXITCODE`; bootstrap or restore
+  failure stops with a non-zero status and no success hint. Both entry points resolve the **actual
+  absolute library path** (explicit path absolutized; default path resolved by renv, never guessed)
+  and print the exact `R_LIBS`/`RNP_RSCRIPT` to use.
+- `scripts/restore_r.sh` is now executable in Git (100755); CI calls the project restore script
+  instead of an inline `renv::restore`, checks the printed absolute path, and verifies that a
+  Python-launched `Rscript` sees the restored library through `R_LIBS`.
+- Added restore-script regressions for bootstrap failure, restore failure, explicit path and
+  default path, using temporary substitute processes (no real R download).
+- Case preparation: compounds now carry explicit `stp_file`/`submission_id` bindings; added the
+  `SUBMISSION-LOG.tsv` template, a compact `HANDOFF.md`, and a reproducible local PubChem fetch
+  script. The PubChem structures were fetched locally (8 rows, SHA-256 recorded) into the ignored
+  `data/local/` only; disease/HGNC/universe/STP inputs and licence evidence remain missing. The
+  case stays `blocked`; no source, date, structure or STP export was fabricated.
+- Skill: instructions now reuse recorded/applicable decisions and ask only for missing, conflicting
+  or changed decisions; the 8 compounds/CTD/0.10 thresholds are explicitly case configuration, not
+  generic defaults. A **real-agent session** (DeepSeek Harness/`deepseek-flash`, Windows, commit
+  `49f0996` + dirty worktree) executed normal/missing/partial/tamper/zero: 5/5 passed, enrichment
+  skipped due the Windows R `0xC0000005`, no pytest used. Full report:
+  `docs/skill-agent-acceptance-2026-10-20.md`.
+
 ### v0.1 case freeze and Skill acceptance — 2026-10-20
 
 - Environment status corrected: Linux CI (run 39393951056) restores `renv.lock` and passes the full
