@@ -5,6 +5,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### v0.1 case data preparation fixes — 2026-10-20
+
+- Fixed `scripts/fetch_pubchem_structures.py`: the current PUG REST endpoint returns `SMILES`
+  (stereochemistry included where defined) and `ConnectivitySMILES` (connectivity only), not the old
+  `CanonicalSMILES`/`IsomericSMILES` names. The parser now checks the returned CID, requires both
+  structure fields non-empty, records field meanings/raw-response hashes/retrieval time, writes
+  atomically, and fails instead of producing an empty-structure success table.
+- Re-fetched the 8 local structures; new local table SHA-256
+  `c43811542fe1ef1856c8e9aefd2c1805e400d0c87d6093117565c04e9ebc6d02`, 8/8 non-empty SMILES.
+  Local-only (`data/local/`), not committed.
+- Moved the STP submission log out of the export scan directory:
+  `examples/demo/inputs/STP-SUBMISSION-LOG.tsv` (was inside `inputs/stp/`, where ingest would
+  quarantine it as an unbound export). Updated the template references, HANDOFF, freeze and tests;
+  the unbound-export isolation rule is unchanged.
+- Corrected the Skill zero-result guidance: only intersection/network are zero; raw target, disease
+  gene, linkage and mapping-loss counts keep their audited values.
+- Added PubChem field/CID/empty-response regressions and a local metadata-vs-freeze consistency test.
+
 ### v0.1 restore entry, case handoff and real-agent Skill acceptance — 2026-10-20
 
 - Fixed `scripts/restore_r.ps1`: every Rscript call now checks `$LASTEXITCODE`; bootstrap or restore

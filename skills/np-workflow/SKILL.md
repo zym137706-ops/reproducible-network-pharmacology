@@ -87,8 +87,10 @@ uv run rnp manifest --run-dir results/<run-id> --check-inputs
   chooses `--allow-partial`. If used, show the override and keep it recorded; never hide it.
 - **Tampered artifact**: `rnp report` exits 2 because a recorded hash no longer matches. Do not edit
   the report or weaken the hash check; identify the changed file and re-run the affected stage.
-- **Zero result**: an empty intersection/network is a valid `empty` result, not an error; report all
-  counts as zero and do not invent edges or terms.
+- **Zero result**: an empty intersection/network is a valid `empty` result, not an error. Report the
+  real audited counts: the intersection and network are zero, but raw target, disease-gene,
+  compound-linkage and mapping-loss counts keep their actual values (do not zero them), and no edges
+  or enrichment terms may be invented.
 - **R process failure**: any non-zero R exit is a failure even if `enrichment_meta.json` looks
   normal; surface the exit code and stderr.
 

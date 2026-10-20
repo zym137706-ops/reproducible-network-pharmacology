@@ -28,7 +28,7 @@ Executable evidence: `tests/skill/test_skill_scenarios.py` (all pass in the norm
 | missing file | `rnp validate` with a nonexistent disease file | exit 2; missing path named; no output directory |
 | partial upstream | ingest with one of two exports missing → intersect without/with `--allow-partial` | ingest exit 3, audit `partial`; intersect exit 2 and no output; with override exit 0 and `partial_override`; report refuses without `--allow-partial` |
 | tamper | append to `targets.tsv` after ingest → `rnp report` | exit 2; error names `targets.tsv` / changed upstream; no report directory |
-| zero result | disease gene absent from targets → ingest/intersect/network/report | exit 0; report audit `stage_status: empty`; zero intersection shown, no invented edges/terms |
+| zero result | disease gene absent from targets → ingest/intersect/network/report | exit 0; report audit `stage_status: empty`; zero intersection/network, but raw target/disease counts retain audit values; no invented edges/terms |
 | R process failure | simulated rc=1/137 with normal-looking meta | wrapper rejects with exit 3; no staged output (`tests/unit/test_enrich_wrapper.py`) |
 
 ## Explicit non-claims

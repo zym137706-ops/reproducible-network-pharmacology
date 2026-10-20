@@ -39,6 +39,14 @@ def test_skill_keeps_validation_boundary() -> None:
     assert "do not" in text
 
 
+def test_skill_zero_result_keeps_raw_counts() -> None:
+    text = re.sub(r"\s+", " ", SKILL.read_text(encoding="utf-8"))
+    assert "empty intersection/network" in text
+    assert "do not zero them" in text
+    assert "raw target, disease-gene" in text
+    assert "no edges or enrichment terms may be invented" in text
+
+
 def test_skill_reuses_recorded_scientific_decisions() -> None:
     text = re.sub(r"\s+", " ", SKILL.read_text(encoding="utf-8"))
     assert "Recorded decisions: reuse" in text

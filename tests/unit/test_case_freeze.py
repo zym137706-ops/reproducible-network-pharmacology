@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
+import pytest
 import yaml
 
 from rnp.io.tables import read_table
@@ -66,6 +68,30 @@ def test_freeze_matches_run_yaml_and_binding_files() -> None:
         entry["pubchem_cid"] for entry in decisions["compound_list"]["compounds"]
     }
 
-    log = read_table(DEMO / "inputs" / "stp" / "SUBMISSION-LOG.tsv")
+    log = read_table(DEMO / "inputs" / "STP-SUBMISSION-LOG.tsv")
     assert len(log) == 8
     assert {row["stp_file"] for row in log} == set(freeze["stp_exports"]["expected_files"])
+    # The log must not sit in the export scan directory; otherwise ingest treats it as an
+    # unbound export and quarantines it.
+    stp_files = {path.suffix.lower() for path in (DEMO / "inputs" / "stp").iterdir()}
+    assert ".tsv" not in stp_files and ".csv" not in stp_files
+
+
+def test_local_pubchem_metadata_matches_freeze_and_is_nonempty() -> None:
+    metadata_path = ROOT / "data" / "local" / "case" / "metadata.json"
+    if not metadata_path.is_file():
+        pytest.skip("local PubChem fetch not present (expected in CI)")
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    freeze = yaml.safe_load(FREEZE.read_text(encoding="utf-8"))
+    source = freeze["data_sources"]["pubchem"]
+    files = metadata["files"]
+    table = next(iter(files.values()))
+    assert table["row_count"] == 8
+    assert table["sha256"] == source["sha256"]
+    assert metadata["retrieved_utc"] == source["retrieved"]
+    assert metadata["requested_fields"] == ["SMILES", "ConnectivitySMILES"]
+    rows = read_table(ROOT / "data" / "local" / "case" / "pubchem_structures.tsv")
+    assert len(rows) == 8
+    assert all(row["smiles"].strip() for row in rows)
+    assert all(row["connectivity_smiles"].strip() for row in rows)
+    assert all(row["pubchem_cid"].strip() for row in rows)

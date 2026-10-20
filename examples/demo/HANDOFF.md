@@ -5,15 +5,15 @@ The case is **blocked**. These are the only remaining human inputs; do not fabri
 | # | What | Where | Format | Acceptance check | Blocked step |
 |---|---|---|---|---|---|
 | 1 | Exact CTD disease term, query, release, retrieval date, inclusion/exclusion rules and licence evidence | `examples/demo/CASE-FREEZE.yaml` → `disease:`; save genes as `examples/demo/inputs/disease_genes.txt` | one HGNC symbol per line, UTF-8; metadata in freeze fields | `rnp validate` accepts the file; row count and SHA-256 match the freeze; licence is recorded for this release | `validate` (disease input), so everything downstream |
-| 2 | Eight manual SwissTargetPrediction exports | `examples/demo/inputs/stp/quercetin.csv` … `chlorogenic-acid.csv` (names fixed in `compounds.tsv`) | native CSV/XLSX export per compound; one file per `stp_file` | `rnp ingest stp` binds all 8 to the explicit `stp_file`; no quarantine/missing; log `SUBMISSION-LOG.tsv` completed with structure/species/date/hash | `ingest stp` → `targets.tsv` |
-| 3 | Per-compound submission record | `examples/demo/inputs/stp/SUBMISSION-LOG.tsv` | TSV template; fill every column, including submitted SMILES/InChI, species, date, result file, SHA-256 | no blank required fields; structure/species/date consistent with the actual STP job | `ingest` cannot be called a traceable STP submission |
+| 2 | Eight manual SwissTargetPrediction exports | `examples/demo/inputs/stp/quercetin.csv` … `chlorogenic-acid.csv` (names fixed in `compounds.tsv`) | native CSV/XLSX export per compound; one file per `stp_file` | `rnp ingest stp` binds all 8 to the explicit `stp_file`; no quarantine/missing; log `STP-SUBMISSION-LOG.tsv` completed with structure/species/date/hash | `ingest stp` → `targets.tsv` |
+| 3 | Per-compound submission record | `examples/demo/inputs/STP-SUBMISSION-LOG.tsv` | TSV template; fill every column, including submitted SMILES/InChI, species, date, result file, SHA-256 | no blank required fields; structure/species/date consistent with the actual STP job | `ingest` cannot be called a traceable STP submission |
 | 4 | HGNC complete-set snapshot | `examples/demo/inputs/hgnc_map.tsv` | TSV compatible with the existing `hgnc_map` format (symbol/alias/UniProt columns) | `rnp validate` accepts it; release/date/hash/licence recorded in freeze | `intersect` |
 | 5 | Explicit enrichment background | `examples/demo/inputs/universe.txt` | one gene symbol/Entrez per line, UTF-8 | `rnp enrich` accepts it; source/selection basis/hash recorded; never the annotated genome | `enrich` |
 | 6 | Case licence/source evidence | `examples/demo/CASE-FREEZE.yaml` → `data_sources:` | fields already present; replace nulls with actual URL/release/date/hash/licence | no fabricated values; restricted sources not committed | acceptance as a public case |
 
 ## Submission log template
 
-Use [`inputs/stp/SUBMISSION-LOG.tsv`](inputs/stp/SUBMISSION-LOG.tsv). The eight rows and
+Use [`inputs/STP-SUBMISSION-LOG.tsv`](inputs/STP-SUBMISSION-LOG.tsv). The eight rows and
 `stp_file` names are prefilled; fill the blank columns:
 
 ```text

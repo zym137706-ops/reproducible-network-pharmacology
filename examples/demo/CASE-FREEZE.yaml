@@ -59,7 +59,7 @@ stp_exports:
   directory: inputs/stp
   count: 8
   binding_file: inputs/compounds.tsv
-  submission_log_template: inputs/stp/SUBMISSION-LOG.tsv
+  submission_log_template: inputs/STP-SUBMISSION-LOG.tsv
   expected_files:
     - quercetin.csv
     - kaempferol.csv
@@ -93,11 +93,17 @@ data_sources:
   pubchem:
     used_for: compound identity / structure source
     url: https://pubchem.ncbi.nlm.nih.gov/
-    retrieved: "2026-10-20T11:22:04Z"
+    retrieved: "2026-10-20T12:40:37Z"
     release_or_date: "retrieved 2026-10-20"
-    sha256: "5a679e787bea28649bdf29683872de80a29747167c1c3b66844422d2ad85c828"
+    sha256: "c43811542fe1ef1856c8e9aefd2c1805e400d0c87d6093117565c04e9ebc6d02"
     row_count: 8
+    structure_fields: ["SMILES", "ConnectivitySMILES"]
+    field_meanings:
+      SMILES: "includes stereochemistry where the PubChem record defines it"
+      ConnectivitySMILES: "connectivity only; no stereochemistry"
     local_path: data/local/case/pubchem_structures.tsv
+    metadata_path: data/local/case/metadata.json
+    raw_responses_recorded: true
     license_status: >-
       fetched locally by scripts/fetch_pubchem_structures.py; local use only until PubChem
       terms for redistribution are checked, so the structure table is not committed
