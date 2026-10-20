@@ -107,6 +107,8 @@ def test_synthetic_hypergeom_and_bh_match_independent_calculation(tmp_path: Path
     assert meta["gene_sets"] == "SYNTHETIC"
     assert meta["universe"]["source"] == "explicit"
     assert meta["universe"]["statistical"] == len(universe)
+    assert meta["effective"]["foreground"] == len(genes)
+    assert meta["effective"]["background"] == len(universe)
     for row in rows:
         denominator = int(row["BgRatio"].split("/")[1])
         assert denominator == meta["universe"]["statistical"], row["ID"]
@@ -168,3 +170,21 @@ def test_partial_background_mapping_records_statistical_background(tmp_path: Pat
     assert meta["universe"]["mapped"] == 1
     assert meta["universe"]["unmapped"] == 1
     assert meta["universe"]["statistical"] == 1
+
+
+@pytest.mark.skipif(RSCRIPT is None, reason="Rscript not available")
+def test_mapping_succeeds_but_selected_ontology_has_no_annotation(tmp_path: Path) -> None:
+    # XIST/H19 map to Entrez but have no GO BP annotation in org.Hs.eg.db.
+    code, stderr, meta = _run_ora_request(
+        tmp_path,
+        genes=["XIST", "H19"],
+        universe=["XIST", "H19", "TNF"],
+    )
+    assert code == 0, stderr
+    assert meta["status"] == "no_ontology_annotation"
+    assert meta["counts"]["mapped"] == 2
+    assert meta["effective"]["foreground"] == 0
+    foreground = (tmp_path / "out" / "effective_foreground.tsv").read_text(encoding="utf-8")
+    assert foreground.strip() == "entrez_id"
+    assert (tmp_path / "out" / "effective_background.tsv").is_file()
+    assert (tmp_path / "out" / "enrichment_result.tsv").is_file()

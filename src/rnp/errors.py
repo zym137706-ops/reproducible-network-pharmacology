@@ -47,6 +47,16 @@ class PartialResult(RnpError):
     exit_code = 3
 
 
+class ExternalToolError(RnpError):
+    """An external process (Rscript) failed or did not exit cleanly.
+
+    A non-zero process status is authoritative even when its output files look
+    normal, so this is never downgraded to a successful enrichment.
+    """
+
+    exit_code = 3
+
+
 class SchemaViolation(RnpError):
     """An output artifact does not satisfy its schema (an internal consistency bug)."""
 

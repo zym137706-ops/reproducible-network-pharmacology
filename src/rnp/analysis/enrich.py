@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from ..config import RunConfig, validate_document
-from ..errors import InputError
+from ..errors import ExternalToolError, InputError
 from ..io.tables import clean_text, read_table, write_table
 from ..output import staged_output
 from ..provenance import build_manifest, sha256_file, utc_now_iso, write_json
@@ -44,6 +44,69 @@ SERVICE_STATUSES = {"kegg_unavailable", "analysis_failed"}
 
 def _resolve_rscript(override: str | None) -> str | None:
     return override or os.environ.get("RNP_RSCRIPT") or shutil.which("Rscript")
+
+
+def _invoke_ora(
+    rscript_path: str,
+    ora_script: Path,
+    request_path: Path,
+    group_dir: Path,
+    *,
+    group: str,
+) -> subprocess.CompletedProcess[str]:
+    """Run the R bridge and make the process status authoritative.
+
+    The R script may have written a normal-looking ``enrichment_meta.json`` and
+    result table before dying (native crash, kill, wrapper failure). A non-zero
+    status is therefore propagated as a failure regardless of those files.
+    """
+    try:
+        completed = subprocess.run(
+            [rscript_path, str(ora_script), str(request_path), str(group_dir)],
+            capture_output=True,
+            text=True,
+            timeout=1800,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise ExternalToolError(
+            f"R enrichment timed out for group {group!r}",
+            details=["the staged output directory was discarded", "rerun after checking R"],
+        ) from exc
+    except OSError as exc:
+        raise ExternalToolError(
+            f"could not start Rscript for group {group!r}: {exc}",
+            details=[f"Rscript: {rscript_path}"],
+        ) from exc
+
+    meta_path = group_dir / "enrichment_meta.json"
+    meta_status: str | None = None
+    if meta_path.is_file():
+        try:
+            meta_status = json.loads(meta_path.read_text(encoding="utf-8")).get("status")
+        except (OSError, json.JSONDecodeError):
+            meta_status = "<unreadable meta>"
+
+    if completed.returncode != 0:
+        details = [
+            f"R exit code: {completed.returncode}",
+            f"R meta status: {meta_status or '<no meta written>'}",
+            completed.stderr.strip()[-800:] or "no stderr",
+        ]
+        if completed.returncode == 2:
+            raise InputError(
+                f"enrichment input/background error for group {group!r}",
+                details=details,
+            )
+        raise ExternalToolError(
+            f"R enrichment process failed for group {group!r}",
+            details=details,
+        )
+    if meta_status is None:
+        raise ExternalToolError(
+            f"R exited 0 but wrote no enrichment_meta.json for group {group!r}",
+            details=[completed.stderr.strip()[-800:] or "no stderr"],
+        )
+    return completed
 
 
 def _read_gene_list(path: Path) -> list[str]:
@@ -268,24 +331,15 @@ def run_enrich(
             }
             request_path = group_dir / "request.json"
             write_json(request_path, request)
-            completed = subprocess.run(
-                [rscript_path, str(ora_script), str(request_path), str(group_dir)],
-                capture_output=True,
-                text=True,
-                timeout=1800,
+            completed = _invoke_ora(
+                rscript_path,
+                ora_script,
+                request_path,
+                group_dir,
+                group=group,
             )
             result_path = group_dir / "enrichment_result.tsv"
             meta_path = group_dir / "enrichment_meta.json"
-            if completed.returncode == 2:
-                raise InputError(
-                    f"enrichment input/background error for group {group!r}",
-                    details=[completed.stderr.strip()[-800:] or "R reported an input error"],
-                )
-            if not meta_path.is_file():
-                raise InputError(
-                    f"R did not write enrichment_meta.json for group {group!r}",
-                    details=[completed.stderr.strip()[-800:]],
-                )
             meta = json.loads(meta_path.read_text(encoding="utf-8"))
             status = meta.get("status", "analysis_failed")
             if universe_summary["mapped"] is None:
@@ -325,6 +379,8 @@ def run_enrich(
                 group_status = "ok" if significant else "completed_no_significant_terms"
             elif status == "no_mapped_genes":
                 group_status = "no_mapped_foreground"
+            elif status == "no_ontology_annotation":
+                group_status = "no_ontology_annotation"
             elif status in SERVICE_STATUSES:
                 group_status = "service_unavailable"
                 service_failure = True
@@ -344,11 +400,22 @@ def run_enrich(
                     }
                 )
             counts = meta.get("counts") or {}
+            effective = meta.get("effective") or {}
+            foreground_set = group_dir / "effective_foreground.tsv"
+            background_set = group_dir / "effective_background.tsv"
             group_audits[group] = {
                 "status": group_status,
                 "foreground_input": len(genes),
                 "foreground_mapped": counts.get("mapped"),
                 "foreground_unmapped": counts.get("unmapped"),
+                "effective_foreground": effective.get("foreground"),
+                "effective_background": effective.get("background"),
+                "effective_foreground_sha256": sha256_file(foreground_set)
+                if foreground_set.is_file()
+                else None,
+                "effective_background_sha256": sha256_file(background_set)
+                if background_set.is_file()
+                else None,
                 "terms_tested": len(result_rows),
                 "significant": len(significant),
                 "result_sha256": sha256_file(result_path) if result_path.is_file() else None,

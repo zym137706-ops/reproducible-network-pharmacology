@@ -196,18 +196,22 @@ Closed:
 
 Still pending (do not claim released):
 
-- the Skill layer and a public scientific case with verified data terms
-  ([checklist](public-case-checklist.md));
-- an R-side lock (renv/container) for byte-level enrichment reproducibility; Python is locked by
-  `uv.lock`, observed R versions are recorded in [environment.md](environment.md);
+- a validated Skill layer and a public scientific case with verified data terms
+  ([checklist](public-case-checklist.md), [candidate sources](public-case-sources.md)); the thin
+  `skills/np-workflow/SKILL.md` draft is not claimed validated;
+- recorded CI evidence that `renv.lock` restores on a clean runner (the lock exists and was
+  generated from a separately verified clean library);
 - docking/upstream contracts (design only).
 
 Closed with enrichment: explicit background enforcement, mapped-vs-statistical background
-recording, complete tested-term tables, no-hit vs failure separation, mapping loss, and an
-independent synthetic hypergeometric/BH benchmark ([acceptance evidence](enrich-acceptance.md)).
+recording, **engine-effective foreground/background sets with hashes and counts**, a distinct
+`no_ontology_annotation` outcome, complete tested-term tables, no-hit vs failure separation,
+mapping loss, and an independent synthetic hypergeometric/BH benchmark
+([acceptance evidence](enrich-acceptance.md)).
 Closed with report: hash-verified stage readings **and parent links**, hash-verified side artifacts
 it actually reads (exclusions/conflicts/Venn/enrichment views), artifact list in the audit, "not
 run" handling, partial override, and evidence-bound wording.
 Closed with release hardening: explicit compound IDs are reserved before automatic allocation,
-persisted, and conflicting IDs are refused; CI installs from `uv.lock`, and README/CI share one
-quickstart config (`examples/quickstart/run.yaml`).
+persisted, and conflicting IDs are refused; **every non-zero R process status is propagated** (a
+normal-looking meta cannot turn a crash/kill into success); CI installs Python from `uv.lock`, R
+from `renv.lock`, and README/CI share one quickstart config (`examples/quickstart/run.yaml`).

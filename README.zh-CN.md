@@ -5,10 +5,11 @@
 输入：化合物清单 + SwissTargetPrediction 导出 + 疾病基因集。
 输出：可追溯的交集表、Cytoscape 网络表、富集结果、报告，以及一份记录输入哈希、参考库版本、参数与工具版本的运行清单。
 
-> 当前状态：**未发布的 v0.1 开发中**（包版本 0.0.1）。2026-10-19 已加固导入/交集/网络，并接通 `rnp enrich`
-> （显式背景、完整检验表、状态分离）、`rnp report`（哈希校验的报告渲染）与离线合成 demo；Skill 与公开科学案例仍待接通。
-> 测试状态以实际执行记录为准。
-> 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[下一步任务](docs/next-steps-dsh.md)。
+> 当前状态：**未发布的 v0.1 开发中**（包版本 0.0.1）。导入/交集/网络/富集/报告已接通；2026-10-20 加固了
+> 包装层非零退出码传播、engine 实际前景/背景集合与哈希、以及干净 R 库验证；Python 用 `uv.lock`、
+> R 用 `renv.lock` 锁定。Skill 仅有薄草稿，公开科学案例尚未完成；测试状态以实际执行记录为准。
+> 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[公开案例来源清单](docs/public-case-sources.md)；
+> [环境记录](docs/environment.md)。
 
 ## 为什么做这个
 
@@ -16,7 +17,7 @@
 
 - **确定性内核**：解析、基因编号归一化、交集、网络表、富集全部由代码完成，可单独重跑。
 - **默认溯源**：每次运行产出 `run_manifest.json`（工具版本、git commit、输入哈希、参考库版本、参数、时间）。
-- **显式失败**：已知数据陷阱直接报错并给出修复建议，不静默跳过。
+- **显式失败**：已知数据陷阱直接报错并给出修复建议，不静默跳过；R 进程非零退出即使留下正常 meta 也视为失败。
 - **Agent 只在外层**：CLI 是唯一事实来源，SKILL.md 只负责编排、提问与解释。**不用任何 Agent 也能跑**。
 
 ## 快速开始
@@ -24,6 +25,7 @@
 ```bash
 # 需要 Python 3.10+；富集功能另需 R 4.3+（clusterProfiler / org.Hs.eg.db）
 uv sync --locked --extra dev
+Rscript -e 'renv::restore(lockfile="renv.lock", prompt=FALSE)'
 
 uv run rnp validate --config examples/quickstart/run.yaml
 uv run rnp ingest stp --config examples/quickstart/run.yaml --run-id quickstart
@@ -36,7 +38,7 @@ uv run python scripts/synthetic_demo.py --out .demo
 uv run pytest -q
 ```
 
-自包含的 fixture 用于快速开始与测试。公开数据 demo（`examples/demo/`）排在第 2 周；其 STP 导出需手工提交，原因见 [examples/demo/inputs/README.md](examples/demo/inputs/README.md)。
+自包含的 fixture 用于快速开始与测试。公开数据案例**尚未完成**；`examples/demo/` 只是目标契约，数据来源/许可候选见 [docs/public-case-sources.md](docs/public-case-sources.md)。
 
 Windows 注意：确认 `python` 指向 Python 3。装了分子模拟工具的工作站常见 `python` 命中 MGLTools 的 Python 2.7，请用 `py -3.12` 或 `uv run`。
 

@@ -8,14 +8,16 @@ Turn a folder of prediction exports and a disease gene list into a **traceable, 
 compound–target–disease analysis. Every run records its inputs, reference-data versions, parameters
 and hashes, and every output can be regenerated from a single config file.
 
-> Status: **unreleased v0.1 development** (package version 0.0.1). Ingest, intersection and network
-> commands have implementations hardened on 2026-10-19: explicit compound↔export binding, quarantine
-> of unbound exports, separate parse-status taxonomy, upstream stage-state enforcement, stable
-> compound IDs, code/config identity separation, an offline synthetic demo with hand-computed
-> expectations, and the `rnp enrich` + `rnp report` CLIs (explicit background, complete tested-term
-> table, hash-checked report rendering). The Skill and the **public scientific case** are still
-> pending. Test/release status requires dated execution evidence. See the
-> [maintained plan](docs/project-plan.zh-CN.md) and [next implementation slice](docs/next-steps-dsh.md).
+> Status: **unreleased v0.1 development** (package version 0.0.1). Ingest, intersection, network,
+> enrichment and report implementations are hardened: explicit compound↔export binding, stage-state
+> enforcement, stable IDs, wrapper-layer propagation of every non-zero R status, engine-effective
+> gene sets with hashes, and hash-checked report rendering. Python is locked by `uv.lock`; R is
+> locked by `renv.lock` (generated from a clean, separately verified library). A thin CLI-only Skill
+> draft exists but is **not validated**; the **public scientific case** is still pending. Test and
+> release status require dated execution evidence. See the
+> [maintained plan](docs/project-plan.zh-CN.md),
+> [public-case sources](docs/public-case-sources.md) and
+> [environment record](docs/environment.md).
 
 ---
 
@@ -60,6 +62,7 @@ flowchart LR
 ```bash
 # Python 3.10+ and R 4.3+ (R only needed for the enrichment step)
 uv sync --locked --extra dev
+Rscript -e 'renv::restore(lockfile="renv.lock", prompt=FALSE)'  # R lock
 
 # 1. check the quickstart config against the JSON Schema
 uv run rnp validate --config examples/quickstart/run.yaml
@@ -175,15 +178,17 @@ Implemented in this slice:
 7. `rnp report` re-verifies every artifact it reads (targets, compounds, edges, intersection,
    disease, exclusions, conflicts, Venn data, enrichment views, universe) and the parent-stage audit
    hashes before rendering; missing stages are "not run" and partial stages need an override.
-8. Python dependencies are locked (`uv.lock`, `uv sync --locked`); CI installs from that lock file.
+8. Python dependencies are locked (`uv.lock`, `uv sync --locked`); R dependencies are locked by
+   `renv.lock` and CI restores that lock (observed versions are also recorded per run).
+9. A non-zero R process status is never masked by a plausible meta file; engine-effective
+   foreground/background sets are written with hashes and counts.
 
 Still required before calling v0.1 released:
 
-- a public scientific case (checklist in [docs/public-case-checklist.md](docs/public-case-checklist.md));
-- the Skill layer;
-- an R-side lock (`renv.lock` or dated container) if byte-level enrichment reproducibility is
-  required; current R versions are recorded per run in `enrichment_meta.json`
-  ([docs/environment.md](docs/environment.md)).
+- a public scientific case (checklist in [docs/public-case-checklist.md](docs/public-case-checklist.md),
+  candidate sources in [docs/public-case-sources.md](docs/public-case-sources.md));
+- the Skill layer to be validated end-to-end (a thin draft exists but is not claimed validated);
+- recorded CI evidence for the `renv.lock` restore and the full enrich→report chain.
 
 See [architecture](docs/architecture.md) for current gaps and target contracts.
 

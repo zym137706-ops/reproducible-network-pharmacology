@@ -16,6 +16,8 @@ htmlcov/
 .RData
 .Rproj.user/
 *.Rcheck/
+renv/library/
+rlib/
 
 # Pipeline outputs (never commit results)
 results/

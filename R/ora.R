@@ -184,6 +184,57 @@ if (universe_source == "explicit" && universe_mapped == 0L) {
 }
 statistical_size <- if (is.null(statistical_universe)) NA_integer_ else length(statistical_universe)
 
+# ---- effective foreground/background actually given to the engine -----------
+# Mapping success is not the same as "has an annotation in the selected
+# ontology": record the exact Entrez sets the engine sees, even when empty.
+effective_background <- character(0)
+effective_foreground <- character(0)
+if (universe_source == "explicit" && universe_mapped == 0L) {
+  effective_background <- character(0)
+  effective_foreground <- character(0)
+} else if (!is.null(term2gene)) {
+  effective_background <- statistical_universe
+  effective_foreground <- intersect(entrez, effective_background)
+} else if (gene_sets == "KEGG") {
+  effective_background <- if (is.null(universe)) character(0) else universe
+  effective_foreground <- intersect(entrez, effective_background)
+} else {
+  ont <- sub("^GO_", "", gene_sets)
+  go_rows <- suppressWarnings(tryCatch(
+    AnnotationDbi::select(
+      orgdb,
+      keys = statistical_universe,
+      columns = c("GO", "ONTOLOGY"),
+      keytype = "ENTREZID"
+    ),
+    error = function(e) NULL
+  ))
+  ontology_ids <- if (is.null(go_rows)) {
+    character(0)
+  } else {
+    unique(as.character(
+      go_rows$ENTREZID[!is.na(go_rows$ONTOLOGY) & go_rows$ONTOLOGY == ont]
+    ))
+  }
+  effective_background <- intersect(statistical_universe, ontology_ids)
+  effective_foreground <- intersect(entrez, effective_background)
+}
+statistical_size <- if (universe_source == "explicit" && universe_mapped == 0L) {
+  NA_integer_
+} else {
+  length(effective_background)
+}
+
+write_gene_set <- function(path, genes) {
+  frame <- data.frame(entrez_id = sort(unique(as.character(genes))), stringsAsFactors = FALSE)
+  write.table(
+    frame, path, sep = "\t", quote = FALSE, row.names = FALSE,
+    fileEncoding = "UTF-8"
+  )
+}
+write_gene_set(file.path(output_dir, "effective_foreground.tsv"), effective_foreground)
+write_gene_set(file.path(output_dir, "effective_background.tsv"), effective_background)
+
 write.table(
   mapping, file.path(output_dir, "entrez_to_symbol.tsv"),
   sep = "\t", quote = FALSE, row.names = FALSE, fileEncoding = "UTF-8"
@@ -216,6 +267,11 @@ make_meta <- function(status) {
       mapped = universe_mapped,
       unmapped = length(universe_unmapped),
       statistical = statistical_size
+    ),
+    effective = list(
+      foreground = length(effective_foreground),
+      background = length(effective_background),
+      ontology = if (gene_sets == "KEGG" || !is.null(term2gene)) NA_character_ else sub("^GO_", "", gene_sets)
     ),
     unmapped_genes = head(unmapped, 100L),
     environment = list(
@@ -274,13 +330,20 @@ if (length(entrez) == 0L) {
   quit(save = "no", status = 0L)
 }
 
+if (length(entrez) > 0L && length(effective_foreground) == 0L) {
+  write_empty_result()
+  write_meta("no_ontology_annotation")
+  cat("ora: mapping succeeded but no foreground gene has the selected ontology annotation\n")
+  quit(save = "no", status = 0L)
+}
+
 # ---- run ORA on the complete tested-term table ------------------------------
 status <- "ok"
 result <- NULL
 if (!is.null(term2gene)) {
   result <- tryCatch(
     suppressWarnings(clusterProfiler::enricher(
-      gene = entrez, universe = statistical_universe, TERM2GENE = term2gene,
+      gene = effective_foreground, universe = effective_background, TERM2GENE = term2gene,
       pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = requested_p_adjust,
       minGSSize = min_gssize, maxGSSize = max_gssize
     )),
@@ -294,9 +357,9 @@ if (!is.null(term2gene)) {
 } else if (gene_sets == "KEGG") {
   result <- tryCatch(
     suppressWarnings(clusterProfiler::enrichKEGG(
-      gene = entrez, organism = species$organism, keyType = "kegg",
+      gene = effective_foreground, organism = species$organism, keyType = "kegg",
       pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = requested_p_adjust,
-      minGSSize = min_gssize, maxGSSize = max_gssize, universe = statistical_universe
+      minGSSize = min_gssize, maxGSSize = max_gssize, universe = effective_background
     )),
     error = function(e) {
       status <<- "kegg_unavailable"
@@ -308,10 +371,10 @@ if (!is.null(term2gene)) {
   ont <- sub("^GO_", "", gene_sets)
   result <- tryCatch(
     suppressWarnings(clusterProfiler::enrichGO(
-      gene = entrez, OrgDb = orgdb, keyType = "ENTREZID", ont = ont,
+      gene = effective_foreground, OrgDb = orgdb, keyType = "ENTREZID", ont = ont,
       pvalueCutoff = 1, qvalueCutoff = 1, pAdjustMethod = requested_p_adjust,
       minGSSize = min_gssize, maxGSSize = max_gssize,
-      universe = statistical_universe, readable = FALSE
+      universe = effective_background, readable = FALSE
     )),
     error = function(e) {
       status <<- "analysis_failed"

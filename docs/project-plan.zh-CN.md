@@ -15,18 +15,24 @@
 > 发布前加固（同日）：显式 compound_id 预留/持久化/冲突拒绝；report 追加侧产物与父阶段审计哈希校验；
 > 富集区分映射背景与统计背景并修正全映射失败计数；README/CI 共用 `examples/quickstart/run.yaml`；
 > CI 使用 `uv.lock`；新增 `docs/environment.md` 记录 Windows R/DOSE 退出行为。
-> 仍未实现：Skill 层、公开科学案例、R 侧锁文件（renv/容器）。验收项见
-> `docs/enrich-acceptance.md` 与 `docs/public-case-checklist.md`。
+> 2026-10-20 继续加固：包装层对 R 非零退出码全部传播（含"meta 正常但进程异常"模拟回归）；
+> engine 实际前景/背景集合落盘并记录哈希/数量，新增"映射成功但无本体注释"状态；
+> 用隔离的 pak 干净 R 库（clusterProfiler 4.18.4 / DOSE 4.4.0 / org.Hs.eg.db 3.22.0）复现并通过
+> 25 个 R 相关测试，再由该库生成 `renv.lock`；空项目副本用 `uv.lock` 恢复后 130 个测试通过。
+> 仍未完成：公开科学案例（仅有来源/许可清单草案）、Skill 的正式验证声明、R 锁的 CI 恢复实测（提交后验证）。
+> 验收项见 `docs/enrich-acceptance.md`、`docs/public-case-sources.md` 与 `docs/public-case-checklist.md`。
 
 ## 1. 定位与当前状态
 
 定位：可独立运行、可追溯、可复算的网络药理学分析工具，以及调用同一 CLI 的薄 Codex Skill 层。
 展示重点：输入身份与分析决策可靠、统计计算可核验、Agent 能识别异常；预测关联和对接结果不构成机制或疗效验证。
 
-截至本次只读检查：CLI 配置校验、STP 导入、manifest 检查、HGNC 交集及网络导出已有代码；
-R 富集有独立脚本，尚未接通 enrich CLI；报告、公开端到端 demo、结构注册和 docking 尚待实现。
-DSH 曾报告 60 个测试通过；本次文档修订未重跑测试，不将该数字写成当前验证结论。
-本次检查时 Git 尚无首次提交；v0.0.1 是包版本/骨架标识，不能据此称为已经发布的 GitHub release。
+截至 2026-10-20：v0.1 的 `validate → ingest → intersect → network → enrich → report → manifest`
+链路已实现；包装层非零退出码、report 父链/产物哈希、富集有效前景/背景集合均有回归测试。
+空项目副本用 `uv.lock` 恢复后 130 个测试通过；隔离干净 R 库通过 25 个 R 相关测试并生成
+`renv.lock`。中文规划正文的旧"尚未接通"描述已过时，以此状态块和 README 为准。
+GitHub Actions 的 R 锁恢复与完整链路需在提交后记录；公开端到端案例与结构注册/docking 仍未实现。
+v0.0.1 是包版本/骨架标识，不能据此称为已经发布的 GitHub release；尚未打 `v0.1.0` tag。
 
 状态统一使用：设计中 → 已实现 → 在指定环境验证 → 已发布。每项状态附 commit、运行记录或 release 链接。
 规划阶段的字段允许按实现验证调整，不能继续声称全部接口已经冻结。

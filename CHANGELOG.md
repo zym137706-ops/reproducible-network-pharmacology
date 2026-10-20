@@ -5,6 +5,32 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Release hardening, R lock and clean-environment verification — 2026-10-20
+
+- Wrapper layer: every non-zero `Rscript` status is now authoritative. Exit code 2 remains an
+  input/background error; any other non-zero status (crash, kill, wrapper failure) raises an
+  external-tool failure even when `enrichment_meta.json` says `ok`. Exit 0 without a meta file is
+  rejected too. Added simulated regressions for rc=1/137 with a normal-looking meta and for the
+  no-meta case.
+- Enrichment engine sets: R now writes `effective_foreground.tsv` and `effective_background.tsv`
+  (actual Entrez sets passed to the engine), records their counts/hashes in the audit, and uses
+  them for ORA. Added a distinct `no_ontology_annotation` status for "mapping succeeded but no
+  selected-ontology annotation" (e.g. XIST/H19 with GO BP); this is not reported as a mapping
+  failure or a generic analysis failure. Report verifies the new files and shows effective counts.
+- Clean R environment: a fresh isolated library was installed from CRAN + Bioconductor 3.22 with
+  `pak` (clusterProfiler 4.18.4, DOSE 4.4.0, org.Hs.eg.db 3.22.0) and passed 25 R-dependent tests
+  (bridge, synthetic hypergeometric/BH benchmark, enrichment, report). `renv.lock` (121 packages,
+  R 4.5.2) was generated from that verified library, not from the host library.
+- Clean project restore: a copy of the working tree with no `.venv`/results was installed with
+  `uv sync --locked --extra dev`; the full suite passed 130 tests, including the hypergeometric/BH
+  benchmark and the enrich→report chain. A separate clean-project quickstart with the isolated R
+  library completed ingest→intersect→network→enrich→report→manifest with all stages `complete`.
+- CI R job now restores `renv.lock` (`renv::restore`) and exposes it through `R_LIBS` instead of
+  installing unpinned Bioconductor packages.
+- Added a thin CLI-only Skill draft (`skills/np-workflow/SKILL.md`) with static tests, plus
+  `docs/public-case-sources.md` (candidate data sources and license checks, no dataset committed).
+  The Skill is **not** claimed validated, and no public case exists yet.
+
 ### Release hardening — 2026-10-19
 
 - Compound identity: explicit IDs are reserved before automatic allocation, new explicit IDs are

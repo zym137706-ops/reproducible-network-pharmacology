@@ -11,7 +11,9 @@ in `CHANGELOG.md`). The command refuses an incomplete intersection stage by defa
 2. Output contains the **complete** tested-term table (not only significant rows), the actual
    background used, gene-set source/release, and the mapping loss (input → mapped → unmapped).
    The audit distinguishes the **mapped background** from the **statistical background** actually
-   passed to the engine (annotation coverage or term-gene union can be smaller).
+   passed to the engine (annotation coverage or term-gene union can be smaller), and records the
+   **engine-effective foreground/background sets** (`effective_foreground.tsv`,
+   `effective_background.tsv`) with counts and SHA-256 hashes.
 3. The result table is deterministic: fixed ordering, full precision, no wall-clock values.
 4. A manifest records: R version, `clusterProfiler`, `DOSE`, OrgDb and gene-set versions, the
    universe, correction method and cutoffs.
@@ -24,6 +26,8 @@ in `CHANGELOG.md`). The command refuses an incomplete intersection stage by defa
 | Foreground genes partially unmapped | continue only with the mapped subset, report the unmapped list and counts in the audit |
 | R package missing / R service error | exit 2 or 3 with the R stderr; not "no significant terms" |
 | Analysis completed, zero significant terms | exit 0 with `status: completed_no_significant_terms`, complete table present |
+| Mapping succeeds but no selected-ontology annotation | exit 0 with distinct `no_ontology_annotation`; effective foreground is empty, background and hashes recorded |
+| R process exits non-zero | propagate every non-zero status; a normal-looking meta file cannot mask it (exit 2 is input error, other statuses are external-tool/partial failure) |
 | KEGG unavailable (network/license) | explicit `kegg_unavailable` status; GO results unaffected |
 
 "No significant result" and "the analysis failed" must never share a code path or a status value.

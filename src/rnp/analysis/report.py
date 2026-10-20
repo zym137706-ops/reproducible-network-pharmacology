@@ -155,6 +155,8 @@ def _verify_enrichment(run_dir: Path, audit: dict[str, Any]) -> list[dict[str, s
             ("enrichment_result", "enrichment_result.tsv", "result_sha256"),
             ("enrichment_meta", "enrichment_meta.json", "meta_sha256"),
             ("enrichment_significant", "enrichment_significant.tsv", "significant_sha256"),
+            ("effective_foreground", "effective_foreground.tsv", "effective_foreground_sha256"),
+            ("effective_background", "effective_background.tsv", "effective_background_sha256"),
         ):
             artifacts.append(
                 _verify_artifact(group_dir / filename, entry.get(field), f"{role}:{group}")
@@ -466,13 +468,24 @@ def run_report(
                     entry.get("status", ""),
                     entry.get("foreground_mapped", "n/a"),
                     entry.get("foreground_unmapped", "n/a"),
+                    entry.get("effective_foreground", "n/a"),
+                    entry.get("effective_background", "n/a"),
                     entry.get("terms_tested", 0),
                     entry.get("significant", 0),
                 ]
             )
         lines.append(
             _table(
-                ["Group", "Status", "Mapped", "Unmapped", "Terms tested", "Significant"],
+                [
+                    "Group",
+                    "Status",
+                    "Mapped",
+                    "Unmapped",
+                    "Effective fg",
+                    "Effective bg",
+                    "Terms tested",
+                    "Significant",
+                ],
                 rows,
             )
         )
