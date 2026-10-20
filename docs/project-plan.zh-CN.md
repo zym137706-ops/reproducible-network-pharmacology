@@ -17,10 +17,14 @@
 > CI 使用 `uv.lock`；新增 `docs/environment.md` 记录 Windows R/DOSE 退出行为。
 > 2026-10-20 继续加固：包装层对 R 非零退出码全部传播（含"meta 正常但进程异常"模拟回归）；
 > engine 实际前景/背景集合落盘并记录哈希/数量，新增"映射成功但无本体注释"状态；
-> 用隔离的 pak 干净 R 库（clusterProfiler 4.18.4 / DOSE 4.4.0 / org.Hs.eg.db 3.22.0）复现并通过
-> 25 个 R 相关测试，再由该库生成 `renv.lock`；空项目副本用 `uv.lock` 恢复后 130 个测试通过。
-> 仍未完成：公开科学案例（仅有来源/许可清单草案）、Skill 的正式验证声明、R 锁的 CI 恢复实测（提交后验证）。
-> 验收项见 `docs/enrich-acceptance.md`、`docs/public-case-sources.md` 与 `docs/public-case-checklist.md`。
+> 用隔离的 pak 干净 R 库复现并通过 25 个 R 相关测试，再由该库生成 `renv.lock`。
+> **Linux CI 已验证**：run 39393951056 的 4/4 jobs 通过，含 `renv.lock` 恢复与完整合成 quickstart。
+> **Windows 尚未验证**：Codex 在 commit `0cf3584` 的隔离库复测为 119 passed / 11 failed，R 子进程
+> `0xC0000005`（3221225477）；保留非零退出保护，不通过忽略退出码消除失败，Windows 根因另行排查。
+> 公开案例冻结为 **BLOCKED**：已复用 8 个 PubChem CID、0.10/0.05 阈值、GO_BP/BH 等已记录决定，
+> 但疾病基因集、8 个手工 STP 导出、HGNC 快照及许可证据缺失，未编造来源、未自动提交 STP。
+> Skill 行为已用 CLI 场景覆盖 normal/missing/partial/tamper/zero，尚未完成真实 agent 会话验收。
+> 仍未完成：公开科学案例真实计算、Skill 的正式验证声明、Windows native exit 根因。
 
 ## 1. 定位与当前状态
 
@@ -29,9 +33,9 @@
 
 截至 2026-10-20：v0.1 的 `validate → ingest → intersect → network → enrich → report → manifest`
 链路已实现；包装层非零退出码、report 父链/产物哈希、富集有效前景/背景集合均有回归测试。
-空项目副本用 `uv.lock` 恢复后 130 个测试通过；隔离干净 R 库通过 25 个 R 相关测试并生成
-`renv.lock`。中文规划正文的旧"尚未接通"描述已过时，以此状态块和 README 为准。
-GitHub Actions 的 R 锁恢复与完整链路需在提交后记录；公开端到端案例与结构注册/docking 仍未实现。
+Linux CI 从 `renv.lock` 恢复并通过完整合成 quickstart；Windows 因 R native exit 0xC0000005
+仍有 11 个 R 相关测试失败，不能作为验证环境。公开案例只有冻结的已记录决定和明确缺项，
+尚未计算；Skill 场景测试通过，但未完成真实 agent 会话验收。
 v0.0.1 是包版本/骨架标识，不能据此称为已经发布的 GitHub release；尚未打 `v0.1.0` tag。
 
 状态统一使用：设计中 → 已实现 → 在指定环境验证 → 已发布。每项状态附 commit、运行记录或 release 链接。

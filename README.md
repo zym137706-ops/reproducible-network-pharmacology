@@ -8,14 +8,15 @@ Turn a folder of prediction exports and a disease gene list into a **traceable, 
 compound–target–disease analysis. Every run records its inputs, reference-data versions, parameters
 and hashes, and every output can be regenerated from a single config file.
 
-> Status: **unreleased v0.1 development** (package version 0.0.1). Ingest, intersection, network,
-> enrichment and report implementations are hardened: explicit compound↔export binding, stage-state
-> enforcement, stable IDs, wrapper-layer propagation of every non-zero R status, engine-effective
-> gene sets with hashes, and hash-checked report rendering. Python is locked by `uv.lock`; R is
-> locked by `renv.lock` (generated from a clean, separately verified library). A thin CLI-only Skill
-> draft exists but is **not validated**; the **public scientific case** is still pending. Test and
-> release status require dated execution evidence. See the
+> Status: **unreleased v0.1 development** (package version 0.0.1). The pipeline and the
+> wrapper-layer exit-code guard, engine-effective gene sets and hash-checked report are implemented.
+> Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (run 39393951056 green).
+> Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
+> guard is intentionally kept. The public case is **frozen but BLOCKED** on disease genes, manual STP
+> exports, HGNC snapshot and licence evidence; no public scientific result exists. The thin Skill
+> draft has CLI scenario tests, not a validated agent claim. See the
 > [maintained plan](docs/project-plan.zh-CN.md),
+> [case freeze](examples/demo/CASE-FREEZE.yaml),
 > [public-case sources](docs/public-case-sources.md) and
 > [environment record](docs/environment.md).
 

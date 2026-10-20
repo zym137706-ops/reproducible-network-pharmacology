@@ -1,0 +1,99 @@
+# Freeze state for the public case. This is deliberately BLOCKED, not a completed case.
+# Do not mark a field verified unless the file, hash, query and license evidence exist.
+case_id: demo-public-compounds
+status: blocked
+frozen_at_utc: "2026-10-20T10:45:00Z"
+case_computed_in_linux: false
+public_case_claim: false
+reason: >-
+  The recorded compound and analysis decisions are frozen, but the disease gene
+  list and the eight manual SwissTargetPrediction exports are absent, and the
+  redistribution/license evidence for the disease list has not been checked.
+  Without those inputs no scientific case can be computed; the synthetic
+  quickstart is not a substitute.
+
+recorded_scientific_decisions:
+  compound_list:
+    file: inputs/compounds.tsv
+    count: 8
+    identity: PubChem CID
+    compounds:
+      - {name: Quercetin, pubchem_cid: "5280343"}
+      - {name: Kaempferol, pubchem_cid: "5280863"}
+      - {name: Luteolin, pubchem_cid: "5280445"}
+      - {name: Apigenin, pubchem_cid: "5280443"}
+      - {name: Naringenin, pubchem_cid: "932"}
+      - {name: Catechin, pubchem_cid: "9064"}
+      - {name: Gallic acid, pubchem_cid: "370"}
+      - {name: Chlorogenic acid, pubchem_cid: "1794427"}
+    smiles_status: pending_v0.2 (not required for the v0.1 name/export pipeline)
+  stp_probability: 0.10
+  sensitivity_probability: 0.05
+  enrichment:
+    gene_sets: GO_BP
+    p_adjust: BH
+    pvalue_cutoff: 0.05
+    qvalue_cutoff: 0.2
+    min_gssize: 10
+    max_gssize: 500
+    universe: explicit file required; never the annotated genome
+  disease_source: CTD
+  stp_submission: manual by researcher; never automated
+
+required_inputs_missing:
+  - id: disease_genes
+    path: inputs/disease_genes.txt
+    needs:
+      - exact CTD disease term and query string
+      - retrieval date and CTD release
+      - CTD redistribution/license evidence for this release
+      - SHA-256, row count and gene-identifier namespace
+    owner: researcher
+  - id: stp_exports
+    path: inputs/stp/<compound>.csv
+    needs:
+      - eight manual SwissTargetPrediction exports for Homo sapiens
+      - per-compound submission/retrieval log (date, species, query structure)
+      - service terms evidence and SHA-256 per file
+    owner: researcher
+  - id: hgnc_map
+    path: inputs/hgnc_map.tsv
+    needs:
+      - complete-set HGNC release/date
+      - retrieval date, SHA-256 and license/attribution evidence
+    owner: researcher
+  - id: expected_outputs
+    path: expected/
+    needs:
+      - golden outputs only after the inputs are frozen and the full chain runs
+      - declared numeric tolerances for enrichment
+    owner: agent+researcher
+  - id: case_readme
+    path: README.md
+    needs:
+      - exact sources, queries, retrieval dates, licenses and what is not verified
+      - no claim of mechanism, efficacy or completed public case
+    owner: agent+researcher
+
+blocked_reason:
+  - "STP exports require manual submission; automatic submission is prohibited."
+  - "The specific CTD disease term and its redistribution terms are not recorded."
+  - "No source file has a verified hash yet, so no source is marked frozen."
+  - "The verified Linux environment is available, but it cannot compute a case with absent inputs."
+
+verification_environment:
+  linux_ci:
+    workflow: .github/workflows/ci.yml
+    run: https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/runs/39393951056
+    result: 4/4 jobs success; renv restore and full synthetic quickstart passed
+    caveat: this verifies machinery, not the public scientific case
+  windows:
+    status: unverified_blocked
+    evidence: Codex isolated-library run 119 passed / 11 failed, R subprocess exit 3221225477 (0xC0000005)
+    policy: keep the non-zero exit guard; do not mask failures or use Windows as the case environment
+    record: docs/environment.md and this file
+
+next_action_when_inputs_exist:
+  - record every source/query/date/hash/license above; replace status blocked with frozen
+  - run the full chain in the verified Linux CI environment
+  - publish case results only if the checklist in docs/public-case-checklist.md is complete

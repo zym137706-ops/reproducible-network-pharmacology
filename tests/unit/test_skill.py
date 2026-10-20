@@ -37,3 +37,13 @@ def test_skill_keeps_validation_boundary() -> None:
     assert "not validated mechanisms" in text
     assert "prediction" in text
     assert "do not" in text
+
+
+def test_skill_reuses_recorded_scientific_decisions() -> None:
+    text = re.sub(r"\s+", " ", SKILL.read_text(encoding="utf-8"))
+    assert "Recorded scientific decisions" in text
+    assert "0.10" in text and "0.05" in text
+    assert "GO BP" in text and "BH" in text
+    assert "explicit `enrichment.universe_file`" in text
+    assert "never automate STP" in text
+    assert "public case data/license freeze is not complete" in text.lower()

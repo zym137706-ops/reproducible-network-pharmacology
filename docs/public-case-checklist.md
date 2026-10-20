@@ -1,8 +1,13 @@
 # Public case: data and license checklist
 
-Status: **not started / not a completed case.** The synthetic demo
+Status: **frozen but BLOCKED / not a completed case.** The recorded decisions and missing items are
+in [`examples/demo/CASE-FREEZE.yaml`](../examples/demo/CASE-FREEZE.yaml). The synthetic demo
 (`scripts/synthetic_demo.py`) is an engineering test, not a public scientific case.
 Do not describe a placeholder dataset as a public case.
+
+Current blockers: specific CTD disease term/query/release/licence evidence; eight manual
+SwissTargetPrediction exports and submission log; HGNC snapshot with hash/licence; expected outputs.
+No STP submission is automated and no source/hash is invented.
 
 ## What the case must contain
 

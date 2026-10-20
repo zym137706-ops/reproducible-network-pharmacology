@@ -5,11 +5,14 @@
 输入：化合物清单 + SwissTargetPrediction 导出 + 疾病基因集。
 输出：可追溯的交集表、Cytoscape 网络表、富集结果、报告，以及一份记录输入哈希、参考库版本、参数与工具版本的运行清单。
 
-> 当前状态：**未发布的 v0.1 开发中**（包版本 0.0.1）。导入/交集/网络/富集/报告已接通；2026-10-20 加固了
-> 包装层非零退出码传播、engine 实际前景/背景集合与哈希、以及干净 R 库验证；Python 用 `uv.lock`、
-> R 用 `renv.lock` 锁定。Skill 仅有薄草稿，公开科学案例尚未完成；测试状态以实际执行记录为准。
-> 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[公开案例来源清单](docs/public-case-sources.md)；
-> [环境记录](docs/environment.md)。
+> 当前状态：**未发布的 v0.1 开发中**（包版本 0.0.1）。导入/交集/网络/富集/报告已接通；包装层非零退出码、
+> engine 实际前景/背景集合与哈希已加固。Python 用 `uv.lock`、R 用 `renv.lock` 锁定，Linux CI
+> （run 39393951056）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
+> exit `0xC0000005` 导致 11 个 R 相关测试失败，非零退出保护保留、不忽略。公开案例**已冻结但 BLOCKED**：
+> 缺疾病基因集、手工 STP 导出、HGNC 快照与许可证据，尚无公开科学结果。Skill 仅有薄草稿与 CLI 场景测试，
+> 尚未完成真实 agent 验收。
+> 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[案例冻结](examples/demo/CASE-FREEZE.yaml)；
+> [公开案例来源清单](docs/public-case-sources.md)；[环境记录](docs/environment.md)。
 
 ## 为什么做这个
 

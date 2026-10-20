@@ -1,92 +1,110 @@
 # Verified environment
 
-Updated 2026-10-20 after a clean-library reproduction. Python is locked by `uv.lock`; R is locked
-by `renv.lock` (generated from the verified clean library, not from an unverified/failed one).
+Updated 2026-10-20 after Linux CI and an independent Codex verification of commit `0cf3584`.
+**Linux CI is the verified case environment. Windows is not verified** because of a native R exit
+(`0xC0000005`) that is still open; the non-zero exit guard stays in place.
 
-## Windows development machine (host)
+## Authoritative status
 
-| Component | Version / note |
-|---|---|
-| OS | Windows 11 (x86_64) |
-| Python | 3.12.5 |
-| uv | 0.12.5 |
-| R | 4.5.2 (`C:\Program Files\R\R-4.5.2\bin\Rscript.exe`) |
-| clusterProfiler (host library) | 4.18.2 |
-| DOSE | 4.4.0 |
-| org.Hs.eg.db | 3.22.0 |
-| VennDiagram | 1.8.2 |
-| jsonlite | 2.0.0 |
+| Environment | Result | Status |
+|---|---|---|
+| Linux GitHub Actions (`r-contract`, run 39393951056) | `renv::restore` from `renv.lock`; 4/4 jobs success; full synthetic enrich→report quickstart passed | **verified for machinery** |
+| Windows local working tree (this round) | 138 passed once (4 min 25 s) | one non-reproducible pass; not a stable Windows result |
+| Windows host / isolated library (Codex, commit `0cf3584`) | 119 passed, 11 failed; R subprocess exit `3221225477` (`0xC0000005`) even when status/results looked normal | **unverified / blocked** |
 
-## Clean R library (pak-installed, isolated)
+The public scientific case cannot be computed until its missing inputs exist; the Linux run verifies
+the tool chain, not a public case. See `examples/demo/CASE-FREEZE.yaml`.
 
-A fresh `R_LIBS` directory was populated by `pak` from CRAN + Bioconductor 3.22, without reusing
-the host user library, and the bridge tests were run against it:
+## Install R 4.5.x, restore the lock, select the library
 
-| Component | Clean-library version |
-|---|---|
-| R | 4.5.2 |
-| clusterProfiler | 4.18.4 |
-| DOSE | 4.4.0 |
-| org.Hs.eg.db | 3.22.0 |
-| GO.db | 3.22.0 |
-| AnnotationDbi | 1.72.0 |
-| jsonlite | 2.0.0 |
-
-The clean-library run passed 25 R-dependent tests (bridge, synthetic hypergeometric/BH benchmark,
-enrichment, report) in 3 min 48 s. Some binaries warned that they were built under R 4.5.3; the
-bridge ran successfully on 4.5.2. The lockfile records the clean-library versions.
-
-## Locked environment
+Python:
 
 ```bash
-uv sync --locked --extra dev          # Python
-Rscript -e 'renv::restore(lockfile="renv.lock", prompt=FALSE)'   # R
+uv sync --locked --extra dev
 ```
 
-`renv.lock` records R 4.5.2 and 121 packages including `clusterProfiler`, `DOSE`, `GO.db`,
-`org.Hs.eg.db` and their dependencies. The lock was generated **after** the clean-library tests
-passed, so it does not enshrine a broken host library.
+R (Linux/macOS):
 
-Note: a second local restore into a fresh Windows library failed while source-building `curl`
-(its bundled download hit a GitHub SSL error under the local proxy). That is a network/build
-limitation of this machine, not a test result; CI restores the same lock on a clean Ubuntu runner.
-Do not treat a failed restore as a successful environment snapshot.
+```bash
+# system build dependencies for igraph/curl/xml/graphics packages
+sudo apt-get install -y libglpk-dev libcurl4-openssl-dev libxml2-dev libssl-dev \
+  libfontconfig1-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev \
+  libpng-dev libtiff5-dev libjpeg-dev libzstd-dev libbz2-dev liblzma-dev
 
-## "Native exit" and stderr: what was actually observed
+# explicit bootstrap + restore; optional argument selects an isolated library
+scripts/restore_r.sh
+# or: scripts/restore_r.sh /abs/path/rlib
+```
 
-The observed red output from Windows PowerShell was `'select()' returned 1:1 mapping...` on
-**stderr**, not an R failure:
+Windows PowerShell:
 
-- `Rscript R/ora.R ...` exits **0**, and Python `subprocess` sees 0;
-- PowerShell renders native-command stderr as `NativeCommandError`; that is shell presentation;
-- a real R process can nevertheless die with a non-zero status (kill, native crash, wrapper
-  failure) after writing a normal-looking `enrichment_meta.json`.
+```powershell
+.\scripts\restore_r.ps1
+# or: .\scripts\restore_r.ps1 -Library C:\path\to\rlib
+```
 
-The previous wrapper only special-cased exit code 2 and otherwise trusted the meta file, so a
-process with status 1/137 and a plausible meta could have been reported as success. The clean
-library did not reproduce a genuine native non-zero exit, so the fix is guarded by simulated
-regression tests in `tests/unit/test_enrich_wrapper.py`: any non-zero R exit is authoritative
-(exit code 2 remains an input/background error; other statuses become a partial/external-tool
-failure with the R status and stderr), and exit 0 without meta is also rejected.
+Library selection rules:
+
+1. The restore target must be explicit. `renv::restore(library=...)` or a project `renv/library` is
+   the only accepted R library.
+2. For Python subprocesses, export the **same** library so `Rscript` sees it:
+   `export R_LIBS=/abs/path/rlib` (Linux) or `$env:R_LIBS = "C:\path\to\rlib"` (Windows).
+3. Never point `R_LIBS` at the host user library and call it a clean environment.
+4. Verify before running:
+
+```bash
+Rscript -e '.libPaths(); packageVersion("clusterProfiler"); packageVersion("DOSE"); packageVersion("org.Hs.eg.db")'
+```
+
+The lock (`renv.lock`) records R 4.5.2 and 121 packages, including clusterProfiler 4.18.4,
+DOSE 4.4.0, org.Hs.eg.db 3.22.0, GO.db 3.22.0, AnnotationDbi 1.72.0 and jsonlite 2.0.0. It was
+generated **after** the clean-library tests, not from an unverified/failed library.
+
+A local second restore into a fresh Windows library failed while source-building `curl` (its
+bundled download hit a GitHub SSL error under the local proxy). That is a Windows network/build
+limitation; the Linux CI restore of the same lock succeeded and is the recorded clean-restore
+evidence.
+
+## Windows native exit: observed, not suppressed
+
+Codex reproduced the real process status on commit `0cf3584` with
+`RNP_RSCRIPT=C:\Program Files\R\R-4.5.2\bin\Rscript.exe` and `R_LIBS=C:\DSH\rnp-renv-clean\lib2`:
+
+- R subprocess exit `3221225477` (`0xC0000005`) while `enrichment_meta.json` said `status=ok` and
+  result files were written;
+- also reproduced with `--vanilla`, `LC_ALL=C`, `LANG=C`, and nonexistent `R_LIBS_USER`/`R_LIBS_SITE`;
+- all 121 locked package versions matched the library;
+- 11 R-dependent tests failed, all because the process did not exit cleanly.
+
+The earlier red `'select()' returned 1:1 mapping...` output is stderr display, not the cause. The
+wrapper now treats every non-zero status as authoritative: `2` remains input/background error, other
+statuses become an external-tool/partial failure (exit 3), and exit 0 without meta is rejected.
+`tests/unit/test_enrich_wrapper.py` covers rc=1/137 with a normal-looking meta.
+
+Windows root cause is **not fixed** in this round. Do not use Windows to claim a verified case; do
+not relax the exit-code check. Use Linux CI for case computation.
 
 ## Reproduction commands
 
 ```powershell
+cd C:\DSH\reproducible-network-pharmacology
 uv sync --locked --extra dev
+.\scripts\restore_r.ps1 -Library C:\DSH\rnp-rlib
+$env:R_LIBS = "C:\DSH\rnp-rlib"
 $env:RNP_RSCRIPT = "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"
-uv run pytest -q
 uv run ruff check .
+uv run pytest -q
 ```
 
-For the clean-library variant, set `R_LIBS` to that isolated library before running the R-dependent
-tests; never point it at the host library while claiming a clean environment.
+On Linux CI the same steps are used with `scripts/restore_r.sh` and `R_LIBS` exported to the
+restored library. The Windows run above is expected to remain blocked by the native exit until the
+root cause is fixed; keep the failures visible.
 
 ## GitHub Actions
 
 - `lint-test`: Ubuntu, Python 3.10/3.11/3.12, `uv sync --locked --extra dev`.
-- `r-contract`: Ubuntu, R 4.5, `renv::restore()` from `renv.lock`, system packages
-  `libglpk-dev`/`libcurl4-openssl-dev`/`libxml2-dev`/`libssl-dev` (igraph needs GLPK). The restored
-  library is exposed to Python subprocesses via `R_LIBS`.
+- `r-contract`: Ubuntu, R 4.5; `renv::restore` from `renv.lock`; system libraries installed; restored
+  library exposed via `R_LIBS`; live bridge/enrichment/report tests plus the full quickstart.
 
-The R bridge records the observed versions in `enrichment_meta.json` on every run; the lock is the
-declared version set, and CI is the clean-environment restore check.
+CI records the observed R versions in `enrichment_meta.json` on every run; `renv.lock` is the
+declared version set.

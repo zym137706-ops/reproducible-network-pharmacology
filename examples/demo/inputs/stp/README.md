@@ -1,7 +1,14 @@
-Place SwissTargetPrediction exports here (one `.csv` or `.xlsx` per compound).
+# SwissTargetPrediction exports: not yet present
 
-Filenames become the `source_file` column, so name them after the compound. See
-`../README.md` for the manual submission and retrieval-log procedure.
+Place one manually downloaded `.csv`/`.xlsx` export per compound here, named so the `stp_file`
+binding in `../compounds.tsv` is explicit. Record the submission/retrieval log in
+[`../README.md`](../README.md).
 
-This directory stays empty in the repository until the week-2 public demo.
-Do not commit exports for unpublished compounds.
+Rules:
+
+- no automated submission, scraping, hidden-form replay or client rotation;
+- no exports for unpublished compounds;
+- record species, retrieval date and per-file SHA-256 before freezing the case;
+- do not invent a missing export or fall back to filename matching silently.
+
+This directory stays empty until the researcher supplies the exports.

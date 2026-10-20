@@ -5,6 +5,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### v0.1 case freeze and Skill acceptance — 2026-10-20
+
+- Environment status corrected: Linux CI (run 39393951056) restores `renv.lock` and passes the full
+  synthetic chain; an independent Codex run on Windows reproduced R exit `0xC0000005`
+  (3221225477) with a normal-looking meta and 11 failing R tests. Windows remains unverified; the
+  non-zero exit guard is kept and no failures are hidden.
+- Added explicit R bootstrap/restore/library scripts (`scripts/restore_r.sh`,
+  `scripts/restore_r.ps1`) and documented library selection (`R_LIBS`, `renv::restore`) and system
+  dependencies.
+- Public case frozen as **BLOCKED** in `examples/demo/CASE-FREEZE.yaml`: recorded decisions
+  (8 PubChem CIDs, 0.10/0.05 thresholds, GO BP/BH, manual STP) are reused; disease genes, eight
+  manual STP exports, HGNC snapshot and licence evidence are listed as missing. No source, hash or
+  scientific result was invented, and no STP submission was automated.
+- Thin Skill behavior acceptance: `tests/skill/test_skill_scenarios.py` exercises normal, missing
+  input, partial upstream, hash tampering and zero-result flows through the existing CLI; the Skill
+  records the scientific decisions and failure handling. Not yet a real-agent validation claim.
+- CI R job continues to restore the lock; Linux remains the verified case environment.
+
 ### Release hardening, R lock and clean-environment verification — 2026-10-20
 
 - Wrapper layer: every non-zero `Rscript` status is now authoritative. Exit code 2 remains an

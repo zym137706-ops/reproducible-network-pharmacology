@@ -123,7 +123,9 @@ jobs:
             tests/unit/test_enrich_benchmark.py \
             tests/unit/test_enrich_wrapper.py \
             tests/unit/test_report.py \
-            tests/unit/test_r_environment.py
+            tests/unit/test_r_environment.py \
+            tests/unit/test_case_freeze.py \
+            tests/skill/test_skill_scenarios.py
       - name: Full quickstart including enrichment
         env:
           RNP_RSCRIPT: Rscript

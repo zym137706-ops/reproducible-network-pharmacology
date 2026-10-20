@@ -9,6 +9,22 @@ The deterministic core is the `rnp` command. This skill **only** runs those comm
 review gates, and explains their audit output. Never re-implement parsing, mapping, intersection,
 statistics or report wording in the skill, and never edit generated files by hand.
 
+## Recorded scientific decisions (do not ask again)
+
+These decisions are recorded in the repository; reuse them unless the user explicitly changes them:
+
+- Scope for this release: `examples/demo/` public compound list with PubChem CIDs; no v0.2
+  metabolomics/upstream expansion and no docking in this skill.
+- Prediction threshold: `thresholds.stp_probability: 0.10`; report a sensitivity run at `0.05`
+  separately if the user asks.
+- Enrichment: GO BP, BH correction, `pvalue_cutoff 0.05`, `qvalue_cutoff 0.2`, explicit
+  `enrichment.universe_file`; never fall back to the annotated genome.
+- Disease source and retrieval date must already be in the config; do not invent a disease term.
+- SwissTargetPrediction exports are submitted manually by the researcher; never automate STP
+  submissions.
+- Public case data/license freeze is not complete until the checklist in
+  `docs/public-case-checklist.md` is satisfied; do not call a placeholder a public case.
+
 ## Preconditions
 
 1. Work in the repository checkout and use its locked environment:
@@ -54,6 +70,19 @@ uv run rnp manifest --run-dir results/<run-id> --check-inputs
 - `rnp report` verifies recorded hashes. If it refuses, do not hand-edit the report: find what
   changed and re-run the affected stage.
 - Use `rnp manifest --check-inputs` before calling a run reproducible.
+
+## Failure handling (scenario acceptance)
+
+- **Missing file/config**: `rnp validate` exits 2; report the missing path, do not create a substitute
+  file or switch to `allow_filename_match` silently.
+- **Partial upstream**: a partial ingest exits 3; downstream `intersect` refuses unless the user
+  chooses `--allow-partial`. If used, show the override and keep it recorded; never hide it.
+- **Tampered artifact**: `rnp report` exits 2 because a recorded hash no longer matches. Do not edit
+  the report or weaken the hash check; identify the changed file and re-run the affected stage.
+- **Zero result**: an empty intersection/network is a valid `empty` result, not an error; report all
+  counts as zero and do not invent edges or terms.
+- **R process failure**: any non-zero R exit is a failure even if `enrichment_meta.json` looks
+  normal; surface the exit code and stderr.
 
 ## Boundaries
 
