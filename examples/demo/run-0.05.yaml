@@ -1,0 +1,30 @@
+project: demo-public-compounds
+description: Sensitivity analysis at STP probability 0.05 (same case inputs)
+species: Homo_sapiens
+inputs:
+  compounds: inputs/compounds.tsv
+  stp_dir: inputs/stp
+  disease_genes: inputs/disease_genes.txt
+  disease_source: CTD
+  disease_retrieval_date: '2026-10-21'
+  hgnc_map: inputs/hgnc_map.tsv
+thresholds:
+  stp_probability: 0.05
+  note: sensitivity analysis; main analysis is 0.10
+enrichment:
+  engine: r
+  gene_sets: GO_BP
+  p_adjust: BH
+  pvalue_cutoff: 0.05
+  qvalue_cutoff: 0.2
+  min_gssize: 10
+  max_gssize: 500
+  universe_file: inputs/universe-0.05.txt
+network:
+  disease_label: Rheumatoid arthritis (MeSH D001172)
+references:
+  hgnc: '2026-10-16'
+  go: '2026-09-01'
+  string: '12.0'
+outputs:
+  dir: results-0.05

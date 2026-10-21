@@ -57,11 +57,13 @@ string:
 ctd:
   name: Comparative Toxicogenomics Database
   url: https://ctdbase.org/downloads/
-  license: "academic use, cite CTD"
+  license: "research/educational use; reproduction or commercial use requires permission; cite/notify CTD"
   redistribute: false
-  release: null
-  retrieved: null
-  sha256: null
+  release: "September 2026 (latest monthly release)"
+  retrieved: "2026-10-21T05:03:53Z"
+  sha256: "321e5441560904bc7d926be3c8955420654dae22166526f65db69becbb29064a"
+  query: "POST /tools/batchQuery.go?q inputType=disease inputTerms=MeSH:D001172 report=genes_curated format=tsv"
+  note: "179 direct marker/mechanism or therapeutic genes; local only until redistribution permission confirmed"
 
 kegg:
   name: KEGG pathways

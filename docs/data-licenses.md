@@ -10,7 +10,7 @@ own terms. When in doubt, check the upstream license before publishing derived t
 | [GO](https://geneontology.org/) | enrichment gene sets | no bulk data; results derived | CC BY 4.0, attribution required |
 | [Reactome](https://reactome.org/) | alternative gene sets (planned) | no bulk data | CC0 |
 | [STRING](https://string-db.org/) | PPI input (planned) | no bulk network files | CC BY 4.0; record version (e.g. 12.0) |
-| [CTD](https://ctdbase.org/) | disease gene sets (demo) | small demo list only | free for academic use with citation; check terms for redistribution |
+| [CTD](https://ctdbase.org/) | disease gene sets (RA case) | **no** (local extract only) | Research/education use; reproduction or commercial use requires permission; cite/notify CTD. Query/rules recorded in `examples/demo/inputs/CTD-QUERY.md`; data not committed |
 | [PubMed](https://pubmed.ncbi.nlm.nih.gov/) | literature evidence (planned) | no | NCBI terms of use |
 | **GeneCards** | disease genes | **never** | commercial terms; do not redistribute |
 | **OMIM** | disease genes | **never** | Johns Hopkins terms; do not redistribute |

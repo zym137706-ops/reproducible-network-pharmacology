@@ -21,10 +21,13 @@
 > **Linux CI 已验证**：run 39415883483 的 4/4 jobs 通过，含 `renv.lock` 恢复与完整合成 quickstart。
 > **Windows 尚未验证**：Codex 在 commit `0cf3584` 的隔离库复测为 119 passed / 11 failed，R 子进程
 > `0xC0000005`（3221225477）；保留非零退出保护，不通过忽略退出码消除失败，Windows 根因另行排查。
-> 公开案例冻结为 **BLOCKED**：已复用 8 个 PubChem CID、0.10/0.05 阈值、GO_BP/BH 等已记录决定；
-> 已补 `stp_file` 显式绑定、提交日志模板与交接清单；PubChem 8 个结构在本地抓取（非空、哈希/原始响应
-> 已记录，未入库）；HGNC 2026-10-16 快照已按 CC0 冻结并提交（45,277 条 Approved，来源/哈希/许可记录）。
-> 仍缺疾病基因集、8 个手工 STP 导出、显式背景与 expected/许可证据；未编造来源、未自动提交 STP。
+> 公开案例冻结为 **BLOCKED**：已记录 **Arthritis, Rheumatoid（MeSH D001172）**，按精确 ID 检索、
+> 不扩展子疾病；CTD marker/mechanism 或 therapeutic 直接证据筛选出 179 个基因，查询/日期/规则/许可
+> 记录在 `examples/demo/inputs/CTD-QUERY.md`；因 CTD 再分发未确认，疾病数据仅本地、不入库。
+> 背景规则已按阈值冻结：T_r 为疾病筛选前的 HGNC 规范化唯一靶点，背景=T_r、前景=T_r∩D，0.10/0.05
+> 分别生成；生成器/规则/测试已就绪，实际 universe 仍需 STP 导出。
+> HGNC 2026-10-16 快照（CC0，45,277 Approved）已提交；PubChem 8 个结构本地非空、原始响应/哈希已记录。
+> 仍缺 8 个手工 STP 导出及提交日志、可提交的疾病数据（许可）、actual universe 与 expected 输出。
 > R 恢复入口已修复：PowerShell 每次 R 调用检查 `$LASTEXITCODE`，失败非零退出；默认/显式库均解析
 > 精确绝对路径；`restore_r.sh` 为可执行模式；CI 改为调用项目脚本并验证 Python 启动的 R 使用该库。
 > Skill 已完成一次真实 Agent 会话验收（DeepSeek Harness/`deepseek-flash`，5/5 场景通过，enrichment

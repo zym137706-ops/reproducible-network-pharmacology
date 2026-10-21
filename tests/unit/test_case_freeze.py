@@ -24,9 +24,13 @@ def test_public_case_is_not_claimed_before_inputs_exist() -> None:
     missing = {item["id"] for item in data["required_inputs_missing"]}
     assert {"disease_genes", "stp_exports", "universe_file"} <= missing
     assert "hgnc_map" not in missing
-    assert data["disease"]["sha256"] is None
-    assert data["disease"]["term"] is None
-    assert data["enrichment_background"]["sha256"] is None
+    assert data["disease"]["term"] == "Arthritis, Rheumatoid"
+    assert data["disease"]["mesh_id"] == "MESH:D001172"
+    assert data["disease"]["row_count"] == 179
+    assert data["disease"]["license_status"] == "restricted_redistribution_not_confirmed"
+    assert data["disease"]["status"] == "local_prepared_not_committed"
+    assert data["enrichment_background"]["status"] == "rule_frozen_inputs_pending"
+    assert data["enrichment_background"]["thresholds"] == [0.10, 0.05]
     assert data["stp_exports"]["status"] == "blocked"
 
 
@@ -58,10 +62,16 @@ def test_freeze_matches_run_yaml_and_binding_files() -> None:
         "max_gssize",
     ):
         assert decisions["enrichment"][key] == run["enrichment"][key], key
-    assert run["enrichment"]["universe_file"] == "inputs/universe.txt"
+    assert run["enrichment"]["universe_file"] == "inputs/universe-0.10.txt"
+    sensitivity = yaml.safe_load((DEMO / "run-0.05.yaml").read_text(encoding="utf-8"))
+    assert sensitivity["thresholds"]["stp_probability"] == 0.05
+    assert sensitivity["enrichment"]["universe_file"] == "inputs/universe-0.05.txt"
     assert freeze["enrichment_background"]["file"] == run["enrichment"]["universe_file"]
     assert run["references"]["hgnc"] == "2026-10-16"
     assert freeze["data_sources"]["hgnc"]["release_or_date"].endswith("2026-10-16")
+    assert run["inputs"]["disease_source"] == "CTD"
+    assert run["inputs"]["disease_retrieval_date"] == "2026-10-21"
+    assert run["network"]["disease_label"].startswith("Rheumatoid arthritis")
 
     hgnc = read_table(DEMO / "inputs" / "hgnc_map.tsv")
     assert len(hgnc) == 45277
@@ -95,10 +105,34 @@ def test_freeze_matches_run_yaml_and_binding_files() -> None:
     log = read_table(DEMO / "inputs" / "STP-SUBMISSION-LOG.tsv")
     assert len(log) == 8
     assert {row["stp_file"] for row in log} == set(freeze["stp_exports"]["expected_files"])
-    # The log must not sit in the export scan directory; otherwise ingest treats it as an
-    # unbound export and quarantines it.
-    stp_files = {path.suffix.lower() for path in (DEMO / "inputs" / "stp").iterdir()}
-    assert ".tsv" not in stp_files and ".csv" not in stp_files
+    # The submission log must not sit in the export scan directory; real CSV/XLSX exports are
+    # allowed there and must match the explicit bindings, with no unbound export.
+    stp_dir = DEMO / "inputs" / "stp"
+    assert not (stp_dir / "STP-SUBMISSION-LOG.tsv").exists()
+    assert not (stp_dir / "SUBMISSION-LOG.tsv").exists()
+    expected_files = set(freeze["stp_exports"]["expected_files"])
+    export_files = {
+        path.name
+        for path in stp_dir.iterdir()
+        if path.is_file() and path.suffix.lower() in {".csv", ".xlsx"}
+    }
+    assert export_files <= expected_files, f"unbound STP exports: {export_files - expected_files}"
+    if export_files != expected_files:
+        assert freeze["status"] == "blocked"
+    else:
+        # Once all exports exist, the log must contain the real submission evidence.
+        required = {
+            "submitted_structure",
+            "structure_source",
+            "species",
+            "submitted_date",
+            "result_file",
+            "retrieved_date",
+            "operator",
+            "result_sha256",
+        }
+        for row in log:
+            assert all(row.get(field, "").strip() for field in required), row["compound"]
 
 
 def test_local_pubchem_metadata_matches_freeze_and_is_nonempty() -> None:
@@ -119,3 +153,39 @@ def test_local_pubchem_metadata_matches_freeze_and_is_nonempty() -> None:
     assert all(row["smiles"].strip() for row in rows)
     assert all(row["connectivity_smiles"].strip() for row in rows)
     assert all(row["pubchem_cid"].strip() for row in rows)
+
+
+def test_local_ctd_metadata_matches_freeze_if_present() -> None:
+    metadata_path = ROOT / "data" / "local" / "case" / "ctd_metadata.json"
+    if not metadata_path.is_file():
+        pytest.skip("local CTD extract not present (expected in CI)")
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    freeze = yaml.safe_load(FREEZE.read_text(encoding="utf-8"))
+    disease = freeze["disease"]
+    assert metadata["disease"]["mesh_id"] == disease["mesh_id"]
+    assert metadata["disease"]["child_expansion"] is False
+    assert metadata["unique_genes"] == disease["row_count"] == 179
+    assert metadata["disease_genes_sha256"] == disease["sha256"]
+    assert metadata["raw_sha256"] == disease["raw_sha256"]
+    assert metadata["license"]["committed"] is False
+    assert metadata["license"]["status"] == "restricted_redistribution_not_confirmed"
+    genes = (ROOT / "data" / "local" / "case" / "disease_genes.txt").read_text(
+        encoding="utf-8"
+    ).split()
+    assert len(genes) == 179
+    assert len(set(genes)) == 179
+
+
+def test_pending_stp_submission_list_matches_bindings() -> None:
+    freeze = yaml.safe_load(FREEZE.read_text(encoding="utf-8"))
+    pending = read_table(DEMO / "inputs" / "STP-PENDING-SUBMISSIONS.tsv")
+    assert len(pending) == 8
+    assert {row["expected_export_file"] for row in pending} == set(
+        freeze["stp_exports"]["expected_files"]
+    )
+    assert {row["pubchem_cid"] for row in pending} == {
+        row["pubchem_cid"]
+        for row in read_table(DEMO / "inputs" / "compounds.tsv")
+    }
+    assert all(row["species"] == "Homo sapiens" for row in pending)
+    assert all(row["submission_log_path"].endswith("STP-SUBMISSION-LOG.tsv") for row in pending)

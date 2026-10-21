@@ -15,11 +15,13 @@ The recorded scientific decisions are frozen:
 
 ## Missing before this can be called a case
 
-1. `inputs/disease_genes.txt` — exact CTD disease term, query, release, retrieval date, license
-   evidence, SHA-256 and row count.
+1. `inputs/disease_genes.txt` — CTD RA (MeSH D001172) extract is prepared locally (179 direct
+   evidence genes; query/rules in `inputs/CTD-QUERY.md`), but CTD redistribution permission is not
+   confirmed, so it is not committed.
 2. `inputs/stp/*.csv` — eight manual STP exports, per-compound retrieval/submission log, SHA-256 and
-   service-terms evidence.
-3. `inputs/universe.txt` — explicit enrichment background and selection rationale.
+   service-terms evidence; pending list at `inputs/STP-PENDING-SUBMISSIONS.tsv`.
+3. `inputs/universe-0.10.txt` / `universe-0.05.txt` — generated from T_r by the frozen rule in
+   `inputs/BACKGROUND-RULE.md` after the STP exports exist.
 4. `expected/` — golden outputs only after the inputs are frozen and the full chain runs.
 5. Case README with exact sources/queries/dates/licenses and a clear "not verified" statement.
 

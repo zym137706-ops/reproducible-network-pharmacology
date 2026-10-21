@@ -5,6 +5,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### v0.1 case decisions: RA disease, background rule and STP pending list — 2026-10-21
+
+- Applied the researcher's disease decision: **Arthritis, Rheumatoid**, exact MeSH `D001172`, no
+  child expansion; CTD `genes_curated` query with `marker/mechanism` or `therapeutic` direct evidence,
+  inferred-only excluded. Local extract: 179 unique genes, 179 rows; query/release/date/rules/evidence
+  counts and hashes recorded in `examples/demo/inputs/CTD-QUERY.md`. CTD redistribution is not
+  confirmed, so the disease data remains local-only and the case stays blocked.
+- Applied the pre-declared conditional background rule: for each threshold r, T_r = HGNC-normalised
+  unique targets before disease; background=T_r, foreground=T_r∩D; 0.10 and 0.05 generated
+  separately. Added `scripts/build_case_background.py`, `run-0.05.yaml`, `BACKGROUND-RULE.md`, and a
+  rule/foreground regression test. Actual universes remain blocked until STP exports exist.
+- Added `STP-PENDING-SUBMISSIONS.tsv` (CID, species, expected filename, log row) and a local
+  version with the actual PubChem SMILES; no STP submission is automated. The submission log remains
+  outside the export scan directory.
+- Fixed `test_case_freeze.py`: CSV/XLSX exports are now allowed in `inputs/stp/`, while the log is
+  still checked not to be mixed into that directory; when exports exist, they must match the explicit
+  bindings and the completed log evidence.
+- Updated README/plan/HANDOFF/freeze checklist for HGNC frozen, RA decision, background rule and the
+  remaining permission/STP gaps.
+
 ### v0.1 case data preparation fixes — 2026-10-20
 
 - Fixed `scripts/fetch_pubchem_structures.py`: the current PUG REST endpoint returns `SMILES`

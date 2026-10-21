@@ -6,10 +6,11 @@ frozen_at_utc: "2026-10-20T10:45:00Z"
 case_computed_in_linux: false
 public_case_claim: false
 reason: >-
-  The recorded compound and analysis decisions are frozen; the HGNC snapshot and local PubChem
-  structures are also prepared. The disease term/gene list, eight manual STP exports, explicit
-  enrichment background, expected outputs and their licence evidence are still absent. Without
-  those inputs no scientific case can be computed; the synthetic quickstart is not a substitute.
+  The recorded compound and analysis decisions are frozen; HGNC and PubChem structures are
+  prepared. The CTD disease extract is prepared locally (179 direct-evidence genes) but cannot be
+  committed until CTD redistribution permission is confirmed. The eight manual STP exports,
+  generated conditional backgrounds and expected outputs are still absent. Without those inputs no
+  scientific case can be computed; the synthetic quickstart is not a substitute.
 
 recorded_scientific_decisions:
   compound_list:
@@ -35,31 +36,42 @@ recorded_scientific_decisions:
     qvalue_cutoff: 0.2
     min_gssize: 10
     max_gssize: 500
-    universe_file: inputs/universe.txt
-    universe: explicit file required; never the annotated genome
+    universe_file: inputs/universe-0.10.txt
+    universe: explicit conditional T_r file; never the annotated genome
   disease_source: CTD
   stp_submission: manual by researcher; never automated
 
 disease:
   source: CTD
-  file: inputs/disease_genes.txt
-  term: null                 # exact CTD disease term; researcher decision
-  query: null                # exact CTD query string
-  release: null              # CTD release/version
-  retrieval_date: null       # actual retrieval date, not invented
-  inclusion_rules: null      # e.g. direct evidence / marker/mechanism filters
-  excluded_rules: null
-  gene_identifier_namespace: null
-  row_count: null
-  sha256: null
-  license_evidence: null     # redistribution/attribution terms for this release
-  status: blocked
+  repo_file: inputs/disease_genes.txt   # still missing from the repository
+  local_file: data/local/case/disease_genes.txt
+  term: "Arthritis, Rheumatoid"
+  mesh_id: "MESH:D001172"
+  query: "POST /tools/batchQuery.go?q inputType=disease inputTerms=MeSH:D001172 report=genes_curated format=tsv"
+  release: "September 2026 (CTD Data Status page; latest monthly release)"
+  retrieval_date: "2026-10-21"
+  inclusion_rules: "Keep rows whose CTD DirectEvidence contains marker/mechanism or therapeutic; no child disease expansion."
+  excluded_rules: "Exclude inferred-only associations; no child disease terms."
+  gene_identifier_namespace: HGNC symbol
+  row_count: 179
+  sha256: "321e5441560904bc7d926be3c8955420654dae22166526f65db69becbb29064a"
+  raw_sha256: "3742a52f6ed0662098b240beac3a3cf28159a46d73e3642b4fa35ff8878d0fac"
+  evidence_type_counts:
+    marker/mechanism: 175
+    marker/mechanism|therapeutic: 3
+    therapeutic: 1
+  license_evidence: "CTD legal: research/educational use; reproduction or commercial use requires permission; cite/notify CTD. Redistribution not confirmed."
+  license_status: restricted_redistribution_not_confirmed
+  source_record: inputs/CTD-QUERY.md
+  status: local_prepared_not_committed
 
 stp_exports:
   directory: inputs/stp
   count: 8
   binding_file: inputs/compounds.tsv
   submission_log_template: inputs/STP-SUBMISSION-LOG.tsv
+  pending_submission_list: inputs/STP-PENDING-SUBMISSIONS.tsv
+  pending_submission_local_smiles: data/local/case/STP-PENDING-SUBMISSIONS.tsv
   expected_files:
     - quercetin.csv
     - kaempferol.csv
@@ -80,14 +92,26 @@ stp_exports:
   note: never automate submission; download exports manually.
 
 enrichment_background:
-  file: inputs/universe.txt
+  file: inputs/universe-0.10.txt
   required: true
-  source: null                # researcher choice; must be documented
-  selection_basis: null       # why this background, not the annotated genome
-  gene_identifier_namespace: null
+  rule: >-
+    For each threshold r, T_r = all HGNC-normalised unique targets from the thresholded
+    target table before disease intersection; foreground = T_r ∩ D; background = T_r.
+    Multi/composite target rows are excluded and counted. 0.10 and 0.05 are generated and
+    frozen separately. This is a conditional enrichment within predicted targets, not the
+    annotated genome.
+  thresholds: [0.10, 0.05]
+  generator: scripts/build_case_background.py
+  source_record: inputs/BACKGROUND-RULE.md
+  per_threshold_files:
+    - inputs/universe-0.10.txt
+    - inputs/universe-0.05.txt
+  source: "predicted targets from the manual STP exports"
+  selection_basis: "conditional background within predicted targets, pre-declared; never chosen by significance"
+  gene_identifier_namespace: HGNC symbol
   row_count: null
   sha256: null
-  status: blocked
+  status: rule_frozen_inputs_pending
 
 data_sources:
   pubchem:
@@ -110,10 +134,14 @@ data_sources:
   ctd:
     used_for: disease genes
     url: https://ctdbase.org/downloads/
-    retrieved: null
-    release_or_date: null
-    sha256: null
-    license_status: pending; redistribution evidence required
+    query_url: https://ctdbase.org/tools/batchQuery.go?q
+    retrieved: "2026-10-21T05:03:53Z"
+    release_or_date: "September 2026 (latest monthly release)"
+    sha256: "321e5441560904bc7d926be3c8955420654dae22166526f65db69becbb29064a"
+    raw_sha256: "3742a52f6ed0662098b240beac3a3cf28159a46d73e3642b4fa35ff8878d0fac"
+    row_count: 179
+    local_path: data/local/case/disease_genes.txt
+    license_status: "restricted; reproduction/commercial use needs permission; not committed"
   hgnc:
     used_for: gene-symbol normalization
     url: https://www.genenames.org/download/archive/
@@ -143,10 +171,9 @@ required_inputs_missing:
   - id: disease_genes
     path: inputs/disease_genes.txt
     needs:
-      - exact CTD disease term, query and inclusion/exclusion rules
-      - retrieval date and CTD release
-      - CTD redistribution/licence evidence for this release
-      - SHA-256, row count and gene-identifier namespace
+      - local CTD extract is prepared but not committed (redistribution unconfirmed)
+      - permission to commit/use the disease extract in the repository
+      - keep the exact query/inclusion rules and CTD release/date with the data
     owner: researcher
   - id: stp_exports
     path: inputs/stp/<compound>.csv
@@ -156,11 +183,11 @@ required_inputs_missing:
       - service-terms evidence and SHA-256 per file
     owner: researcher
   - id: universe_file
-    path: inputs/universe.txt
+    path: inputs/universe-0.10.txt, inputs/universe-0.05.txt
     needs:
-      - explicit background gene list and its selection basis
-      - source/version and SHA-256
-    owner: researcher
+      - generated from T_r for 0.10 and 0.05 by the pre-declared rule
+      - generation requires the STP exports above; no significance-based choice
+    owner: agent
   - id: expected_outputs
     path: expected/
     needs:

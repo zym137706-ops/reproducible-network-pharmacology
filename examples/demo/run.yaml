@@ -6,10 +6,10 @@ inputs:
   stp_dir: inputs/stp
   disease_genes: inputs/disease_genes.txt
   disease_source: CTD
-  disease_retrieval_date: "2026-10-01"
+  disease_retrieval_date: '2026-10-21'
   hgnc_map: inputs/hgnc_map.tsv
 thresholds:
-  stp_probability: 0.10
+  stp_probability: 0.1
   note: recorded analysis choice; a sensitivity run at 0.05 is reported alongside
 enrichment:
   engine: r
@@ -19,12 +19,12 @@ enrichment:
   qvalue_cutoff: 0.2
   min_gssize: 10
   max_gssize: 500
-  universe_file: inputs/universe.txt
+  universe_file: inputs/universe-0.10.txt
 network:
-  disease_label: Demo disease
+  disease_label: Rheumatoid arthritis (MeSH D001172)
 references:
-  hgnc: "2026-10-16"
-  go: "2026-09-01"
-  string: "12.0"
+  hgnc: '2026-10-16'
+  go: '2026-09-01'
+  string: '12.0'
 outputs:
   dir: results
