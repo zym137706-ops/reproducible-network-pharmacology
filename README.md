@@ -10,12 +10,12 @@ and hashes, and every output can be regenerated from a single config file.
 
 > Status: **unreleased v0.1 development** (package version 0.0.1). The pipeline and the
 > wrapper-layer exit-code guard, engine-effective gene sets and hash-checked report are implemented.
-> Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (run 39393951056 green).
+> Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (run 39544786310 green).
 > Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
-> guard is intentionally kept. The public case is **frozen but BLOCKED** on disease genes, manual STP
-> exports, HGNC snapshot and licence evidence; no public scientific result exists. The thin Skill
-> has a real-agent 5/5 scenario acceptance (enrichment skipped; report linked from
-> `docs/skill-acceptance.md`), not a general validation. See the
+> guard is intentionally kept. The public case is **frozen but BLOCKED** on the disease gene set,
+> manual STP exports, explicit enrichment background and licence evidence; HGNC is frozen (CC0) and
+> no public scientific result exists. The thin Skill has a real-agent 5/5 scenario acceptance
+> (enrichment skipped; report linked from `docs/skill-acceptance.md`), not a general validation. See the
 > [maintained plan](docs/project-plan.zh-CN.md),
 > [case freeze](examples/demo/CASE-FREEZE.yaml),
 > [public-case sources](docs/public-case-sources.md) and

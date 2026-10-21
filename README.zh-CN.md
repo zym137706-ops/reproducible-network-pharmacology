@@ -7,9 +7,9 @@
 
 > 当前状态：**未发布的 v0.1 开发中**（包版本 0.0.1）。导入/交集/网络/富集/报告已接通；包装层非零退出码、
 > engine 实际前景/背景集合与哈希已加固。Python 用 `uv.lock`、R 用 `renv.lock` 锁定，Linux CI
-> （run 39393951056）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
+> （run 39544786310）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
 > exit `0xC0000005` 导致 11 个 R 相关测试失败，非零退出保护保留、不忽略。公开案例**已冻结但 BLOCKED**：
-> 缺疾病基因集、手工 STP 导出、HGNC 快照与许可证据，尚无公开科学结果。Skill 已完成一次真实 Agent
+> 缺疾病基因集、手工 STP 导出、显式背景与许可证据；HGNC 已按 CC0 冻结；尚无公开科学结果。Skill 已完成一次真实 Agent
 > 5/5 场景验收（enrichment 因 Windows R 未执行；见 `docs/skill-acceptance.md`），不等同通用验证。
 > 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[案例冻结](examples/demo/CASE-FREEZE.yaml)；
 > [公开案例来源清单](docs/public-case-sources.md)；[环境记录](docs/environment.md)。
