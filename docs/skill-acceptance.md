@@ -1,16 +1,21 @@
 # Skill behavior acceptance
 
-Scope: the thin `skills/np-workflow/SKILL.md` layer. Two layers exist:
+Scope: the thin `skills/np-workflow/SKILL.md` layer. Three layers exist:
 
 1. CLI scenario tests in `tests/skill/test_skill_scenarios.py` (deterministic pytest coverage).
 2. A **real-agent session** (2026-10-20) that followed the SKILL and executed the same five
    scenarios through the CLI; report:
    [`skill-agent-acceptance-2026-10-20.md`](skill-agent-acceptance-2026-10-20.md).
+3. The **final-revision Codex acceptance** (2026-10-21) at clean commit `e81f5bf`; report:
+   [`skill-agent-acceptance-2026-10-21.md`](skill-agent-acceptance-2026-10-21.md). It covers
+   normal/missing/partial/tamper/zero plus Linux enrichment/report (Codex invoked a Linux Docker
+   pipeline); Codex CLI `0.147.0`, model `gpt-5.6-sol`, Skill SHA-256 `f2002b72…`. The report records
+   the PowerShell-wrapper exit-display caveat and that Codex itself ran on the host.
 
-The real session passed 5/5 scenarios (normal, missing, partial, tamper, zero) on
-DeepSeek Harness/`deepseek-flash`, Windows 11, commit `49f0996` plus a dirty worktree. Enrichment was
-intentionally skipped because Windows R exits `0xC0000005`; no enrichment result is claimed. This is
-one model/session and is not a general validation claim.
+The earlier real session passed 5/5 scenarios on DeepSeek Harness/`deepseek-flash`, Windows 11,
+commit `49f0996` plus a dirty worktree. Enrichment was intentionally skipped because Windows R exits
+`0xC0000005`; no enrichment result is claimed. This is one model/session and is not a general
+validation claim.
 
 ## Recorded decisions reused
 
@@ -33,10 +38,12 @@ Executable evidence: `tests/skill/test_skill_scenarios.py` (all pass in the norm
 
 ## Explicit non-claims
 
-- The real session verifies the five scenarios for one model/run; it does not prove every agent will
-  behave the same, and enrichment was not exercised.
-- No public scientific case exists yet; `examples/demo/CASE-FREEZE.yaml` is `blocked`.
-- Windows R native exit `0xC0000005` is unresolved; Linux CI is the verified case environment.
-- The current SKILL.md was edited after/around the session (decision-reuse wording and environment
-  entry); the CLI behavior scenarios are unchanged, but a fresh session against the exact final
-  revision is still a reasonable follow-up.
+- The real sessions verify the scenarios for specific models/runs; they do not prove every agent will
+  behave the same. The 2026-10-20 session did not exercise enrichment; the 2026-10-21 final-revision
+  session exercised Linux R enrichment/report via a Docker invocation, not a Codex process running
+  inside Linux.
+- The local RA case is computed and independently checked, but `examples/demo/CASE-FREEZE.yaml` is
+  **public-release blocked** pending CTD/STP permission. Local completion is not a public case pass.
+- Windows R native exit `0xC0000005` is unresolved; Linux is the verified case environment.
+- The final Skill at commit `e81f5bf` was used for the 2026-10-21 Codex session. Later documentation
+  edits do not change its behavior; if `SKILL.md` changes, rerun the affected scenarios.

@@ -5,6 +5,26 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### v0.1 portable case entry, provenance and final acceptance — 2026-10-21
+
+- Fixed case-record consistency: actual `.xlsx` bindings, actual local submitted-structure evidence,
+  no stale "missing disease/STP/background" text; split local-complete vs public-release-blocked
+  status and replaced the fixed `blocked` assertion with evidence-based status checks.
+- Added `scripts/case_run.py` (portable preflight, fixed 0.10/0.05 configs, full CLI chain, no
+  overwrite, no downloads/submissions) and `scripts/case_check.py` (independent T_r/foreground and
+  hypergeometric/BH checks). Added `docs/case-run.md`, schemas and tests.
+- Added optional manifest `code.source_attestation` and `container` provenance plus a case
+  `case_provenance.json` schema; source/container values are explicitly host-declared, never
+  fabricated. Avoided backfilling old manifests.
+- Clean-clone `e81f5bf` Linux run: source hash `f271…`, image digest `sha256:e341…`,
+  R 4.5.2/clusterProfiler 4.18.4, both thresholds complete, manifest 10 inputs no drift, independent
+  check passed; synthetic quickstart also complete.
+- Final-revision Codex real-agent acceptance: normal/missing/partial/tamper/zero plus Linux
+  enrichment/report via Docker; Skill hash `f2002b72…`. One PowerShell wrapper exit-display caveat
+  and the fact that Codex ran on the host are recorded; no Codex-in-Linux claim.
+- Public CTD/STP redistribution remains permission-pending; local inputs/results not committed or
+  uploaded. No tag/release/visibility change.
+
 ### v0.1 RA case local Linux calculation — 2026-10-21
 
 - Verified the Codex handoff: 8 XLSX files match `file-checks.json` (size/SHA-256), 8/8 explicit

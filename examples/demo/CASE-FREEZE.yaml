@@ -233,6 +233,9 @@ verification_environment:
     python: 3.12.3 (container)
     status: both thresholds complete; independent hypergeometric/BH check passed
     caveat: local only; no restricted data uploaded to CI
+    clean_clone_commit: e81f5bf
+    source_sha256: f271a2f792b595aebc6bcba1689867d018262b78abe41dc59bc517cab5b2cafa
+    image_digest: bioconductor/bioconductor_docker@sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
 local_calculation:
   status: completed_local_not_public
   environment: bioconductor/bioconductor_docker:RELEASE_3_22; R 4.5.2; clusterProfiler
@@ -280,6 +283,24 @@ local_calculation:
   - report
   - manifest --check-inputs
   independent_check_path: data/local/case/run-2026-10-21/independent-check.json
+  clean_clone_run:
+    commit: e81f5bf1e584b98355229df2b31f21297a560f54
+    dirty: false
+    source_sha256: f271a2f792b595aebc6bcba1689867d018262b78abe41dc59bc517cab5b2cafa
+    image: bioconductor/bioconductor_docker:RELEASE_3_22
+    image_digest: bioconductor/bioconductor_docker@sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
+    image_id: sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
+    python: 3.12.3
+    r_version: 4.5.2
+    r_lib: /rlib
+    renv_lock_sha256: 3cf4de1000b298f79257b7d3ac264a0e0919f5dcd77da8a50b729f6388e8ad9d
+    uv_lock_sha256: ce95aeb3a29342264afbddb145266e7676681fc788e65fb58b11c3d7d0177b11
+    report_sha256:
+      '0.10': d16209e8d80f644b7f961898e324578f21770b9b19c4c1948099328c56c4facd
+      '0.05': 2f8021c17f30b109ea4d917a34408f916b9ed1daf08436a8b629fd3d24b24edd
+    provenance_path: C:/DSH/rnp-clean-run-e81f5bf/case_provenance.json
+    status: complete; all stages complete; independent check passed; manifest 10 inputs
+      no drift
 public_release_status: 'blocked: upstream data redistribution/permission not confirmed;
   results and local inputs not committed'
 input_freeze_status:
@@ -294,7 +315,7 @@ status_dimensions:
   local_independent_check: passed
   public_redistribution: pending_official_clarification
   public_case_claim: false
-  final_skill_acceptance: pending
+  final_skill_acceptance: passed_codex_2026-10-21_with_environment_caveat
 public_release_gate:
   status: blocked
   reason: Official clarification is pending for CTD redistribution and for whether

@@ -28,7 +28,7 @@ def test_public_case_gate_is_not_confused_with_local_completion() -> None:
         "local_independent_check": "passed",
         "public_redistribution": "pending_official_clarification",
         "public_case_claim": False,
-        "final_skill_acceptance": "pending",
+        "final_skill_acceptance": "passed_codex_2026-10-21_with_environment_caveat",
     }
     gaps = {item["id"] for item in data["public_release_gaps"]}
     assert {"ctd_permission", "stp_permission", "public_artifacts"} == gaps

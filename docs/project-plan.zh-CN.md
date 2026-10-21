@@ -30,8 +30,10 @@
 > 精确绝对路径；`restore_r.sh` 为可执行模式；CI 改为调用项目脚本并验证 Python 启动的 R 使用该库。
 > Skill 已完成一次真实 Agent 会话验收（DeepSeek Harness/`deepseek-flash`，5/5 场景通过，enrichment
 > 因 Windows native exit 跳过，未用 pytest 冒充）；报告见 `docs/skill-agent-acceptance-2026-10-20.md`。
-> 仍未完成：公开案例的 CTD/STP 再分发许可与结果发布（本地计算已完成）、Skill 在最终修订版上的
-> 复测、Windows native exit 根因。公开案例不得因本地计算完成而宣称已发布。
+> 仍未完成：公开案例的 CTD/STP 再分发许可与结果发布（本地计算、干净 clone 复算与独立核查已完成）、
+> Windows native exit 根因。最终版 Codex Skill 真实会话验收已完成（含 Linux enrichment/report 的
+> Docker 调用与 shell 退出码显示限制），报告见 `docs/skill-agent-acceptance-2026-10-21.md`。
+> 公开案例不得因本地计算完成而宣称已发布。
 
 ## 1. 定位与当前状态
 

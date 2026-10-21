@@ -14,8 +14,10 @@
 > 可移植真实案例入口：`scripts/case_run.py`（校验绑定/哈希、固定双阈值配置、跑全链并记录
 > `case_provenance.json`）与 `scripts/case_check.py`（独立重建集合并重算超几何/BH）。业务逻辑仍在
 > `rnp`，入口只做编排；见 [docs/case-run.md](docs/case-run.md)。
-> Skill 已完成一次真实 Agent 5/5 场景验收（enrichment 因 Windows R 未执行；见 `docs/skill-acceptance.md`），
-> 不等同通用验证。
+> Skill 已在最终提交上完成 Codex 真实会话验收（normal/missing/partial/tamper/zero；Linux enrichment/report
+> 由 Codex 调用 Docker；存在一个 PowerShell 退出码显示限制），另有一次 DSH 会话；见
+> `docs/skill-acceptance.md` 与 `docs/skill-agent-acceptance-2026-10-21.md`，不等同通用验证。
+> 干净 clone 复算记录见 `docs/case-clean-run-2026-10-21.md`。
 > 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[案例冻结](examples/demo/CASE-FREEZE.yaml)；
 > [公开案例来源清单](docs/public-case-sources.md)；[环境记录](docs/environment.md)。
 
