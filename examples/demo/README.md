@@ -1,36 +1,43 @@
-# Public-data demo: freeze state
+# RA public-data case: local calculation state
 
-Status: **blocked, not a completed public case.** The machine-readable freeze is
-[`CASE-FREEZE.yaml`](CASE-FREEZE.yaml); the acceptance checklist is
-[`docs/public-case-checklist.md`](../../docs/public-case-checklist.md), and candidate sources are in
+Status: **locally computed, NOT public-releaseable (blocked).** The machine-readable freeze is
+[`CASE-FREEZE.yaml`](CASE-FREEZE.yaml); acceptance checklist:
+[`docs/public-case-checklist.md`](../../docs/public-case-checklist.md), sources:
 [`docs/public-case-sources.md`](../../docs/public-case-sources.md).
 
-The recorded scientific decisions are frozen:
+## Recorded decisions
 
-- eight public compounds identified by PubChem CID (see `inputs/compounds.tsv`);
-- `stp_probability: 0.10` with a separate `0.05` sensitivity run;
-- GO BP enrichment, BH correction, explicit background (never the annotated genome);
-- disease source CTD, with the exact disease term and retrieval date still to be recorded;
-- SwissTargetPrediction exports are submitted **manually** by the researcher; never automated.
+- Disease: **Arthritis, Rheumatoid**, exact MeSH **D001172**; no child expansion. CTD
+  `genes_curated`, direct `marker/mechanism` or `therapeutic` evidence only; 179 genes. Query and
+  rules: [`inputs/CTD-QUERY.md`](inputs/CTD-QUERY.md).
+- Eight compounds by PubChem CID; manual STP submission, Homo sapiens; 0.10 main + 0.05 sensitivity.
+- HGNC 2026-10-16 snapshot (CC0) with source/hash record; GO BP, BH, explicit conditional background.
+- Background rule: `T_r` = HGNC-normalised unique targets before disease; background `T_r`,
+  foreground `T_r ∩ D`; see [`inputs/BACKGROUND-RULE.md`](inputs/BACKGROUND-RULE.md).
 
-## Missing before this can be called a case
+## Local Linux result (not committed)
 
-1. `inputs/disease_genes.txt` — CTD RA (MeSH D001172) extract is prepared locally (179 direct
-   evidence genes; query/rules in `inputs/CTD-QUERY.md`), but CTD redistribution permission is not
-   confirmed, so it is not committed.
-2. `inputs/stp/*.csv` — eight manual STP exports, per-compound retrieval/submission log, SHA-256 and
-   service-terms evidence; pending list at `inputs/STP-PENDING-SUBMISSIONS.tsv`.
-3. `inputs/universe-0.10.txt` / `universe-0.05.txt` — generated from T_r by the frozen rule in
-   `inputs/BACKGROUND-RULE.md` after the STP exports exist.
-4. `expected/` — golden outputs only after the inputs are frozen and the full chain runs.
-5. Case README with exact sources/queries/dates/licenses and a clear "not verified" statement.
+Environment: `bioconductor/bioconductor_docker:RELEASE_3_22`, R 4.5.2, clusterProfiler 4.18.4,
+DOSE 4.4.0, org.Hs.eg.db 3.22.0. Results: `data/local/case/run-2026-10-21/` (ignored).
 
-HGNC is already frozen and provided at `inputs/hgnc_map.tsv` (CC0; see `inputs/HGNC-SOURCE.md`).
-No scientific result exists yet. The synthetic quickstart is not a substitute.
+| Threshold | Target rows | T_r | Foreground | Intersection | Network | Effective background | Terms | Significant |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0.10 | 676 | 239 | 15 | 15 | 23 nodes / 67 edges | 234 | 704 | 0 |
+| 0.05 | 740 | 267 | 17 | 17 | 26 nodes / 74 edges | 262 | 747 | 2 |
 
-## Where the case computation must run
+- 0.10: `completed_no_significant_terms`.
+- 0.05: 2 GO BP terms, p.adjust `0.0481978889184172` (conditional enrichment within predicted
+  targets; not evidence of mechanism/efficacy).
+- Both: `manifest --check-inputs` 10 inputs, no drift; all stage audits complete.
+- Independent check: hypergeometric p and BH recomputed for all 704/747 result rows; T_r/foreground
+  rederived from targets + HGNC + CTD genes. Passed.
 
-Only in the verified Linux environment (GitHub Actions `r-contract` with `renv.lock` restore), not on
-the Windows host, where a native R exit `0xC0000005` is still an open blocker. The CI run verifies
-the machinery, not a public case. Once the missing inputs and license evidence exist, add them under
-`inputs/`, record hashes, run the chain, and only then update `CASE-FREEZE.yaml` to `frozen`.
+## Why it is not public
+
+The CTD disease extract, STP XLSX files, submission log and result tables are **local only**:
+CTD/STP redistribution permission is not confirmed. HGNC is CC0 and committed; provenance/rule
+records are committed. Local computation does not equal public-release clearance.
+
+Reproduction requires the local materials (`C:\DSH\rnp-case-inputs\handoff-2026-10-21` and
+`C:\DSH\rnp-case-inputs\stp`) and the commands recorded in `CASE-FREEZE.yaml` /
+`docs/environment.md`; do not upload them to CI without permission.

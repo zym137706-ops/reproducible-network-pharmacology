@@ -21,18 +21,17 @@
 > **Linux CI 已验证**：run 39415883483 的 4/4 jobs 通过，含 `renv.lock` 恢复与完整合成 quickstart。
 > **Windows 尚未验证**：Codex 在 commit `0cf3584` 的隔离库复测为 119 passed / 11 failed，R 子进程
 > `0xC0000005`（3221225477）；保留非零退出保护，不通过忽略退出码消除失败，Windows 根因另行排查。
-> 公开案例冻结为 **BLOCKED**：已记录 **Arthritis, Rheumatoid（MeSH D001172）**，按精确 ID 检索、
-> 不扩展子疾病；CTD marker/mechanism 或 therapeutic 直接证据筛选出 179 个基因，查询/日期/规则/许可
-> 记录在 `examples/demo/inputs/CTD-QUERY.md`；因 CTD 再分发未确认，疾病数据仅本地、不入库。
-> 背景规则已按阈值冻结：T_r 为疾病筛选前的 HGNC 规范化唯一靶点，背景=T_r、前景=T_r∩D，0.10/0.05
-> 分别生成；生成器/规则/测试已就绪，实际 universe 仍需 STP 导出。
-> HGNC 2026-10-16 快照（CC0，45,277 Approved）已提交；PubChem 8 个结构本地非空、原始响应/哈希已记录。
-> 仍缺 8 个手工 STP 导出及提交日志、可提交的疾病数据（许可）、actual universe 与 expected 输出。
+> 公开案例 RA（MeSH D001172）已完成**本地 Linux 双阈值计算**：0.10 得 676 行、T_r 239、前景 15、
+> 交集 15、有效背景 234、704 terms、0 significant；0.05 得 740 行、T_r 267、前景 17、交集 17、
+> 有效背景 262、747 terms、2 significant；独立超几何/BH 复核通过。因 CTD/STP 再分发未确认，疾病/
+> STP/结果仍只在本地，公开状态为 **blocked**；HGNC 2026-10-16 已按 CC0 提交。
+> 背景规则/T_r 生成器、待提交/提交日志、查询记录和双阈值配置均已记录。
 > R 恢复入口已修复：PowerShell 每次 R 调用检查 `$LASTEXITCODE`，失败非零退出；默认/显式库均解析
 > 精确绝对路径；`restore_r.sh` 为可执行模式；CI 改为调用项目脚本并验证 Python 启动的 R 使用该库。
 > Skill 已完成一次真实 Agent 会话验收（DeepSeek Harness/`deepseek-flash`，5/5 场景通过，enrichment
 > 因 Windows native exit 跳过，未用 pytest 冒充）；报告见 `docs/skill-agent-acceptance-2026-10-20.md`。
-> 仍未完成：公开科学案例真实计算、Skill 在最终修订版上的复测、Windows native exit 根因。
+> 仍未完成：公开案例的 CTD/STP 再分发许可与结果发布（本地计算已完成）、Skill 在最终修订版上的
+> 复测、Windows native exit 根因。公开案例不得因本地计算完成而宣称已发布。
 
 ## 1. 定位与当前状态
 

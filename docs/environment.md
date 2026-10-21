@@ -9,11 +9,13 @@ Updated 2026-10-20 after Linux CI and an independent Codex verification of commi
 | Environment | Result | Status |
 |---|---|---|
 | Linux GitHub Actions (`r-contract`, run 39415883483) | `renv::restore` from `renv.lock`; 4/4 jobs success; full synthetic enrich→report quickstart passed | **verified for machinery** |
+| Local Linux Docker (2026-10-21) | `bioconductor/bioconductor_docker:RELEASE_3_22`; R 4.5.2, clusterProfiler 4.18.4, DOSE 4.4.0, org.Hs.eg.db 3.22.0; both RA thresholds completed; `manifest --check-inputs` 10 inputs, no drift | **verified for local case calculation** |
 | Windows local working tree (this round) | 138 passed once (4 min 25 s) | one non-reproducible pass; not a stable Windows result |
 | Windows host / isolated library (Codex, commit `0cf3584`) | 119 passed, 11 failed; R subprocess exit `3221225477` (`0xC0000005`) even when status/results looked normal | **unverified / blocked** |
 
-The public scientific case cannot be computed until its missing inputs exist; the Linux run verifies
-the tool chain, not a public case. See `examples/demo/CASE-FREEZE.yaml`.
+The RA case was computed locally in Linux Docker, but its upstream CTD/STP data and results are not
+redistributable without permission; local computation is not public release. See
+`examples/demo/CASE-FREEZE.yaml`.
 
 ## Install R 4.5.x, restore the lock, select the library
 

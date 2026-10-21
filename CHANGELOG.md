@@ -5,6 +5,28 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### v0.1 RA case local Linux calculation — 2026-10-21
+
+- Verified the Codex handoff: 8 XLSX files match `file-checks.json` (size/SHA-256), 8/8 explicit
+  `stp_file` bindings match `compounds.tsv`, log hashes match; 800 rows, 0 invalid, 676 rows at 0.10
+  and 740 at 0.05. Original XLSX files were not renamed or modified.
+- Received local materials are not committed/uploaded: CTD disease extract, STP XLSX, submission log
+  and result tables remain in `data/local`/the external handoff directory; CTD/STP redistribution
+  permission is still unconfirmed.
+- Generated and froze local conditional backgrounds by the approved rule: 0.10 T_r=239,
+  foreground=15; 0.05 T_r=267, foreground=17 (multi/composite excluded, no mapping loss).
+- Ran the full chain in Linux Docker (`bioconductor/bioconductor_docker:RELEASE_3_22`, R 4.5.2,
+  clusterProfiler 4.18.4, DOSE 4.4.0): both thresholds complete; `manifest --check-inputs` 10 inputs,
+  no drift.
+  - 0.10: intersection 15, network 23 nodes/67 edges, effective background 234, 704 terms,
+    0 significant (`completed_no_significant_terms`).
+  - 0.05: intersection 17, network 26 nodes/74 edges, effective background 262, 747 terms,
+    2 significant GO BP terms at p.adjust 0.0481979 (conditional within predicted targets).
+- Independent check recomputed hypergeometric p-values and BH for all 704/747 result rows and
+  rederived T_r/foreground from targets + HGNC + CTD genes; passed. Results remain local-only.
+- Updated CASE-FREEZE to record `case_computed_in_linux: true`, local run paths/counts and
+  `public_release_status: blocked`; no repository visibility/tag/release change.
+
 ### v0.1 case decisions: RA disease, background rule and STP pending list — 2026-10-21
 
 - Applied the researcher's disease decision: **Arthritis, Rheumatoid**, exact MeSH `D001172`, no

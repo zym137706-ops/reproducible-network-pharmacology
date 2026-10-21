@@ -12,11 +12,10 @@ and hashes, and every output can be regenerated from a single config file.
 > wrapper-layer exit-code guard, engine-effective gene sets and hash-checked report are implemented.
 > Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (run 39544786310 green).
 > Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
-> guard is intentionally kept. The public case is **frozen but BLOCKED** on a committable CTD
-> disease extract (RA MeSH D001172 prepared locally; redistribution not confirmed), the eight manual
-> STP exports, generated conditional backgrounds and expected outputs. HGNC is frozen (CC0) and the
-> disease/background rules are recorded; no public scientific result exists. The thin Skill has a
-> real-agent 5/5 scenario acceptance (enrichment skipped; report linked from
+> guard is intentionally kept. The public RA case (MeSH D001172) is **locally computed** in Linux for
+> 0.10 and 0.05, with independent hypergeometric/BH checks; it is **not public-releaseable** because
+> CTD/STP redistribution permission is missing. Disease/STP/results stay local; HGNC is frozen (CC0).
+> The thin Skill has a real-agent 5/5 scenario acceptance (enrichment skipped; report linked from
 > `docs/skill-acceptance.md`), not a general validation. See the
 > [maintained plan](docs/project-plan.zh-CN.md),
 > [case freeze](examples/demo/CASE-FREEZE.yaml),

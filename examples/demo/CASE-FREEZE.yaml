@@ -1,33 +1,44 @@
-# Freeze state for the public case. This is deliberately BLOCKED, not a completed case.
-# Do not mark a field verified unless the file, hash, query and licence evidence exist.
 case_id: demo-public-compounds
 status: blocked
-frozen_at_utc: "2026-10-20T10:45:00Z"
-case_computed_in_linux: false
+frozen_at_utc: '2026-10-20T10:45:00Z'
+case_computed_in_linux: true
 public_case_claim: false
-reason: >-
-  The recorded compound and analysis decisions are frozen; HGNC and PubChem structures are
-  prepared. The CTD disease extract is prepared locally (179 direct-evidence genes) but cannot be
-  committed until CTD redistribution permission is confirmed. The eight manual STP exports,
-  generated conditional backgrounds and expected outputs are still absent. Without those inputs no
-  scientific case can be computed; the synthetic quickstart is not a substitute.
-
+reason: 'The local Linux calculation is complete for both thresholds, but public release
+  is blocked: CTD and STP upstream redistribution/permission is not confirmed. Disease
+  genes, structures, STP results and generated results remain local-only; the repository
+  commits only public HGNC and provenance/rule records.'
 recorded_scientific_decisions:
   compound_list:
     file: inputs/compounds.tsv
     count: 8
     identity: PubChem CID
     compounds:
-      - {name: Quercetin, pubchem_cid: "5280343", stp_file: quercetin.csv}
-      - {name: Kaempferol, pubchem_cid: "5280863", stp_file: kaempferol.csv}
-      - {name: Luteolin, pubchem_cid: "5280445", stp_file: luteolin.csv}
-      - {name: Apigenin, pubchem_cid: "5280443", stp_file: apigenin.csv}
-      - {name: Naringenin, pubchem_cid: "932", stp_file: naringenin.csv}
-      - {name: Catechin, pubchem_cid: "9064", stp_file: catechin.csv}
-      - {name: Gallic acid, pubchem_cid: "370", stp_file: gallic-acid.csv}
-      - {name: Chlorogenic acid, pubchem_cid: "1794427", stp_file: chlorogenic-acid.csv}
+    - name: Quercetin
+      pubchem_cid: '5280343'
+      stp_file: quercetin.csv
+    - name: Kaempferol
+      pubchem_cid: '5280863'
+      stp_file: kaempferol.csv
+    - name: Luteolin
+      pubchem_cid: '5280445'
+      stp_file: luteolin.csv
+    - name: Apigenin
+      pubchem_cid: '5280443'
+      stp_file: apigenin.csv
+    - name: Naringenin
+      pubchem_cid: '932'
+      stp_file: naringenin.csv
+    - name: Catechin
+      pubchem_cid: '9064'
+      stp_file: catechin.csv
+    - name: Gallic acid
+      pubchem_cid: '370'
+      stp_file: gallic-acid.csv
+    - name: Chlorogenic acid
+      pubchem_cid: '1794427'
+      stp_file: chlorogenic-acid.csv
     smiles_status: pending_v0.2 (not required for the v0.1 name/export pipeline)
-  stp_probability: 0.10
+  stp_probability: 0.1
   sensitivity_probability: 0.05
   enrichment:
     gene_sets: GO_BP
@@ -40,31 +51,32 @@ recorded_scientific_decisions:
     universe: explicit conditional T_r file; never the annotated genome
   disease_source: CTD
   stp_submission: manual by researcher; never automated
-
 disease:
   source: CTD
-  repo_file: inputs/disease_genes.txt   # still missing from the repository
+  repo_file: inputs/disease_genes.txt
   local_file: data/local/case/disease_genes.txt
-  term: "Arthritis, Rheumatoid"
-  mesh_id: "MESH:D001172"
-  query: "POST /tools/batchQuery.go?q inputType=disease inputTerms=MeSH:D001172 report=genes_curated format=tsv"
-  release: "September 2026 (CTD Data Status page; latest monthly release)"
-  retrieval_date: "2026-10-21"
-  inclusion_rules: "Keep rows whose CTD DirectEvidence contains marker/mechanism or therapeutic; no child disease expansion."
-  excluded_rules: "Exclude inferred-only associations; no child disease terms."
+  term: Arthritis, Rheumatoid
+  mesh_id: MESH:D001172
+  query: POST /tools/batchQuery.go?q inputType=disease inputTerms=MeSH:D001172 report=genes_curated
+    format=tsv
+  release: September 2026 (CTD Data Status page; latest monthly release)
+  retrieval_date: '2026-10-21'
+  inclusion_rules: Keep rows whose CTD DirectEvidence contains marker/mechanism or
+    therapeutic; no child disease expansion.
+  excluded_rules: Exclude inferred-only associations; no child disease terms.
   gene_identifier_namespace: HGNC symbol
   row_count: 179
-  sha256: "321e5441560904bc7d926be3c8955420654dae22166526f65db69becbb29064a"
-  raw_sha256: "3742a52f6ed0662098b240beac3a3cf28159a46d73e3642b4fa35ff8878d0fac"
+  sha256: 321e5441560904bc7d926be3c8955420654dae22166526f65db69becbb29064a
+  raw_sha256: 3742a52f6ed0662098b240beac3a3cf28159a46d73e3642b4fa35ff8878d0fac
   evidence_type_counts:
     marker/mechanism: 175
     marker/mechanism|therapeutic: 3
     therapeutic: 1
-  license_evidence: "CTD legal: research/educational use; reproduction or commercial use requires permission; cite/notify CTD. Redistribution not confirmed."
+  license_evidence: 'CTD legal: research/educational use; reproduction or commercial
+    use requires permission; cite/notify CTD. Redistribution not confirmed.'
   license_status: restricted_redistribution_not_confirmed
   source_record: inputs/CTD-QUERY.md
   status: local_prepared_not_committed
-
 stp_exports:
   directory: inputs/stp
   count: 8
@@ -73,91 +85,114 @@ stp_exports:
   pending_submission_list: inputs/STP-PENDING-SUBMISSIONS.tsv
   pending_submission_local_smiles: data/local/case/STP-PENDING-SUBMISSIONS.tsv
   expected_files:
-    - quercetin.csv
-    - kaempferol.csv
-    - luteolin.csv
-    - apigenin.csv
-    - naringenin.csv
-    - catechin.csv
-    - gallic-acid.csv
-    - chlorogenic-acid.csv
+  - Quercetin.xlsx
+  - Kaempferol.xlsx
+  - Luteolin.xlsx
+  - Apigenin.xlsx
+  - Naringenin.xlsx
+  - Catechin.xlsx
+  - Gallic acid.xlsx
+  - Chlorogenic acid.xlsx
   per_file_required:
-    - stp_file explicit binding in compounds.tsv
-    - submitted structure (SMILES/InChI) and structure source (PubChem CID/other)
-    - species actually submitted (Homo sapiens expected by the config)
-    - submitted_date and result_file association
-    - retrieved_date and result SHA-256
-    - SwissTargetPrediction service-terms evidence
-  status: blocked
+  - stp_file explicit binding in compounds.tsv
+  - submitted structure (SMILES/InChI) and structure source (PubChem CID/other)
+  - species actually submitted (Homo sapiens expected by the config)
+  - submitted_date and result_file association
+  - retrieved_date and result SHA-256
+  - SwissTargetPrediction service-terms evidence
+  status: local_verified_not_committed
   note: never automate submission; download exports manually.
-
+  public_redistribution: blocked
+  local_handoff:
+    directory: C:/DSH/rnp-case-inputs/handoff-2026-10-21
+    compounds_sha256: b2e571f96fa2290258ff325cb27e47cb50221d01b24b56e1b61e187cbd54152a
+    log_sha256: 4a9039faac15b290b4e75049ec50cc45c2d991301d3da2ffbcc48093fb4ce63c
+    file_checks_sha256: 3f06c3374c82dce7b06d98c4d7a771becd0c64818f7f0445f3dd8d28d49d35fa
+    raw_rows: 800
+    invalid_rows: 0
+    rows_at_0.10: 676
+    rows_at_0.05: 740
+    files_verified: 8
+    time_precision: submitted_date=date; retrieved=file LastWriteTime proxy, seconds,
+      +08:00; URL/job_id=not_saved
 enrichment_background:
   file: inputs/universe-0.10.txt
   required: true
-  rule: >-
-    For each threshold r, T_r = all HGNC-normalised unique targets from the thresholded
+  rule: For each threshold r, T_r = all HGNC-normalised unique targets from the thresholded
     target table before disease intersection; foreground = T_r ∩ D; background = T_r.
-    Multi/composite target rows are excluded and counted. 0.10 and 0.05 are generated and
-    frozen separately. This is a conditional enrichment within predicted targets, not the
-    annotated genome.
-  thresholds: [0.10, 0.05]
+    Multi/composite target rows are excluded and counted. 0.10 and 0.05 are generated
+    and frozen separately. This is a conditional enrichment within predicted targets,
+    not the annotated genome.
+  thresholds:
+  - 0.1
+  - 0.05
   generator: scripts/build_case_background.py
   source_record: inputs/BACKGROUND-RULE.md
   per_threshold_files:
-    - inputs/universe-0.10.txt
-    - inputs/universe-0.05.txt
-  source: "predicted targets from the manual STP exports"
-  selection_basis: "conditional background within predicted targets, pre-declared; never chosen by significance"
+  - inputs/universe-0.10.txt
+  - inputs/universe-0.05.txt
+  source: predicted targets from the manual STP exports
+  selection_basis: conditional background within predicted targets, pre-declared;
+    never chosen by significance
   gene_identifier_namespace: HGNC symbol
   row_count: null
   sha256: null
-  status: rule_frozen_inputs_pending
-
+  status: generated_and_frozen_local_not_committed
+  files:
+    universe-0.10.txt:
+      sha256: 0a6cbb2cc37ba29a93f2489cc4bf6cf340df0e2ff55bbe22265a46311ae0f9cb
+      row_count: 239
+    universe-0.05.txt:
+      sha256: 969ec07b86402b3b99453253cbb93fd033e5ccc0d1315985a5033d1e023dbf49
+      row_count: 267
 data_sources:
   pubchem:
     used_for: compound identity / structure source
     url: https://pubchem.ncbi.nlm.nih.gov/
-    retrieved: "2026-10-20T12:40:37Z"
-    release_or_date: "retrieved 2026-10-20"
-    sha256: "c43811542fe1ef1856c8e9aefd2c1805e400d0c87d6093117565c04e9ebc6d02"
+    retrieved: '2026-10-20T12:40:37Z'
+    release_or_date: retrieved 2026-10-20
+    sha256: c43811542fe1ef1856c8e9aefd2c1805e400d0c87d6093117565c04e9ebc6d02
     row_count: 8
-    structure_fields: ["SMILES", "ConnectivitySMILES"]
+    structure_fields:
+    - SMILES
+    - ConnectivitySMILES
     field_meanings:
-      SMILES: "includes stereochemistry where the PubChem record defines it"
-      ConnectivitySMILES: "connectivity only; no stereochemistry"
+      SMILES: includes stereochemistry where the PubChem record defines it
+      ConnectivitySMILES: connectivity only; no stereochemistry
     local_path: data/local/case/pubchem_structures.tsv
     metadata_path: data/local/case/metadata.json
     raw_responses_recorded: true
-    license_status: >-
-      fetched locally by scripts/fetch_pubchem_structures.py; local use only until PubChem
-      terms for redistribution are checked, so the structure table is not committed
+    license_status: fetched locally by scripts/fetch_pubchem_structures.py; local
+      use only until PubChem terms for redistribution are checked, so the structure
+      table is not committed
   ctd:
     used_for: disease genes
     url: https://ctdbase.org/downloads/
     query_url: https://ctdbase.org/tools/batchQuery.go?q
-    retrieved: "2026-10-21T05:03:53Z"
-    release_or_date: "September 2026 (latest monthly release)"
-    sha256: "321e5441560904bc7d926be3c8955420654dae22166526f65db69becbb29064a"
-    raw_sha256: "3742a52f6ed0662098b240beac3a3cf28159a46d73e3642b4fa35ff8878d0fac"
+    retrieved: '2026-10-21T05:03:53Z'
+    release_or_date: September 2026 (latest monthly release)
+    sha256: 321e5441560904bc7d926be3c8955420654dae22166526f65db69becbb29064a
+    raw_sha256: 3742a52f6ed0662098b240beac3a3cf28159a46d73e3642b4fa35ff8878d0fac
     row_count: 179
     local_path: data/local/case/disease_genes.txt
-    license_status: "restricted; reproduction/commercial use needs permission; not committed"
+    license_status: restricted; reproduction/commercial use needs permission; not
+      committed
   hgnc:
     used_for: gene-symbol normalization
     url: https://www.genenames.org/download/archive/
-    retrieved: "2026-10-21T04:28:03Z"
-    release_or_date: "snapshot Last-Modified 2026-10-16"
-    sha256: "af156dd54890b96eb8dc7e989d6a880669553ade7bcfea5d1cc4cd6cb494d4a3"
-    raw_sha256: "12363916be36f8f6f91879b0faade4eeaac973722de7136ec61329b77f2c2f91"
+    retrieved: '2026-10-21T04:28:03Z'
+    release_or_date: snapshot Last-Modified 2026-10-16
+    sha256: af156dd54890b96eb8dc7e989d6a880669553ade7bcfea5d1cc4cd6cb494d4a3
+    raw_sha256: 12363916be36f8f6f91879b0faade4eeaac973722de7136ec61329b77f2c2f91
     row_count: 45277
     local_path: examples/demo/inputs/hgnc_map.tsv
     source_record: examples/demo/inputs/HGNC-SOURCE.md
-    license_status: "CC0; attribution recorded; derived table committed"
+    license_status: CC0; attribution recorded; derived table committed
   go:
     used_for: enrichment gene sets
     url: https://geneontology.org/docs/download-ontology/
-    release_or_date: "via renv.lock GO.db 3.22.0"
-    sha256: "recorded indirectly by renv.lock"
+    release_or_date: via renv.lock GO.db 3.22.0
+    sha256: recorded indirectly by renv.lock
     license_status: CC-BY-4.0 attribution required; verify current terms
   stp:
     used_for: predicted targets
@@ -166,49 +201,45 @@ data_sources:
     release_or_date: null
     sha256: null
     license_status: manual submission only; service-terms evidence required
-
 required_inputs_missing:
-  - id: disease_genes
-    path: inputs/disease_genes.txt
-    needs:
-      - local CTD extract is prepared but not committed (redistribution unconfirmed)
-      - permission to commit/use the disease extract in the repository
-      - keep the exact query/inclusion rules and CTD release/date with the data
-    owner: researcher
-  - id: stp_exports
-    path: inputs/stp/<compound>.csv
-    needs:
-      - eight manual SwissTargetPrediction exports for Homo sapiens
-      - per-compound submission/retrieval log with submitted structure, species and date
-      - service-terms evidence and SHA-256 per file
-    owner: researcher
-  - id: universe_file
-    path: inputs/universe-0.10.txt, inputs/universe-0.05.txt
-    needs:
-      - generated from T_r for 0.10 and 0.05 by the pre-declared rule
-      - generation requires the STP exports above; no significance-based choice
-    owner: agent
-  - id: expected_outputs
-    path: expected/
-    needs:
-      - golden outputs only after the inputs are frozen and the full chain runs
-      - declared numeric tolerances for enrichment
-    owner: agent+researcher
-  - id: case_readme
-    path: README.md
-    needs:
-      - exact sources, queries, retrieval dates, licences and what is not verified
-      - no claim of mechanism, efficacy or completed public case
-    owner: agent+researcher
-
+- id: disease_genes
+  path: inputs/disease_genes.txt
+  needs:
+  - local CTD extract is prepared but not committed; redistribution permission required
+    before public release/commit
+  owner: researcher
+- id: stp_exports
+  path: inputs/stp/<compound>.csv
+  needs:
+  - 8 XLSX locally received and verified; public redistribution permission required
+    before commit/upload
+  owner: researcher
+- id: universe_file
+  path: inputs/universe-0.10.txt, inputs/universe-0.05.txt
+  needs:
+  - 0.10/0.05 universes generated and frozen locally; public commit blocked with the
+    upstream data
+  owner: agent
+- id: expected_outputs
+  path: expected/
+  needs:
+  - golden outputs only after the inputs are frozen and the full chain runs
+  - declared numeric tolerances for enrichment
+  owner: agent+researcher
+- id: case_readme
+  path: README.md
+  needs:
+  - exact sources, queries, retrieval dates, licences and what is not verified
+  - no claim of mechanism, efficacy or completed public case
+  owner: agent+researcher
 blocked_reason:
-  - "STP exports require manual submission; automatic submission is prohibited."
-  - "The specific CTD disease term/query, release and redistribution terms are not recorded."
-  - "The explicit enrichment background is not chosen or documented."
-  - "No disease, STP, background or expected-output evidence exists yet; HGNC and local PubChem
-    structures are prepared but do not make the case complete."
-  - "The verified Linux environment is available, but it cannot compute a case with absent inputs."
-
+- STP exports require manual submission; automatic submission is prohibited.
+- The specific CTD disease term/query, release and redistribution terms are not recorded.
+- The explicit enrichment background is not chosen or documented.
+- No disease, STP, background or expected-output evidence exists yet; HGNC and local
+  PubChem structures are prepared but do not make the case complete.
+- The verified Linux environment is available, but it cannot compute a case with absent
+  inputs.
 verification_environment:
   linux_ci:
     workflow: .github/workflows/ci.yml
@@ -217,18 +248,77 @@ verification_environment:
     caveat: this verifies machinery, not the public scientific case
   windows:
     status: unverified_blocked
-    evidence: Codex isolated-library run 119 passed / 11 failed, R subprocess exit 3221225477 (0xC0000005)
-    policy: keep the non-zero exit guard; do not mask failures or use Windows as the case environment
+    evidence: Codex isolated-library run 119 passed / 11 failed, R subprocess exit
+      3221225477 (0xC0000005)
+    policy: keep the non-zero exit guard; do not mask failures or use Windows as the
+      case environment
     record: docs/environment.md and this file
-
 handoff:
-  - ask_researcher_for: exact CTD disease term, query, release, inclusion/exclusion rules, retrieval date and redistribution terms
-  - ask_researcher_for: eight manual STP exports plus the completed STP-SUBMISSION-LOG.tsv rows and service-terms evidence
-  - ask_researcher_for: explicit enrichment universe list and the reason for choosing it
-  - then: record all hashes in this file, change status to frozen, run the chain in Linux CI
-  - then: create expected outputs and only then update the case README
-
+- ask_researcher_for: exact CTD disease term, query, release, inclusion/exclusion
+    rules, retrieval date and redistribution terms
+- ask_researcher_for: eight manual STP exports plus the completed STP-SUBMISSION-LOG.tsv
+    rows and service-terms evidence
+- ask_researcher_for: explicit enrichment universe list and the reason for choosing
+    it
+- then: record all hashes in this file, change status to frozen, run the chain in
+    Linux CI
+- then: create expected outputs and only then update the case README
 next_action_when_inputs_exist:
-  - record every source/query/date/hash/licence above; replace status blocked with frozen
-  - run the full chain in the verified Linux CI environment
-  - publish case results only if the checklist in docs/public-case-checklist.md is complete
+- record every source/query/date/hash/licence above; replace status blocked with frozen
+- run the full chain in the verified Linux CI environment
+- publish case results only if the checklist in docs/public-case-checklist.md is complete
+local_calculation:
+  status: completed_local_not_public
+  environment: bioconductor/bioconductor_docker:RELEASE_3_22; R 4.5.2; clusterProfiler
+    4.18.4; DOSE 4.4.0; org.Hs.eg.db 3.22.0
+  results_path: data/local/case/run-2026-10-21
+  stage_status:
+    '0.10': ingest/intersect/network/enrichment/report complete
+    '0.05': ingest/intersect/network/enrichment/report complete
+  manifest_check_inputs: 10
+  manifest_drift: []
+  independent_check: 'passed: hypergeometric p and BH recomputed for 704 (0.10) and
+    747 (0.05) result rows; background/foreground recomputed from targets/HGNC/disease'
+  runs:
+    '0.10':
+      T_r: 239
+      foreground: 15
+      intersection: 15
+      network_nodes: 23
+      network_edges: 67
+      effective_background: 234
+      effective_foreground: 15
+      terms_tested: 704
+      significant: 0
+      enrichment_status: completed_no_significant_terms
+      report_sha256: 257469379f4ba3530181b914101d27044bf32f88c013c53456118b0797a40c6e
+    '0.05':
+      T_r: 267
+      foreground: 17
+      intersection: 17
+      network_nodes: 26
+      network_edges: 74
+      effective_background: 262
+      effective_foreground: 17
+      terms_tested: 747
+      significant: 2
+      enrichment_status: ok
+      report_sha256: da75fa53d13a35727e55a402298db4b7d814b1b9baaafa152d03497346075039
+  run_commands:
+  - validate
+  - ingest stp
+  - build_case_background.py
+  - intersect
+  - network
+  - enrich
+  - report
+  - manifest --check-inputs
+  independent_check_path: data/local/case/run-2026-10-21/independent-check.json
+public_release_status: 'blocked: upstream data redistribution/permission not confirmed;
+  results and local inputs not committed'
+input_freeze_status:
+  disease: prepared locally; redistribution permission pending
+  stp: 8 XLSX locally received and verified; public redistribution blocked
+  hgnc: frozen CC0 and committed
+  background: generated and frozen locally for 0.10/0.05
+  claims: not public

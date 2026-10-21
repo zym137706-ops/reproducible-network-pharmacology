@@ -20,7 +20,8 @@ def test_public_case_is_not_claimed_before_inputs_exist() -> None:
     assert data["case_id"] == "demo-public-compounds"
     assert data["status"] == "blocked"
     assert data["public_case_claim"] is False
-    assert data["case_computed_in_linux"] is False
+    assert data["case_computed_in_linux"] is True
+    assert data["public_release_status"].startswith("blocked")
     missing = {item["id"] for item in data["required_inputs_missing"]}
     assert {"disease_genes", "stp_exports", "universe_file"} <= missing
     assert "hgnc_map" not in missing
@@ -29,9 +30,15 @@ def test_public_case_is_not_claimed_before_inputs_exist() -> None:
     assert data["disease"]["row_count"] == 179
     assert data["disease"]["license_status"] == "restricted_redistribution_not_confirmed"
     assert data["disease"]["status"] == "local_prepared_not_committed"
-    assert data["enrichment_background"]["status"] == "rule_frozen_inputs_pending"
+    assert data["enrichment_background"]["status"] == "generated_and_frozen_local_not_committed"
     assert data["enrichment_background"]["thresholds"] == [0.10, 0.05]
-    assert data["stp_exports"]["status"] == "blocked"
+    assert data["stp_exports"]["status"] == "local_verified_not_committed"
+    assert data["stp_exports"]["public_redistribution"] == "blocked"
+    runs = data["local_calculation"]["runs"]
+    assert runs["0.10"]["T_r"] == 239 and runs["0.10"]["foreground"] == 15
+    assert runs["0.05"]["T_r"] == 267 and runs["0.05"]["foreground"] == 17
+    assert runs["0.10"]["significant"] == 0
+    assert runs["0.05"]["significant"] == 2
 
 
 def test_freeze_reuses_recorded_decisions_without_inventing_sources() -> None:
