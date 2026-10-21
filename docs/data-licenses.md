@@ -5,7 +5,7 @@ own terms. When in doubt, check the upstream license before publishing derived t
 
 | Source | Used for | Redistribution in this repo | Notes |
 |---|---|---|---|
-| [HGNC](https://www.genenames.org/) | gene-symbol normalization | version string only (no bulk data) | free to use with attribution; check current terms on genenames.org |
+| [HGNC](https://www.genenames.org/) | gene-symbol normalization | derived `hgnc_map.tsv` committed (CC0) | CC0; attribution recommended and recorded in `examples/demo/inputs/HGNC-SOURCE.md` |
 | [PubChem](https://pubchem.ncbi.nlm.nih.gov/) | public compound identity/structures | local fetched table only (not committed) | check PubChem terms before redistribution; the fetch script writes to `data/local/` |
 | [GO](https://geneontology.org/) | enrichment gene sets | no bulk data; results derived | CC BY 4.0, attribution required |
 | [Reactome](https://reactome.org/) | alternative gene sets (planned) | no bulk data | CC0 |

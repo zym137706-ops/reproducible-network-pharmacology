@@ -22,7 +22,8 @@ def test_public_case_is_not_claimed_before_inputs_exist() -> None:
     assert data["public_case_claim"] is False
     assert data["case_computed_in_linux"] is False
     missing = {item["id"] for item in data["required_inputs_missing"]}
-    assert {"disease_genes", "stp_exports", "hgnc_map", "universe_file"} <= missing
+    assert {"disease_genes", "stp_exports", "universe_file"} <= missing
+    assert "hgnc_map" not in missing
     assert data["disease"]["sha256"] is None
     assert data["disease"]["term"] is None
     assert data["enrichment_background"]["sha256"] is None
@@ -59,6 +60,29 @@ def test_freeze_matches_run_yaml_and_binding_files() -> None:
         assert decisions["enrichment"][key] == run["enrichment"][key], key
     assert run["enrichment"]["universe_file"] == "inputs/universe.txt"
     assert freeze["enrichment_background"]["file"] == run["enrichment"]["universe_file"]
+    assert run["references"]["hgnc"] == "2026-10-16"
+    assert freeze["data_sources"]["hgnc"]["release_or_date"].endswith("2026-10-16")
+
+    hgnc = read_table(DEMO / "inputs" / "hgnc_map.tsv")
+    assert len(hgnc) == 45277
+    assert list(hgnc[0]) == [
+        "hgnc_id",
+        "symbol",
+        "status",
+        "prev_symbol",
+        "alias_symbol",
+        "uniprot_ids",
+        "entrez_id",
+        "locus_group",
+    ]
+    assert all(row["status"] == "Approved" for row in hgnc)
+    hgnc_meta = json.loads(
+        (DEMO / "inputs" / "hgnc_map.metadata.json").read_text(encoding="utf-8")
+    ) if (DEMO / "inputs" / "hgnc_map.metadata.json").is_file() else None
+    if hgnc_meta is not None:
+        assert hgnc_meta["derived_sha256"] == freeze["data_sources"]["hgnc"]["sha256"]
+        assert hgnc_meta["derived_rows_approved"] == 45277
+    assert (DEMO / "inputs" / "HGNC-SOURCE.md").is_file()
 
     compounds = read_table(DEMO / "inputs" / "compounds.tsv")
     assert len(compounds) == 8

@@ -22,6 +22,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 - Corrected the Skill zero-result guidance: only intersection/network are zero; raw target, disease
   gene, linkage and mapping-loss counts keep their audited values.
 - Added PubChem field/CID/empty-response regressions and a local metadata-vs-freeze consistency test.
+- Frozen the HGNC normalisation input: downloaded the 2026-10-16 complete-set snapshot under CC0,
+  derived a 45,277-row Approved `hgnc_map.tsv`, committed it with raw/derived SHA-256, snapshot date,
+  source URL and attribution (`examples/demo/inputs/HGNC-SOURCE.md`); updated the `run.yaml`
+  reference to the actual snapshot date and removed HGNC from the missing-input list.
 
 ### v0.1 restore entry, case handoff and real-agent Skill acceptance — 2026-10-20
 

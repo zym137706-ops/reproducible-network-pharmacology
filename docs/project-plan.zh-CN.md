@@ -22,9 +22,9 @@
 > **Windows 尚未验证**：Codex 在 commit `0cf3584` 的隔离库复测为 119 passed / 11 failed，R 子进程
 > `0xC0000005`（3221225477）；保留非零退出保护，不通过忽略退出码消除失败，Windows 根因另行排查。
 > 公开案例冻结为 **BLOCKED**：已复用 8 个 PubChem CID、0.10/0.05 阈值、GO_BP/BH 等已记录决定；
-> 已补 `stp_file` 显式绑定、提交日志模板与交接清单，并在 `data/local/` 本地抓取 PubChem 结构
-> （8 行，哈希已记录，未入库）；疾病基因集、8 个手工 STP 导出、HGNC 快照、背景与许可证据仍缺，
-> 未编造来源、未自动提交 STP。
+> 已补 `stp_file` 显式绑定、提交日志模板与交接清单；PubChem 8 个结构在本地抓取（非空、哈希/原始响应
+> 已记录，未入库）；HGNC 2026-10-16 快照已按 CC0 冻结并提交（45,277 条 Approved，来源/哈希/许可记录）。
+> 仍缺疾病基因集、8 个手工 STP 导出、显式背景与 expected/许可证据；未编造来源、未自动提交 STP。
 > R 恢复入口已修复：PowerShell 每次 R 调用检查 `$LASTEXITCODE`，失败非零退出；默认/显式库均解析
 > 精确绝对路径；`restore_r.sh` 为可执行模式；CI 改为调用项目脚本并验证 Python 启动的 R 使用该库。
 > Skill 已完成一次真实 Agent 会话验收（DeepSeek Harness/`deepseek-flash`，5/5 场景通过，enrichment

@@ -23,7 +23,7 @@ enrichment:
 network:
   disease_label: Demo disease
 references:
-  hgnc: "2026-09"
+  hgnc: "2026-10-16"
   go: "2026-09-01"
   string: "12.0"
 outputs:

@@ -1,0 +1,24 @@
+{
+  "committed": true,
+  "committed_path": "examples/demo/inputs/hgnc_map.tsv",
+  "derived_columns": [
+    "hgnc_id",
+    "symbol",
+    "status",
+    "prev_symbol",
+    "alias_symbol",
+    "uniprot_ids",
+    "entrez_id",
+    "locus_group"
+  ],
+  "derived_rows_approved": 45277,
+  "derived_sha256": "af156dd54890b96eb8dc7e989d6a880669553ade7bcfea5d1cc4cd6cb494d4a3",
+  "http_last_modified": "Fri, 16 Oct 2026 13:36:15 GMT",
+  "license": "CC0 (HGNC recommends attribution; cite genenames.org)",
+  "raw_sha256": "12363916be36f8f6f91879b0faade4eeaac973722de7136ec61329b77f2c2f91",
+  "raw_size_bytes": 16982321,
+  "raw_total_rows": 45277,
+  "retrieved_utc": "2026-10-21T04:28:03Z",
+  "source": "HGNC complete set",
+  "url": "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/hgnc_complete_set.txt"
+}

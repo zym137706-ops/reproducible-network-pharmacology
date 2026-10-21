@@ -19,7 +19,7 @@ URL is not by itself permission to redistribute.
 | Disease genes | Open Targets Platform | Ensembl gene IDs, disease ID, score, release | CC BY 4.0 typically; record release and attribution | candidate |
 | Disease genes | CTD | gene symbols/IDs, disease term, evidence | Read CTD terms for the release; some derived content may be restricted | candidate |
 | Disease genes (excluded) | GeneCards / OMIM | — | Repository policy excludes vendored GeneCards/OMIM content | excluded |
-| Gene identifiers | HGNC | complete set, HGNC ID, symbol, alias, UniProt | Check HGNC download terms; commit only if redistribution is permitted | candidate |
+| Gene identifiers | HGNC | complete set, HGNC ID, symbol, alias, UniProt | CC0; attribution recommended; frozen derived table with source record | **frozen** |
 | PPI (optional) | STRING | v12.0, confidence cutoff, `protein.links` | CC BY 4.0; record attribution | optional |
 | Enrichment sets | GO | GO release, `org.Hs.eg.db` version | GO CC BY 4.0; record versions in the audited meta | candidate |
 | Enrichment sets | Reactome | Reactome release, pathway IDs | Check Reactome terms for the release | candidate |

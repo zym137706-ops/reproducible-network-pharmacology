@@ -19,12 +19,12 @@ The recorded scientific decisions are frozen:
    evidence, SHA-256 and row count.
 2. `inputs/stp/*.csv` — eight manual STP exports, per-compound retrieval/submission log, SHA-256 and
    service-terms evidence.
-3. `inputs/hgnc_map.tsv` — complete HGNC release/date, hash and attribution/license evidence.
+3. `inputs/universe.txt` — explicit enrichment background and selection rationale.
 4. `expected/` — golden outputs only after the inputs are frozen and the full chain runs.
 5. Case README with exact sources/queries/dates/licenses and a clear "not verified" statement.
 
-No file above is marked verified or frozen, and no scientific result exists yet. The synthetic
-quickstart is not a substitute.
+HGNC is already frozen and provided at `inputs/hgnc_map.tsv` (CC0; see `inputs/HGNC-SOURCE.md`).
+No scientific result exists yet. The synthetic quickstart is not a substitute.
 
 ## Where the case computation must run
 

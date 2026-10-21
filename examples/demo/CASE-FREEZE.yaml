@@ -6,10 +6,10 @@ frozen_at_utc: "2026-10-20T10:45:00Z"
 case_computed_in_linux: false
 public_case_claim: false
 reason: >-
-  The recorded compound and analysis decisions are frozen, but the disease term/query,
-  disease gene list, eight manual SwissTargetPrediction exports, HGNC snapshot,
-  explicit enrichment background and their licence evidence are absent. Without those
-  inputs no scientific case can be computed; the synthetic quickstart is not a substitute.
+  The recorded compound and analysis decisions are frozen; the HGNC snapshot and local PubChem
+  structures are also prepared. The disease term/gene list, eight manual STP exports, explicit
+  enrichment background, expected outputs and their licence evidence are still absent. Without
+  those inputs no scientific case can be computed; the synthetic quickstart is not a substitute.
 
 recorded_scientific_decisions:
   compound_list:
@@ -117,10 +117,14 @@ data_sources:
   hgnc:
     used_for: gene-symbol normalization
     url: https://www.genenames.org/download/archive/
-    retrieved: null
-    release_or_date: null
-    sha256: null
-    license_status: pending; attribution/redistribution evidence required
+    retrieved: "2026-10-21T04:28:03Z"
+    release_or_date: "snapshot Last-Modified 2026-10-16"
+    sha256: "af156dd54890b96eb8dc7e989d6a880669553ade7bcfea5d1cc4cd6cb494d4a3"
+    raw_sha256: "12363916be36f8f6f91879b0faade4eeaac973722de7136ec61329b77f2c2f91"
+    row_count: 45277
+    local_path: examples/demo/inputs/hgnc_map.tsv
+    source_record: examples/demo/inputs/HGNC-SOURCE.md
+    license_status: "CC0; attribution recorded; derived table committed"
   go:
     used_for: enrichment gene sets
     url: https://geneontology.org/docs/download-ontology/
@@ -151,12 +155,6 @@ required_inputs_missing:
       - per-compound submission/retrieval log with submitted structure, species and date
       - service-terms evidence and SHA-256 per file
     owner: researcher
-  - id: hgnc_map
-    path: inputs/hgnc_map.tsv
-    needs:
-      - complete-set HGNC release/date
-      - retrieval date, SHA-256 and licence/attribution evidence
-    owner: researcher
   - id: universe_file
     path: inputs/universe.txt
     needs:
@@ -180,7 +178,8 @@ blocked_reason:
   - "STP exports require manual submission; automatic submission is prohibited."
   - "The specific CTD disease term/query, release and redistribution terms are not recorded."
   - "The explicit enrichment background is not chosen or documented."
-  - "No source file has a verified hash yet, so no source is marked frozen."
+  - "No disease, STP, background or expected-output evidence exists yet; HGNC and local PubChem
+    structures are prepared but do not make the case complete."
   - "The verified Linux environment is available, but it cannot compute a case with absent inputs."
 
 verification_environment:
@@ -197,8 +196,7 @@ verification_environment:
 
 handoff:
   - ask_researcher_for: exact CTD disease term, query, release, inclusion/exclusion rules, retrieval date and redistribution terms
-  - ask_researcher_for: eight manual STP exports plus the completed SUBMISSION-LOG.tsv rows and service-terms evidence
-  - ask_researcher_for: HGNC complete-set snapshot with release/date and licence evidence
+  - ask_researcher_for: eight manual STP exports plus the completed STP-SUBMISSION-LOG.tsv rows and service-terms evidence
   - ask_researcher_for: explicit enrichment universe list and the reason for choosing it
   - then: record all hashes in this file, change status to frozen, run the chain in Linux CI
   - then: create expected outputs and only then update the case README

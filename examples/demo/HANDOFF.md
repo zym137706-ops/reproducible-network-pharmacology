@@ -1,13 +1,14 @@
 # Case handoff: what the researcher must provide
 
-The case is **blocked**. These are the only remaining human inputs; do not fabricate them.
+The case is **blocked** on the remaining scientific inputs (disease term/list, manual STP exports,
+enrichment background, expected outputs). HGNC is already frozen and provided.
 
 | # | What | Where | Format | Acceptance check | Blocked step |
 |---|---|---|---|---|---|
 | 1 | Exact CTD disease term, query, release, retrieval date, inclusion/exclusion rules and licence evidence | `examples/demo/CASE-FREEZE.yaml` → `disease:`; save genes as `examples/demo/inputs/disease_genes.txt` | one HGNC symbol per line, UTF-8; metadata in freeze fields | `rnp validate` accepts the file; row count and SHA-256 match the freeze; licence is recorded for this release | `validate` (disease input), so everything downstream |
 | 2 | Eight manual SwissTargetPrediction exports | `examples/demo/inputs/stp/quercetin.csv` … `chlorogenic-acid.csv` (names fixed in `compounds.tsv`) | native CSV/XLSX export per compound; one file per `stp_file` | `rnp ingest stp` binds all 8 to the explicit `stp_file`; no quarantine/missing; log `STP-SUBMISSION-LOG.tsv` completed with structure/species/date/hash | `ingest stp` → `targets.tsv` |
 | 3 | Per-compound submission record | `examples/demo/inputs/STP-SUBMISSION-LOG.tsv` | TSV template; fill every column, including submitted SMILES/InChI, species, date, result file, SHA-256 | no blank required fields; structure/species/date consistent with the actual STP job | `ingest` cannot be called a traceable STP submission |
-| 4 | HGNC complete-set snapshot | `examples/demo/inputs/hgnc_map.tsv` | TSV compatible with the existing `hgnc_map` format (symbol/alias/UniProt columns) | `rnp validate` accepts it; release/date/hash/licence recorded in freeze | `intersect` |
+| 4 | HGNC complete-set snapshot | `examples/demo/inputs/hgnc_map.tsv` (provided) | frozen HGNC-derived table, CC0 | release/date/hash/attribution in `HGNC-SOURCE.md` | **provided/frozen** |
 | 5 | Explicit enrichment background | `examples/demo/inputs/universe.txt` | one gene symbol/Entrez per line, UTF-8 | `rnp enrich` accepts it; source/selection basis/hash recorded; never the annotated genome | `enrich` |
 | 6 | Case licence/source evidence | `examples/demo/CASE-FREEZE.yaml` → `data_sources:` | fields already present; replace nulls with actual URL/release/date/hash/licence | no fabricated values; restricted sources not committed | acceptance as a public case |
 

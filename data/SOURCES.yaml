@@ -10,11 +10,12 @@
 hgnc:
   name: HGNC gene nomenclature
   url: https://www.genenames.org/download/archive/
-  license: "free to use with attribution (see genenames.org)"
-  redistribute: false
-  release: "2026-09"
-  retrieved: null
-  sha256: null
+  license: "CC0; attribution recommended"
+  redistribute: true
+  release: "snapshot Last-Modified 2026-10-16"
+  retrieved: "2026-10-21T04:28:03Z"
+  sha256: "af156dd54890b96eb8dc7e989d6a880669553ade7bcfea5d1cc4cd6cb494d4a3"
+  note: "derived hgnc_map.tsv committed under examples/demo/inputs; raw file local only"
 
 pubchem:
   name: PubChem compound structures

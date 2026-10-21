@@ -6,8 +6,8 @@ in [`examples/demo/CASE-FREEZE.yaml`](../examples/demo/CASE-FREEZE.yaml). The sy
 Do not describe a placeholder dataset as a public case.
 
 Current blockers: specific CTD disease term/query/release/licence evidence; eight manual
-SwissTargetPrediction exports and submission log; HGNC snapshot with hash/licence; expected outputs.
-No STP submission is automated and no source/hash is invented.
+SwissTargetPrediction exports and submission log; explicit enrichment background; expected outputs.
+HGNC is frozen and committed (CC0). No STP submission is automated and no source/hash is invented.
 
 ## What the case must contain
 
@@ -16,7 +16,7 @@ No STP submission is automated and no source/hash is invented.
 | Compound list | stable `compound_id`, name, SMILES or a documented structure source; explicit `stp_file` binding; group if multiple products | compounds must be public; record source (PubChem CID, vendor, paper) and retrieval date | TODO |
 | SwissTargetPrediction exports | one export per compound, species recorded, retrieval date, submission log (query structure) | produced manually by the researcher; no automatic submission; no bulk redistribution without terms check | TODO |
 | Disease gene list | gene symbols + source (CTD / Open Targets / other), query string, retrieval date, inclusion criteria | confirm redistribution terms for the release used; restricted sources (GeneCards/OMIM) stay out of git | TODO |
-| HGNC snapshot | complete-set TSV version/date; which release | acceptable to use locally; check attribution terms before committing even a subset | TODO |
+| HGNC snapshot | complete-set TSV version/date; which release | CC0; attribution recommended and recorded | FROZEN: `examples/demo/inputs/hgnc_map.tsv` (2026-10-16 snapshot, 45,277 Approved records) |
 | STRING/PPI (optional) | version (e.g. 12.0), confidence cutoff, retrieval date | CC BY 4.0; record attribution | TODO |
 | Enrichment gene sets | GO/Reactome/KEGG release; background definition | GO CC BY 4.0; KEGG is not redistributable — user-provided | TODO |
 | Demo commands + expected tables | exact command log, committed expected outputs derived independently | synthetic or public only | TODO |
