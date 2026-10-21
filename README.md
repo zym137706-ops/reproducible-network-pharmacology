@@ -106,10 +106,16 @@ overwrite an existing output directory unless `--force` is passed. Downstream co
 incomplete upstream stage unless `--allow-partial` is passed, and the override is recorded in the
 audit. Ingest creates a persistent compound-ID registry; a re-run reuses the same IDs.
 
-The public-data case (`examples/demo/`) is still **not** a completed case: its data and license
-checklist is in [docs/public-case-checklist.md](docs/public-case-checklist.md), and STP exports must
-be produced by hand (see [examples/demo/inputs/README.md](examples/demo/inputs/README.md)). The
-synthetic demo is an engineering test, not a scientific result.
+The public-data RA case (`examples/demo/`) is **locally computed and independently checked** but
+**not public-releaseable**: CTD/STP redistribution permission is pending. Its data/license checklist
+is in [docs/public-case-checklist.md](docs/public-case-checklist.md); STP exports are produced by
+hand. The synthetic demo is an engineering test, not a scientific result.
+
+For a user-supplied real case, [`scripts/case_run.py`](scripts/case_run.py) verifies explicit
+bindings/hashes, fixes both threshold configs, runs the full CLI chain and records
+`case_provenance.json`; [`scripts/case_check.py`](scripts/case_check.py) independently re-derives the
+sets and recomputes hypergeometric p-values/BH. See [docs/case-run.md](docs/case-run.md). This is an
+orchestrator only: business logic remains in `rnp`.
 
 Windows note: make sure `python` resolves to Python 3. A common trap on workstations with
 molecular-modeling tools installed is `python` resolving to **MGLTools' Python 2.7**; use `py -3.12`
@@ -127,6 +133,8 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 | `rnp enrich` | ✅ v0.1 | ORA via R `clusterProfiler` per group with an **explicit background**; complete tested-term table + significant view; distinct statuses for no-hit vs failure |
 | `rnp mcode` | 🚧 later extension | Module enrichment from Cytoscape MCODE exports; independent of hub ranking |
 | `rnp report` | ✅ v0.1 | Markdown report from verified stage audits + tables; hash-checked; no claims beyond the evidence |
+| `scripts/case_run.py` | ✅ local case entry | Portable preflight + full CLI chain for user-supplied inputs; records source/config/container provenance |
+| `scripts/case_check.py` | ✅ independent check | Re-derives T_r/foreground and recomputes hypergeometric/BH from result tables |
 | `rnp metabolites import` | 🚧 v0.2 | Import processed metabolomics annotations; confirmed compound lists also supported |
 | `rnp structures resolve` | 🚧 v0.2.0 | Resolve names / InChIKeys to structures (PubChem cache) |
 | `rnp compounds annotate/select` | 🚧 v0.2 design | Properties plus explicit inclusion/exclusion decisions; all original candidates retained |

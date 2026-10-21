@@ -15,16 +15,24 @@ DEMO = ROOT / "examples" / "demo"
 FREEZE = DEMO / "CASE-FREEZE.yaml"
 
 
-def test_public_case_is_not_claimed_before_inputs_exist() -> None:
+def test_public_case_gate_is_not_confused_with_local_completion() -> None:
     data = yaml.safe_load(FREEZE.read_text(encoding="utf-8"))
     assert data["case_id"] == "demo-public-compounds"
-    assert data["status"] == "blocked"
+    assert data["status"] == "local_complete_public_release_pending"
     assert data["public_case_claim"] is False
     assert data["case_computed_in_linux"] is True
     assert data["public_release_status"].startswith("blocked")
-    missing = {item["id"] for item in data["required_inputs_missing"]}
-    assert {"disease_genes", "stp_exports", "universe_file"} <= missing
-    assert "hgnc_map" not in missing
+    assert data["status_dimensions"] == {
+        "local_inputs_verified": True,
+        "local_linux_calculation": "complete",
+        "local_independent_check": "passed",
+        "public_redistribution": "pending_official_clarification",
+        "public_case_claim": False,
+        "final_skill_acceptance": "pending",
+    }
+    gaps = {item["id"] for item in data["public_release_gaps"]}
+    assert {"ctd_permission", "stp_permission", "public_artifacts"} == gaps
+    assert data["public_release_gate"]["not_a_data_gap"]
     assert data["disease"]["term"] == "Arthritis, Rheumatoid"
     assert data["disease"]["mesh_id"] == "MESH:D001172"
     assert data["disease"]["row_count"] == 179
@@ -51,7 +59,10 @@ def test_freeze_reuses_recorded_decisions_without_inventing_sources() -> None:
     compounds = decisions["compound_list"]["compounds"]
     assert len(compounds) == 8
     assert compounds[0]["pubchem_cid"] == "5280343"
-    assert data["required_inputs_missing"]
+    assert all(entry["stp_file"].endswith(".xlsx") for entry in compounds)
+    assert "pending_v0.2" not in decisions["compound_list"]["smiles_status"]
+    assert decisions["compound_list"]["smiles_evidence"]["local_pending"]
+    assert data["public_release_gaps"]
     assert data["verification_environment"]["windows"]["status"] == "unverified_blocked"
 
 
@@ -125,7 +136,7 @@ def test_freeze_matches_run_yaml_and_binding_files() -> None:
     }
     assert export_files <= expected_files, f"unbound STP exports: {export_files - expected_files}"
     if export_files != expected_files:
-        assert freeze["status"] == "blocked"
+        assert freeze["public_release_gate"]["status"] == "blocked"
     else:
         # Once all exports exist, the log must contain the real submission evidence.
         required = {

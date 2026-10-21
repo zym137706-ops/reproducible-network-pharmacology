@@ -1,10 +1,10 @@
 # Public case: candidate data sources and license checklist
 
-Status: **candidate sources only — no dataset has been downloaded or committed, and no scientific
-result exists yet.** This page prepares the data/source/license work only. It does not turn
-`examples/demo/` into a completed case, and it must not be cited as one.
-
-For the acceptance conditions see [public-case-checklist.md](public-case-checklist.md).
+Status: **RA case inputs exist locally; public release is pending permission.** The disease extract,
+eight STP XLSX exports, submission log and detailed results are local-only and were used for the
+completed local calculation. HGNC is frozen/committed (CC0). No restricted dataset is committed and
+the local result is not a public case. This page records the source/license checks. For acceptance
+conditions see [public-case-checklist.md](public-case-checklist.md).
 
 ## Candidate public sources
 
@@ -13,7 +13,7 @@ URL is not by itself permission to redistribute.
 
 | Layer | Candidate source | Access / identifiers | License / redistribution check | Status |
 |---|---|---|---|---|
-| Compound structures | PubChem | CID, canonical SMILES, `https://pubchem.ncbi.nlm.nih.gov/` | Check PubChem data terms for the release; do not redistribute vendor-only fields | candidate |
+| Compound structures | PubChem | CID, SMILES/ConnectivitySMILES | Terms for redistribution not confirmed; 8 rows fetched locally, not committed | **local fetched, not committed** |
 | Compound structures | ChEMBL | ChEMBL ID, canonical SMILES, release number | CC BY-SA 4.0 (attribution + share-alike obligations); record release | candidate |
 | Compound names / natural products | NPASS / COCONUT | compound ID, source organism, SMILES | Check each database's academic-use terms; do not assume redistribution rights | candidate |
 | Disease genes | Open Targets Platform | Ensembl gene IDs, disease ID, score, release | CC BY 4.0 typically; record release and attribution | candidate |
@@ -21,10 +21,10 @@ URL is not by itself permission to redistribute.
 | Disease genes (excluded) | GeneCards / OMIM | — | Repository policy excludes vendored GeneCards/OMIM content | excluded |
 | Gene identifiers | HGNC | complete set, HGNC ID, symbol, alias, UniProt | CC0; attribution recommended; frozen derived table with source record | **frozen** |
 | PPI (optional) | STRING | v12.0, confidence cutoff, `protein.links` | CC BY 4.0; record attribution | optional |
-| Enrichment sets | GO | GO release, `org.Hs.eg.db` version | GO CC BY 4.0; record versions in the audited meta | candidate |
+| Enrichment sets | GO | GO release, `org.Hs.eg.db` version | GO CC BY 4.0; local GO.db 3.22.0 used through the locked R library | **local used** |
 | Enrichment sets | Reactome | Reactome release, pathway IDs | Check Reactome terms for the release | candidate |
 | Enrichment sets (excluded) | KEGG | — | KEGG is not redistributable in this repository; keep it user-provided | excluded |
-| Target prediction | SwissTargetPrediction export | one export per compound, submission log, species | Produced manually by the researcher; no automatic submission; check site terms before committing exports | manual gate |
+| Target prediction | SwissTargetPrediction export | 8 XLSX, 800 rows, submission log, Homo sapiens | Manually produced; original files local-only; Terms list CC BY 4.0 for Licensed Materials, scope of exports/derived tables pending clarification | **local verified; public gate pending** |
 
 ## Local data preparation (not committed)
 
@@ -52,15 +52,16 @@ redistribution use. STP submission still requires the researcher's manual export
 5. Whether the file is committed, or only a retrieval script + checksum is committed.
 6. What the case does **not** verify (predictions ≠ experimental validation).
 
-## Open decisions (researcher)
+## Open decisions (researcher / upstream)
 
-- Which disease and compound series may be public without disclosing an unpublished thesis direction.
-- Whether SwissTargetPrediction exports can be redistributed, or only a submission log plus checksums.
-- Whether the case uses only public compounds or a published compound list.
-- Whether the target journal/advisor permits reuse of any wording from an unpublished report.
+- Whether CTD permits public redistribution of the 179-gene subset and derived outputs.
+- Whether the eight STP exports and derived tables fall within Licensed Materials under CC BY 4.0.
+- If permission is not granted, whether to publish only the query/filter recipe and checksums, or
+  choose a case with clear redistribution terms.
 
-## Next step after core verification
+## Next step after local verification
 
-Only after the R environment lock and the CLI tests are green: retrieve the chosen inputs, record the
-table above with hashes, run `validate → ingest → intersect → network → enrich → report`, and write
-the case README with source/license/retrieval evidence. Until then, no public-case claim is allowed.
+The R lock is restored and the local dual-threshold chain plus independent checks are complete. The
+remaining step is the permission gate in `examples/demo/CASE-FREEZE.yaml`: record official replies,
+then either commit the covered subset/results or keep them local and publish only the reproducible
+recipe/checksums. Until then, no public-case claim is allowed.

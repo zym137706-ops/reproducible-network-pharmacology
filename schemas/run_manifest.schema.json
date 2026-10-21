@@ -41,7 +41,19 @@
         "version": { "type": "string" },
         "commit": { "type": ["string", "null"] },
         "dirty": { "type": ["boolean", "null"] },
-        "root": { "type": "string" }
+        "root": { "type": "string" },
+        "source_attestation": {
+          "type": "object",
+          "required": ["origin", "source_sha256", "note"],
+          "additionalProperties": false,
+          "properties": {
+            "origin": { "const": "host_declared" },
+            "source_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "declared_commit": { "type": ["string", "null"] },
+            "declared_dirty": { "type": ["boolean", "null"] },
+            "note": { "type": "string" }
+          }
+        }
       }
     },
     "config": {
@@ -99,6 +111,20 @@
       }
     },
     "references": { "type": "object", "additionalProperties": { "type": "string" } },
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "image": { "type": "string" },
+        "image_id": { "type": "string" },
+        "image_digest": { "type": "string" },
+        "python": { "type": "string" },
+        "r_version": { "type": "string" },
+        "r_lib": { "type": "string" },
+        "renv_lock_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "uv_lock_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
     "r_version": { "type": ["string", "null"] },
     "platform": { "type": "string" },
     "started_at_utc": { "type": "string" },

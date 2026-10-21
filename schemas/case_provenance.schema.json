@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/case_provenance.schema.json",
+  "title": "rnp case run provenance",
+  "description": "External provenance record for a portable case run: source identity, container declarations, fixed configs and inputs.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "generated_at_utc", "source", "container", "inputs", "configs", "commands", "status"],
+  "properties": {
+    "schema": { "const": "rnp-case-provenance/1" },
+    "generated_at_utc": { "type": "string" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root", "git", "source_sha256", "attestation"],
+      "properties": {
+        "root": { "type": "string" },
+        "git": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["commit", "dirty"],
+          "properties": {
+            "commit": { "type": ["string", "null"] },
+            "dirty": { "type": ["boolean", "null"] }
+          }
+        },
+        "source_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "attestation": { "type": "string" }
+      }
+    },
+    "container": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "image": { "type": ["string", "null"] },
+        "image_id": { "type": ["string", "null"] },
+        "image_digest": { "type": ["string", "null"] },
+        "python": { "type": "string" },
+        "r_version": { "type": ["string", "null"] },
+        "r_lib": { "type": ["string", "null"] },
+        "renv_lock_sha256": { "type": ["string", "null"] },
+        "uv_lock_sha256": { "type": ["string", "null"] }
+      }
+    },
+    "inputs": { "type": "object" },
+    "configs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        }
+      }
+    },
+    "commands": { "type": "array", "items": { "type": "string" } },
+    "status": { "enum": ["preflight_only", "running", "complete", "failed"] }
+  }
+}

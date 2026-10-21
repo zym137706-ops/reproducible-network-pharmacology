@@ -1,5 +1,5 @@
 case_id: demo-public-compounds
-status: blocked
+status: local_complete_public_release_pending
 frozen_at_utc: '2026-10-20T10:45:00Z'
 case_computed_in_linux: true
 public_case_claim: false
@@ -15,29 +15,36 @@ recorded_scientific_decisions:
     compounds:
     - name: Quercetin
       pubchem_cid: '5280343'
-      stp_file: quercetin.csv
+      stp_file: Quercetin.xlsx
     - name: Kaempferol
       pubchem_cid: '5280863'
-      stp_file: kaempferol.csv
+      stp_file: Kaempferol.xlsx
     - name: Luteolin
       pubchem_cid: '5280445'
-      stp_file: luteolin.csv
+      stp_file: Luteolin.xlsx
     - name: Apigenin
       pubchem_cid: '5280443'
-      stp_file: apigenin.csv
+      stp_file: Apigenin.xlsx
     - name: Naringenin
       pubchem_cid: '932'
-      stp_file: naringenin.csv
+      stp_file: Naringenin.xlsx
     - name: Catechin
       pubchem_cid: '9064'
-      stp_file: catechin.csv
+      stp_file: Catechin.xlsx
     - name: Gallic acid
       pubchem_cid: '370'
-      stp_file: gallic-acid.csv
+      stp_file: Gallic acid.xlsx
     - name: Chlorogenic acid
       pubchem_cid: '1794427'
-      stp_file: chlorogenic-acid.csv
-    smiles_status: pending_v0.2 (not required for the v0.1 name/export pipeline)
+      stp_file: Chlorogenic acid.xlsx
+    smiles_status: actual submitted structures recorded locally in data/local/case/STP-PENDING-SUBMISSIONS.tsv
+      and STP-SUBMISSION-LOG.tsv; PubChem structures local-only pending terms; complete
+      chemical registration deferred to v0.2
+    smiles_evidence:
+      local_pending: data/local/case/STP-PENDING-SUBMISSIONS.tsv
+      local_log: C:/DSH/rnp-case-inputs/handoff-2026-10-21/STP-SUBMISSION-LOG.tsv
+      structures_source: PubChem CID + SMILES/ConnectivitySMILES, fetched 2026-10-20
+      license_status: local-only; not committed
   stp_probability: 0.1
   sensitivity_probability: 0.05
   enrichment:
@@ -197,55 +204,22 @@ data_sources:
   stp:
     used_for: predicted targets
     url: https://www.swisstargetprediction.ch/
-    retrieved: null
-    release_or_date: null
-    sha256: null
-    license_status: manual submission only; service-terms evidence required
-required_inputs_missing:
-- id: disease_genes
-  path: inputs/disease_genes.txt
-  needs:
-  - local CTD extract is prepared but not committed; redistribution permission required
-    before public release/commit
-  owner: researcher
-- id: stp_exports
-  path: inputs/stp/<compound>.csv
-  needs:
-  - 8 XLSX locally received and verified; public redistribution permission required
-    before commit/upload
-  owner: researcher
-- id: universe_file
-  path: inputs/universe-0.10.txt, inputs/universe-0.05.txt
-  needs:
-  - 0.10/0.05 universes generated and frozen locally; public commit blocked with the
-    upstream data
-  owner: agent
-- id: expected_outputs
-  path: expected/
-  needs:
-  - golden outputs only after the inputs are frozen and the full chain runs
-  - declared numeric tolerances for enrichment
-  owner: agent+researcher
-- id: case_readme
-  path: README.md
-  needs:
-  - exact sources, queries, retrieval dates, licences and what is not verified
-  - no claim of mechanism, efficacy or completed public case
-  owner: agent+researcher
-blocked_reason:
-- STP exports require manual submission; automatic submission is prohibited.
-- The specific CTD disease term/query, release and redistribution terms are not recorded.
-- The explicit enrichment background is not chosen or documented.
-- No disease, STP, background or expected-output evidence exists yet; HGNC and local
-  PubChem structures are prepared but do not make the case complete.
-- The verified Linux environment is available, but it cannot compute a case with absent
-  inputs.
+    retrieved: 2026-10-21 (submitted date); 14:00:11-14:13:22 +08:00 file LastWriteTime
+      proxy
+    release_or_date: manual submission 2026-10-21; date-only; no service release version
+    sha256: 8 per-file hashes recorded in the local submission log; not committed
+    license_status: STP Terms grant CC BY 4.0 to Licensed Materials; coverage of these
+      exports/derived outputs is pending clarification; not public
+    raw_rows: 800
+    invalid_rows: 0
+    rows_at_0.10: 676
+    rows_at_0.05: 740
 verification_environment:
   linux_ci:
     workflow: .github/workflows/ci.yml
-    run: https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/runs/39415883483
-    result: 4/4 jobs success; renv restore and full synthetic quickstart passed
-    caveat: this verifies machinery, not the public scientific case
+    run: https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/runs/39560317764
+    result: 4/4 jobs success on commit 0146bee
+    caveat: CI verifies machinery/synthetic data, not the restricted local case
   windows:
     status: unverified_blocked
     evidence: Codex isolated-library run 119 passed / 11 failed, R subprocess exit
@@ -253,20 +227,12 @@ verification_environment:
     policy: keep the non-zero exit guard; do not mask failures or use Windows as the
       case environment
     record: docs/environment.md and this file
-handoff:
-- ask_researcher_for: exact CTD disease term, query, release, inclusion/exclusion
-    rules, retrieval date and redistribution terms
-- ask_researcher_for: eight manual STP exports plus the completed STP-SUBMISSION-LOG.tsv
-    rows and service-terms evidence
-- ask_researcher_for: explicit enrichment universe list and the reason for choosing
-    it
-- then: record all hashes in this file, change status to frozen, run the chain in
-    Linux CI
-- then: create expected outputs and only then update the case README
-next_action_when_inputs_exist:
-- record every source/query/date/hash/licence above; replace status blocked with frozen
-- run the full chain in the verified Linux CI environment
-- publish case results only if the checklist in docs/public-case-checklist.md is complete
+  local_docker:
+    image: bioconductor/bioconductor_docker:RELEASE_3_22
+    r_version: 4.5.2
+    python: 3.12.3 (container)
+    status: both thresholds complete; independent hypergeometric/BH check passed
+    caveat: local only; no restricted data uploaded to CI
 local_calculation:
   status: completed_local_not_public
   environment: bioconductor/bioconductor_docker:RELEASE_3_22; R 4.5.2; clusterProfiler
@@ -322,3 +288,56 @@ input_freeze_status:
   hgnc: frozen CC0 and committed
   background: generated and frozen locally for 0.10/0.05
   claims: not public
+status_dimensions:
+  local_inputs_verified: true
+  local_linux_calculation: complete
+  local_independent_check: passed
+  public_redistribution: pending_official_clarification
+  public_case_claim: false
+  final_skill_acceptance: pending
+public_release_gate:
+  status: blocked
+  reason: Official clarification is pending for CTD redistribution and for whether
+    the eight STP exports/derived tables fall under CC BY 4.0. Local computation and
+    inspection are allowed.
+  not_a_data_gap: The disease extract, STP XLSX files, submission log, backgrounds
+    and detailed results all exist locally and were used for the completed calculation.
+local_input_handoff:
+  STP_directory: C:/DSH/rnp-case-inputs/stp
+  handoff_directory: C:/DSH/rnp-case-inputs/handoff-2026-10-21
+  disease: data/local/case/disease_genes.txt
+  backgrounds: data/local/case/run-2026-10-21/backgrounds
+  results: data/local/case/run-2026-10-21
+  files_verified: 8
+  submitted_date_precision: date
+  retrieved_date_basis: user-approved file LastWriteTime proxy
+  retrieved_date_precision: filesystem timestamp seconds
+  time_zone: China Standard Time (UTC+08:00)
+  operator: manual by user; identity not supplied
+  result_url: not_saved
+  job_id: not_saved
+public_release_gaps:
+- id: ctd_permission
+  what: written/clarified permission for the 179-gene subset and derived outputs on
+    public GitHub/releases
+  owner: researcher + CTD
+  status: pending
+- id: stp_permission
+  what: confirmation whether the eight exports and derived tables are Licensed Materials
+    under CC BY 4.0
+  owner: researcher + STP
+  status: pending
+- id: public_artifacts
+  what: commit restricted inputs/expected outputs only if permission covers them;
+    otherwise publish query/filtering recipe and checksums
+  owner: researcher + agent
+  status: pending
+public_release_actions:
+- record the official replies; do not treat the current project record as written
+  permission
+- if permitted, add the covered subset/results with attribution/licence and rerun
+  from a clean clone
+- if not permitted, keep the local case and publish only code, synthetic examples,
+  a reproducible query/filtering recipe and checksums
+- do not change the completed local status into a public-case pass without the permission
+  gate

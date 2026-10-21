@@ -102,12 +102,49 @@ def code_root() -> Path:
 def code_identity() -> dict[str, Any]:
     root = code_root()
     state = git_state(root)
-    return {
+    identity: dict[str, Any] = {
         "version": package_version(),
         "commit": state["commit"],
         "dirty": state["dirty"],
         "root": str(root),
     }
+    source_sha = os.environ.get("RNP_CODE_SOURCE_SHA256")
+    if source_sha:
+        identity["source_attestation"] = {
+            "origin": "host_declared",
+            "source_sha256": source_sha,
+            "declared_commit": os.environ.get("RNP_CODE_DECLARED_COMMIT") or None,
+            "declared_dirty": (
+                os.environ.get("RNP_CODE_DECLARED_DIRTY", "").lower() in {"true", "1", "yes"}
+                if os.environ.get("RNP_CODE_DECLARED_DIRTY")
+                else None
+            ),
+            "note": (
+                "supplied by the host/runner; git fields above are read from the checkout "
+                "if available"
+            ),
+        }
+    return identity
+
+
+def container_identity() -> dict[str, Any]:
+    """Container/environment declarations supplied by the host runner.
+
+    These values are not inferred from the container. A runner that cannot establish a value leaves
+    it out; it must not fabricate a digest or a restored-library version.
+    """
+    keys = {
+        "image": "RNP_CONTAINER_IMAGE",
+        "image_id": "RNP_CONTAINER_IMAGE_ID",
+        "image_digest": "RNP_CONTAINER_IMAGE_DIGEST",
+        "python": "RNP_CONTAINER_PYTHON",
+        "r_version": "RNP_R_VERSION",
+        "r_lib": "RNP_R_LIB",
+        "renv_lock_sha256": "RNP_RENV_LOCK_SHA256",
+        "uv_lock_sha256": "RNP_UV_LOCK_SHA256",
+    }
+    identity = {key: os.environ.get(env) for key, env in keys.items() if os.environ.get(env)}
+    return identity
 
 
 def config_identity(config) -> dict[str, Any]:
@@ -142,7 +179,7 @@ def build_manifest(
     repository must not borrow the code commit as its own identity.
     """
     env = environment()
-    return {
+    manifest = {
         "schema_version": "2.0",
         "run_id": run_id,
         "tool": {"name": DIST_NAME, "version": package_version()},
@@ -164,6 +201,10 @@ def build_manifest(
         # platform strings are informative only; keep them out of tables.
         "platform": env["platform"],
     }
+    container = container_identity()
+    if container:
+        manifest["container"] = container
+    return manifest
 
 
 def write_json(path: str | Path, payload: Any) -> None:

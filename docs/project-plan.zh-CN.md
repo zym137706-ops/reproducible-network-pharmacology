@@ -38,11 +38,12 @@
 定位：可独立运行、可追溯、可复算的网络药理学分析工具，以及调用同一 CLI 的薄 Codex Skill 层。
 展示重点：输入身份与分析决策可靠、统计计算可核验、Agent 能识别异常；预测关联和对接结果不构成机制或疗效验证。
 
-截至 2026-10-20：v0.1 的 `validate → ingest → intersect → network → enrich → report → manifest`
+截至 2026-10-21：v0.1 的 `validate → ingest → intersect → network → enrich → report → manifest`
 链路已实现；包装层非零退出码、report 父链/产物哈希、富集有效前景/背景集合均有回归测试。
 Linux CI 从 `renv.lock` 恢复并通过完整合成 quickstart；Windows 因 R native exit 0xC0000005
-仍有 11 个 R 相关测试失败，不能作为验证环境。公开案例只有冻结的已记录决定和明确缺项，
-尚未计算；Skill 场景测试通过，但未完成真实 agent 会话验收。
+仍有 11 个 R 相关测试失败，不能作为验证环境。真实 RA 案例已在本地 Linux Docker 完成双阈值
+计算与独立超几何/BH 核查，但 CTD/STP 再分发许可未确认，公开状态仍 blocked、不得宣称公开案例通过。
+Skill 场景测试通过，最终版真实 agent 会话验收待本轮完成。
 v0.0.1 是包版本/骨架标识，不能据此称为已经发布的 GitHub release；尚未打 `v0.1.0` tag。
 
 状态统一使用：设计中 → 已实现 → 在指定环境验证 → 已发布。每项状态附 commit、运行记录或 release 链接。
