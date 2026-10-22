@@ -113,6 +113,7 @@ def code_identity() -> dict[str, Any]:
         identity["source_attestation"] = {
             "origin": "host_declared",
             "source_sha256": source_sha,
+            "scope": os.environ.get("RNP_CODE_SOURCE_SCOPE") or None,
             "declared_commit": os.environ.get("RNP_CODE_DECLARED_COMMIT") or None,
             "declared_dirty": (
                 os.environ.get("RNP_CODE_DECLARED_DIRTY", "").lower() in {"true", "1", "yes"}

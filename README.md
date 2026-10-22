@@ -114,10 +114,12 @@ is in [docs/public-case-checklist.md](docs/public-case-checklist.md); STP export
 hand. The synthetic demo is an engineering test, not a scientific result.
 
 For a user-supplied real case, [`scripts/case_run.py`](scripts/case_run.py) verifies explicit
-bindings/hashes, fixes both threshold configs, runs the full CLI chain and records
-`case_provenance.json`; [`scripts/case_check.py`](scripts/case_check.py) independently re-derives the
-sets and recomputes hypergeometric p-values/BH. See [docs/case-run.md](docs/case-run.md). This is an
-orchestrator only: business logic remains in `rnp`.
+bindings/hashes and exact submitted structures when a log is supplied, fixes both threshold configs,
+runs the full CLI chain, invokes [`scripts/case_check.py`](scripts/case_check.py) and records
+`case_provenance.json`; the overall status is `complete` only after the analysis, both manifest checks
+and the independent set/p-value/BH check succeed. Source hashes use the versioned
+`case-source-hash-v2` scope (case-relevant source + entrypoints + locks, not the whole package).
+See [docs/case-run.md](docs/case-run.md). This is an orchestrator only: business logic remains in `rnp`.
 
 Windows note: make sure `python` resolves to Python 3. A common trap on workstations with
 molecular-modeling tools installed is `python` resolving to **MGLTools' Python 2.7**; use `py -3.12`

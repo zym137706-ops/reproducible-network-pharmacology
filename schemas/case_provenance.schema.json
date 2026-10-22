@@ -25,6 +25,38 @@
           }
         },
         "source_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "hash_rule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["version", "algorithm", "path_format", "content", "scope", "excludes"],
+          "properties": {
+            "version": { "type": "string" },
+            "algorithm": { "type": "string" },
+            "path_format": { "type": "string" },
+            "content": { "type": "string" },
+            "scope": { "type": "string" },
+            "excludes": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "groups": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["files", "sha256"],
+            "properties": {
+              "files": { "type": "integer", "minimum": 0 },
+              "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+            }
+          }
+        },
+        "combined": {
+          "type": "object",
+          "required": ["files", "sha256"],
+          "properties": {
+            "files": { "type": "integer", "minimum": 0 },
+            "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+          }
+        },
         "attestation": { "type": "string" }
       }
     },
@@ -55,6 +87,9 @@
       }
     },
     "commands": { "type": "array", "items": { "type": "string" } },
-    "status": { "enum": ["preflight_only", "running", "complete", "failed"] }
+    "status": { "enum": ["preflight_only", "running", "complete", "failed"] },
+    "failed_stage": { "type": "string" },
+    "failed_command": { "type": "string" },
+    "child_exit_code": { "type": "integer" }
   }
 }

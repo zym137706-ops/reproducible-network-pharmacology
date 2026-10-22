@@ -49,6 +49,7 @@
           "properties": {
             "origin": { "const": "host_declared" },
             "source_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+            "scope": { "type": ["string", "null"] },
             "declared_commit": { "type": ["string", "null"] },
             "declared_dirty": { "type": ["boolean", "null"] },
             "note": { "type": "string" }

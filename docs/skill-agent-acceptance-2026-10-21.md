@@ -12,10 +12,17 @@ installed final `skills/np-workflow/SKILL.md` at clean commit **e81f5bf**. Sessi
 | Model | `gpt-5.6-sol` |
 | Host | Windows, checkout copy of clean clone e81f5bf |
 | Skill install | copied to `%USERPROFILE%\.codex\skills\np-workflow\SKILL.md` |
-| Skill SHA-256 | `f2002b726198d7d409d9e3efb43935e21bcf1805f2a2313d21719f91ac428147` |
+| Skill SHA-256 at session | `f2002b726198d7d409d9e3efb43935e21bcf1805f2a2313d21719f91ac428147` |
+| Current boundary-only Skill SHA-256 | `2934f2e5cdbd2291a381f82b84657b02be98ed80d60106c2a56aafb752b93b78` |
 | Discovery | Codex listed `np-workflow`; each session read `SKILL.md` before actions |
 | Trigger | normal/zero/partial/tamper/missing sessions invoked the workflow instructions |
 | Fixed commit/worktree | `e81f5bf`, worktree clean before acceptance; only generated `_out/` ignored artifacts changed |
+
+**2026-10-22 addendum.** A policy-only boundary was added to `SKILL.md` (third-party/Agent batch STP
+submission must not create official case inputs; external runs are separate snapshots). This changes
+the text hash but not any analysis/CLI behavior. None of the accepted scenarios invokes that batch
+path, so no scenario was re-run; the installed skill was synced to the new hash. If the behavior
+changes in future, affected scenarios must be re-run rather than relying on this record.
 
 ## Scenario results
 

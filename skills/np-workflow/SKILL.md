@@ -97,5 +97,8 @@ uv run rnp manifest --run-dir results/<run-id> --check-inputs
 ## Boundaries
 
 - No automatic SwissTargetPrediction submission.
+- Do not invoke a third-party STP batch-submission skill to create official case inputs. The official
+  case uses the manually submitted exports plus their completed submission log; browser/Agent batch
+  runs are separate exploratory snapshots and must never overwrite the frozen inputs.
 - No docking, topology, ADMET or upstream metabolomics commands in this skill.
 - No claims of experimental validation; keep the generated report's limitation statement.

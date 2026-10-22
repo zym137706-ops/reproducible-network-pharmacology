@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### v0.1 case-entry hardening — 2026-10-22
+
+- `case_run.py` now strictly binds every submission-log row to `stp_file`, rejects duplicate/missing/
+  unbound rows, checks CID/submission_id/species/hash, and compares `submitted_structure` to the
+  compound's exact stripped SMILES before analysis. A missing/blank compound structure or log column
+  fails with the file/entry/field; optional-log behavior remains.
+- Source hashing is versioned as `case-source-hash-v2`: it covers `src/rnp`, `R`, `schemas`, the three
+  case entrypoint scripts and `uv.lock`/`renv.lock`, excludes caches/venv/build/results/data, records
+  core/entrypoint/lock/combined hashes separately, and is explicitly not a full repository/package
+  hash. Missing caches no longer change the hash; controlled source edits do.
+- The formal `case_run.py` entry now invokes `case_check.py` after both manifest checks. Overall
+  `complete` requires analysis + manifests + independent check; child/checker failure exits non-zero
+  and persists `status=failed`, `failed_stage`, `failed_command`, `child_exit_code` and prior commands.
+- Linux CI R job now runs the synthetic case entry end-to-end (both thresholds + checker with expected
+  counts) and a wrong-structure rejection path. Docs, schema, Skill boundary and tests updated.
+
 ### v0.1 portable case entry, provenance and final acceptance — 2026-10-21
 
 - Fixed case-record consistency: actual `.xlsx` bindings, actual local submitted-structure evidence,

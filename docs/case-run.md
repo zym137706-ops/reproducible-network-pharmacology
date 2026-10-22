@@ -10,8 +10,11 @@ Every analysis step remains the `rnp` CLI.
 - `--stp-dir`: the native STP exports named exactly by `stp_file`; no fuzzy matching
 - `--disease-genes`: one HGNC symbol per line
 - `--hgnc-map`: frozen HGNC table with the columns expected by `rnp`
-- `--log`: optional completed submission log; if provided, every result SHA-256, structure, species
-  and file binding is checked before anything runs
+- `--log`: optional completed submission log; if provided, each row is bound by `stp_file`,
+  `submitted_structure` is compared byte-for-byte (after trimming whitespace) with the compound's
+  actual `smiles`, and CID/submission_id/species/result SHA-256 are checked before anything runs.
+  Missing columns, duplicate/missing/unbound rows, or mismatched structures fail. If no log is
+  provided, `log.provided=false`; the run is **not** labelled as a verified submission log.
 - `--out`: a **new or empty** output directory; the runner refuses to overwrite it
 - `--config-template`: defaults to `examples/demo/run.yaml`; case-specific decisions are reused
 
@@ -38,8 +41,11 @@ uv run python scripts/case_run.py ...same inputs... --out /path/to/new-case-outp
 ```
 
 Order: `validate → ingest → build_case_background.py → intersect → network → enrich → report →
-manifest --check-inputs` for each threshold. Any non-zero child exit stops the run. Configs are
-written before ingest and are not modified afterwards.
+manifest --check-inputs` for each threshold, then **`case_check.py` once across both runs**. The
+overall `case_provenance.json` becomes `complete` only after the analysis, both manifest checks and
+the independent checker succeed. A child/checker failure exits non-zero and persists `status=failed`,
+`failed_stage`, `failed_command` and the real `child_exit_code`, with the earlier commands retained.
+Configs are written before ingest and are not modified afterwards.
 
 ## Independent check
 
@@ -67,14 +73,25 @@ RNP_CONTAINER_PYTHON, RNP_R_VERSION, RNP_R_LIB,
 RNP_RENV_LOCK_SHA256, RNP_UV_LOCK_SHA256
 ```
 
-`case_provenance.json` records these plus the checkout's `git` commit/dirty state and a source-content
-hash. The same values are attached to each `run_manifest.json` as `container` and
-`code.source_attestation`. If `.git` is unavailable, the code commit stays `null`; do not fabricate it.
-The host-declared source hash/origin is explicitly labelled, not presented as a container Git check.
+`case_provenance.json` records these plus the checkout's `git` commit/dirty state. Source hashing uses
+the versioned `case-source-hash-v2` rule: sha256 over sorted repo-relative POSIX paths + NUL + raw
+bytes + NUL, covering `src/rnp`, `R`, `schemas`, the three case entrypoint scripts and `uv.lock` /
+`renv.lock`. Caches, `.venv`, build/output directories and `data` are excluded. Core, entrypoint, lock
+and combined hashes are recorded separately; this is explicitly **case-relevant source, not a full
+repository/package hash**. A new cache file does not change the hash; a controlled source edit does.
+The same values are attached to each `run_manifest.json` as `container` and
+`code.source_attestation` (including the hash scope). If `.git` is unavailable, the code commit stays
+`null`; do not fabricate it. The host-declared source hash/origin is explicitly labelled, not
+presented as a container Git check.
 
 ## Boundaries
 
 - No automatic STP submission, no network download, no synthetic substitute for a real input.
+- Do not use `swiss-target-prediction-batch` or another browser/Agent batch-submission skill for the
+  official case. Those runs are separate exploratory snapshots: store them in a new ignored
+  `data/local/case/stp-reproduction-<date>/` directory, never under the frozen `stp/` input or its
+  submission log, and never let them overwrite the manual exports. Compare first; adopting a new
+  snapshot is a scientific decision and needs a new log/hashes and both-threshold rerun.
 - No restricted input or detailed result is committed or uploaded; keep them under `data/local/` or
   another ignored/external directory.
 - The public-case permission gate is separate; a successful local run is not public clearance.

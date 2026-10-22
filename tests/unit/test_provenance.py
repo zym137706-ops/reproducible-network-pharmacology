@@ -42,6 +42,7 @@ def test_container_identity_is_only_what_the_host_supplied(monkeypatch) -> None:
 
 def test_manifest_schema_accepts_attestation_and_container(monkeypatch) -> None:
     monkeypatch.setenv("RNP_CODE_SOURCE_SHA256", "b" * 64)
+    monkeypatch.setenv("RNP_CODE_SOURCE_SCOPE", "case-relevant source, not full repository")
     monkeypatch.setenv("RNP_CONTAINER_IMAGE_DIGEST", "sha256:" + "c" * 64)
     manifest = build_manifest(
         run_id="test",
@@ -56,6 +57,7 @@ def test_manifest_schema_accepts_attestation_and_container(monkeypatch) -> None:
     )
     jsonschema.validate(manifest, load_schema("run_manifest"))
     assert manifest["code"]["source_attestation"]["origin"] == "host_declared"
+    assert manifest["code"]["source_attestation"]["scope"].startswith("case-relevant")
     assert manifest["container"]["image_digest"].startswith("sha256:")
 
 

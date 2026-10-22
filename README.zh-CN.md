@@ -11,9 +11,10 @@
 > exit `0xC0000005` 导致 11 个 R 相关测试失败，非零退出保护保留、不忽略。公开 RA 案例（MeSH D001172）
 > 已在 Linux Docker 本地完成 0.10/0.05 计算与独立超几何/BH 核查；但 CTD/STP 再分发许可未确认，
 > **不可公开发布**，疾病/STP/结果仅本地保存；HGNC 已按 CC0 冻结。
-> 可移植真实案例入口：`scripts/case_run.py`（校验绑定/哈希、固定双阈值配置、跑全链并记录
-> `case_provenance.json`）与 `scripts/case_check.py`（独立重建集合并重算超几何/BH）。业务逻辑仍在
-> `rnp`，入口只做编排；见 [docs/case-run.md](docs/case-run.md)。
+> 可移植真实案例入口：`scripts/case_run.py`（严格校验日志结构/CID/哈希、固定双阈值配置、跑全链、
+> 调用 `scripts/case_check.py`、记录 `case_provenance.json`；只有分析 + manifest + 独立核查全部成功
+> 才标记 `complete`）。源码哈希使用版本化 `case-source-hash-v2` 范围（案例相关源码/入口/锁文件，
+> 不是完整仓库包）。业务逻辑仍在 `rnp`，入口只做编排；见 [docs/case-run.md](docs/case-run.md)。
 > Skill 已在最终提交上完成 Codex 真实会话验收（normal/missing/partial/tamper/zero；Linux enrichment/report
 > 由 Codex 调用 Docker；存在一个 PowerShell 退出码显示限制），另有一次 DSH 会话；见
 > `docs/skill-acceptance.md` 与 `docs/skill-agent-acceptance-2026-10-21.md`，不等同通用验证。

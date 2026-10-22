@@ -45,7 +45,8 @@
 Linux CI 从 `renv.lock` 恢复并通过完整合成 quickstart；Windows 因 R native exit 0xC0000005
 仍有 11 个 R 相关测试失败，不能作为验证环境。真实 RA 案例已在本地 Linux Docker 完成双阈值
 计算与独立超几何/BH 核查，但 CTD/STP 再分发许可未确认，公开状态仍 blocked、不得宣称公开案例通过。
-Skill 场景测试通过，最终版真实 agent 会话验收待本轮完成。
+Skill 场景测试通过，最终版 Codex 真实会话验收已完成；后续仅增加策略边界说明，不改分析行为，
+其安装版哈希与验收记录同步记录在 `docs/skill-agent-acceptance-2026-10-21.md`。
 v0.0.1 是包版本/骨架标识，不能据此称为已经发布的 GitHub release；尚未打 `v0.1.0` tag。
 
 状态统一使用：设计中 → 已实现 → 在指定环境验证 → 已发布。每项状态附 commit、运行记录或 release 链接。

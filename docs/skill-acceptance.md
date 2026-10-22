@@ -9,8 +9,10 @@ Scope: the thin `skills/np-workflow/SKILL.md` layer. Three layers exist:
 3. The **final-revision Codex acceptance** (2026-10-21) at clean commit `e81f5bf`; report:
    [`skill-agent-acceptance-2026-10-21.md`](skill-agent-acceptance-2026-10-21.md). It covers
    normal/missing/partial/tamper/zero plus Linux enrichment/report (Codex invoked a Linux Docker
-   pipeline); Codex CLI `0.147.0`, model `gpt-5.6-sol`, Skill SHA-256 `f2002b72…`. The report records
-   the PowerShell-wrapper exit-display caveat and that Codex itself ran on the host.
+   pipeline); Codex CLI `0.147.0`, model `gpt-5.6-sol`, Skill SHA-256 at session `f2002b72…`;
+   current boundary-only text hash `2934f2e5…`. The report records the PowerShell-wrapper
+   exit-display caveat and that Codex itself ran on the host; the later batch-boundary edit did not
+   change CLI behavior and was not re-run.
 
 The earlier real session passed 5/5 scenarios on DeepSeek Harness/`deepseek-flash`, Windows 11,
 commit `49f0996` plus a dirty worktree. Enrichment was intentionally skipped because Windows R exits

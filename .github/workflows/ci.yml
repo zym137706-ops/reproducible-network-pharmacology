@@ -153,3 +153,126 @@ jobs:
           uv run rnp report --config examples/quickstart/run.yaml \
             --run-dir results/quickstart-r
           uv run rnp manifest --run-dir results/quickstart-r --check-inputs
+      - name: Portable case entry end-to-end on synthetic inputs
+        env:
+          RNP_RSCRIPT: Rscript
+        run: |
+          OUT="$RUNNER_TEMP/case-entry-e2e"
+          uv run python scripts/case_run.py \
+            --compounds tests/fixtures/run/inputs/compounds.tsv \
+            --stp-dir tests/fixtures/run/inputs/stp \
+            --disease-genes tests/fixtures/run/inputs/disease_genes.txt \
+            --hgnc-map tests/fixtures/hgnc/hgnc_map.tsv \
+            --config-template examples/quickstart/run.yaml \
+            --out "$OUT"
+          uv run python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          out = Path(os.environ["RUNNER_TEMP"]) / "case-entry-e2e"
+          provenance = json.loads((out / "case_provenance.json").read_text(encoding="utf-8"))
+          assert provenance["status"] == "complete", provenance
+          assert provenance["source"]["hash_rule"]["version"] == "case-source-hash-v2"
+          assert any("case_check.py" in c for c in provenance["commands"])
+          check = json.loads((out / "independent-check.json").read_text(encoding="utf-8"))
+          expected = {
+              "0.10": (4, 2, 4, 4),
+              "0.05": (5, 3, 5, 6),
+          }
+          for label, (targets, intersection, nodes, edges) in expected.items():
+              run = check["runs"][label]
+              assert run["T_r"] == targets, (label, run)
+              assert run["intersection"] == intersection, (label, run)
+              assert run["network_nodes"] == nodes, (label, run)
+              assert run["network_edges"] == edges, (label, run)
+          print("portable case entry e2e ok")
+          PY
+      - name: Portable case entry rejects wrong submitted structure
+        run: |
+          uv run python - <<'PY'
+          import csv
+          import hashlib
+          import subprocess
+          import sys
+          import tempfile
+          from pathlib import Path
+
+          root = Path.cwd()
+          with tempfile.TemporaryDirectory() as raw:
+              tmp = Path(raw)
+              compounds = list(
+                  csv.DictReader(
+                      (root / "tests/fixtures/run/inputs/compounds.tsv").open(
+                          encoding="utf-8"
+                      ),
+                      delimiter="\t",
+                  )
+              )
+              for row, smiles in zip(compounds, ["CCO", "CCC"], strict=True):
+                  row["smiles"] = smiles
+              compounds_path = tmp / "compounds.tsv"
+              with compounds_path.open("w", encoding="utf-8", newline="") as handle:
+                  writer = csv.DictWriter(
+                      handle,
+                      fieldnames=list(compounds[0]),
+                      delimiter="\t",
+                      lineterminator="\n",
+                  )
+                  writer.writeheader()
+                  writer.writerows(compounds)
+              log = tmp / "log.tsv"
+              with log.open("w", encoding="utf-8", newline="") as handle:
+                  writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
+                  writer.writerow(
+                      [
+                          "stp_file",
+                          "compound",
+                          "pubchem_cid",
+                          "submitted_structure",
+                          "species",
+                          "submitted_date",
+                          "result_sha256",
+                      ]
+                  )
+                  for row in compounds:
+                      stp = row["stp_file"]
+                      writer.writerow(
+                          [
+                              stp,
+                              row["name"],
+                              row["pubchem_cid"],
+                              "C",
+                              "Homo sapiens",
+                              "2026-10-21",
+                              hashlib.sha256(
+                                  (root / "tests/fixtures/run/inputs/stp" / stp).read_bytes()
+                              ).hexdigest(),
+                          ]
+                      )
+              result = subprocess.run(
+                  [
+                      sys.executable,
+                      "scripts/case_run.py",
+                      "--compounds",
+                      str(compounds_path),
+                      "--stp-dir",
+                      str(root / "tests/fixtures/run/inputs/stp"),
+                      "--disease-genes",
+                      str(root / "tests/fixtures/run/inputs/disease_genes.txt"),
+                      "--hgnc-map",
+                      str(root / "tests/fixtures/hgnc/hgnc_map.tsv"),
+                      "--log",
+                      str(log),
+                      "--preflight-only",
+                      "--out",
+                      str(tmp / "out"),
+                  ],
+                  cwd=root,
+                  capture_output=True,
+                  text=True,
+              )
+              assert result.returncode != 0, result
+              assert "submitted_structure" in result.stderr, result.stderr
+          print("invalid submitted structure rejected")
+          PY

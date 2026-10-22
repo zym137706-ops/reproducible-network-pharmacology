@@ -122,6 +122,14 @@ stp_exports:
     files_verified: 8
     time_precision: submitted_date=date; retrieved=file LastWriteTime proxy, seconds,
       +08:00; URL/job_id=not_saved
+  acquisition_policy:
+    official_case: The eight manually submitted XLSX files and the 2026-10-21 submission
+      log; frozen and hash-checked.
+    external_batch_runs: Third-party/browser batch submission runs (e.g. swiss-target-prediction-batch
+      in Codex/zcode) are exploratory reproduction snapshots only. Store under a separate
+      ignored directory, never overwrite the official inputs, and do not merge/replace
+      without a new researcher decision, new log, and full rerun.
+    automatic_submission: Forbidden for the official case.
 enrichment_background:
   file: inputs/universe-0.10.txt
   required: true
