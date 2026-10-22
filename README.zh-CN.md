@@ -18,7 +18,8 @@
 > Skill 已在最终提交上完成 Codex 真实会话验收（normal/missing/partial/tamper/zero；Linux enrichment/report
 > 由 Codex 调用 Docker；存在一个 PowerShell 退出码显示限制），另有一次 DSH 会话；见
 > `docs/skill-acceptance.md` 与 `docs/skill-agent-acceptance-2026-10-21.md`，不等同通用验证。
-> 干净 clone 复算记录见 `docs/case-clean-run-2026-10-21.md`。
+> 最新可移植入口干净 clone 复算记录见 `docs/case-entry-clean-run-2026-10-22.md`；较早记录保留为
+> `docs/case-clean-run-2026-10-21.md`。
 > 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[案例冻结](examples/demo/CASE-FREEZE.yaml)；
 > [公开案例来源清单](docs/public-case-sources.md)；[环境记录](docs/environment.md)。
 

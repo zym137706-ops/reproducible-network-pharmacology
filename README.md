@@ -18,7 +18,9 @@ and hashes, and every output can be regenerated from a single config file.
 > The thin Skill has a final-revision Codex real-agent acceptance (normal/missing/partial/tamper/zero;
 > Linux enrichment/report via Docker; one shell-wrapper caveat) plus a separate DSH session; see
 > `docs/skill-acceptance.md` and `docs/skill-agent-acceptance-2026-10-21.md`. This is not a general
-> validation. The clean-clone run is recorded in `docs/case-clean-run-2026-10-21.md`. See the
+> validation. The latest portable-entry clean-clone run is recorded in
+> `docs/case-entry-clean-run-2026-10-22.md`; the earlier run remains historical at
+> `docs/case-clean-run-2026-10-21.md`. See the
 > [maintained plan](docs/project-plan.zh-CN.md),
 > [case freeze](examples/demo/CASE-FREEZE.yaml),
 > [public-case sources](docs/public-case-sources.md) and

@@ -309,6 +309,18 @@ local_calculation:
     provenance_path: C:/DSH/rnp-clean-run-e81f5bf/case_provenance.json
     status: complete; all stages complete; independent check passed; manifest 10 inputs
       no drift
+  case_entry_clean_run:
+    commit: 2dc39471c1b7913d09c9ea9514b29352fafe268e
+    dirty: false
+    source_sha256: 67e57b00517df811bfc00d8f007d8b81ec966a5b0993518021a8cea664c641d1
+    source_hash_rule: case-source-hash-v2
+    image: bioconductor/bioconductor_docker:RELEASE_3_22
+    image_digest: bioconductor/bioconductor_docker@sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
+    report_sha256:
+      '0.10': 3629cc1a50c894fed8276dc6c519203e805dbf11787fb6eb3d14919979bbbf44
+      '0.05': a54954e8e0af4da060febee028dba2600517e18fcee3e851ba9ab05533974dc5
+    status: complete; strict log structure/CID/hash checks; both manifests no drift;
+      case_check executed and passed
 public_release_status: 'blocked: upstream data redistribution/permission not confirmed;
   results and local inputs not committed'
 input_freeze_status:
