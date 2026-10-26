@@ -5,6 +5,24 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### STP permission confirmation and local release candidate — 2026-10-26
+
+- Recorded the 2026-10-23 SwissDrugDesign reply: the eight native XLSX tables are **CC BY 4.0**;
+  attribution is required; the original tables must not be modified; derived analyses are permitted.
+  Required citation includes the SwissTargetPrediction website, prediction date 2026-10-21 and
+  Daina & Zoete, *Communications Chemistry* 7, 105 (2024).
+- Archived the reply screenshot in the local ignored evidence directory (`2880a092…`); `.eml`/full
+  headers were not supplied, so signature/header authenticity is not claimed. The screenshot/private
+  correspondence is not committed.
+- Added a de-identified permission summary, a byte-identical local STP candidate package with per-file
+  SHA-256/`FILES.tsv`/README/ATTRIBUTION/DATA-LICENSE, and a release-candidate checklist. The
+  candidate is outside Git and not published.
+- Updated LICENSE/source records, CASE-FREEZE, HANDOFF, case README, public checklist/sources, README
+  and plan: STP tables confirmed; CTD remains pending; the overall public case stays blocked.
+- Added an unsent CTD follow-up draft outside Git (suggested 2026-10-28–30).
+- No real XLSX, CTD data, private log or full correspondence was uploaded/committed; no tag, release or
+  visibility change.
+
 ### v0.1 case-entry hardening — 2026-10-22
 
 - `case_run.py` now strictly binds every submission-log row to `stp_file`, rejects duplicate/missing/

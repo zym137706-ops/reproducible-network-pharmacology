@@ -1,7 +1,8 @@
 # Data licenses
 
 The repository **never redistributes restricted data**. Code is MIT; each data source keeps its
-own terms. When in doubt, check the upstream license before publishing derived tables.
+own terms. STP's 2026-10-23 confirmation covers the eight native XLSX tables only; it does not clear
+CTD, PubChem, private logs or mixed-source derived outputs.
 
 | Source | Used for | Redistribution in this repo | Notes |
 |---|---|---|---|
@@ -16,7 +17,7 @@ own terms. When in doubt, check the upstream license before publishing derived t
 | **OMIM** | disease genes | **never** | Johns Hopkins terms; do not redistribute |
 | **KEGG** | pathway gene sets | **never** | proprietary; academic use via license; results are KEGG-derived |
 | **DAVID** | legacy enrichment output | **never** | derived from KEGG/GO; do not publish the raw report |
-| **SwissTargetPrediction** | target prediction demo | **no** (local XLSX/log only) | Terms list CC BY 4.0 for Licensed Materials; whether the eight exports and derived tables are within that scope is pending clarification. Manual submission only; no automated access. See `https://www.swisstargetprediction.ch/termsofuse.php` and the local permission drafts |
+| **SwissTargetPrediction** | target prediction demo | **local candidate only, not committed** | SwissDrugDesign reply 2026-10-23 confirms **CC BY 4.0** for the eight native XLSX tables; include attribution, cite website/prediction date/Daina & Zoete 2024, keep original tables unmodified. Derived analyses are allowed; mixed-source outputs need separate per-source review. Candidate: `C:/DSH/rnp-stp-release-candidate-2026-10-21/` (outside Git). Manual submission only; no automated access. Record: `docs/stp-permission-2026-10-23.md` |
 
 ## How licenses are enforced
 

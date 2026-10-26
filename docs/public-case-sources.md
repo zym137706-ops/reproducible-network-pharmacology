@@ -1,10 +1,11 @@
 # Public case: candidate data sources and license checklist
 
-Status: **RA case inputs exist locally; public release is pending permission.** The disease extract,
-eight STP XLSX exports, submission log and detailed results are local-only and were used for the
-completed local calculation. HGNC is frozen/committed (CC0). No restricted dataset is committed and
-the local result is not a public case. This page records the source/license checks. For acceptance
-conditions see [public-case-checklist.md](public-case-checklist.md).
+Status: **STP tables CC BY 4.0-confirmed; overall public release still pending CTD.** The disease
+extract, eight STP XLSX exports, submission log and detailed results are local-only and were used for
+the completed local calculation. HGNC is frozen/committed (CC0). STP's 2026-10-23 reply covers the
+eight native tables only; a review-only candidate is local and not committed. No restricted dataset
+is committed and the local result is not a public case. This page records the source/license checks.
+For acceptance conditions see [public-case-checklist.md](public-case-checklist.md).
 
 ## Candidate public sources
 
@@ -24,7 +25,7 @@ URL is not by itself permission to redistribute.
 | Enrichment sets | GO | GO release, `org.Hs.eg.db` version | GO CC BY 4.0; local GO.db 3.22.0 used through the locked R library | **local used** |
 | Enrichment sets | Reactome | Reactome release, pathway IDs | Check Reactome terms for the release | candidate |
 | Enrichment sets (excluded) | KEGG | — | KEGG is not redistributable in this repository; keep it user-provided | excluded |
-| Target prediction | SwissTargetPrediction export | 8 XLSX, 800 rows, submission log, Homo sapiens | Manually produced; original files local-only; Terms list CC BY 4.0 for Licensed Materials, scope of exports/derived tables pending clarification | **local verified; public gate pending** |
+| Target prediction | SwissTargetPrediction export | 8 XLSX, 800 rows, submission log, Homo sapiens | SwissDrugDesign reply 2026-10-23 confirms **CC BY 4.0** for the eight native tables; cite website/prediction date/Daina & Zoete 2024; originals unmodified. Derived analyses allowed; mixed-source outputs need per-source review. Local candidate: `C:/DSH/rnp-stp-release-candidate-2026-10-21/` | **confirmed; candidate local; not published** |
 
 ## Local data preparation (not committed)
 
@@ -55,13 +56,15 @@ redistribution use. STP submission still requires the researcher's manual export
 ## Open decisions (researcher / upstream)
 
 - Whether CTD permits public redistribution of the 179-gene subset and derived outputs.
-- Whether the eight STP exports and derived tables fall within Licensed Materials under CC BY 4.0.
-- If permission is not granted, whether to publish only the query/filter recipe and checksums, or
+- Review the local STP candidate package and decide whether to publish the cleared native tables
+  and/or selected STP-only derived outputs.
+- If CTD permission is not granted, whether to publish only the query/filter recipe and checksums, or
   choose a case with clear redistribution terms.
 
 ## Next step after local verification
 
-The R lock is restored and the local dual-threshold chain plus independent checks are complete. The
-remaining step is the permission gate in `examples/demo/CASE-FREEZE.yaml`: record official replies,
-then either commit the covered subset/results or keep them local and publish only the reproducible
+The R lock is restored and the local dual-threshold chain plus independent checks are complete. STP's
+table scope is confirmed; the remaining public gate is CTD permission in
+`examples/demo/CASE-FREEZE.yaml`. Record the official CTD reply, then either publish the covered
+subset/results with attribution or keep them local and publish only the reproducible
 recipe/checksums. Until then, no public-case claim is allowed.

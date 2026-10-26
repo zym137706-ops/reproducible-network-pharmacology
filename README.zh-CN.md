@@ -7,10 +7,12 @@
 
 > 当前状态：**未发布的 v0.1 开发中**（包版本 0.0.1）。导入/交集/网络/富集/报告已接通；包装层非零退出码、
 > engine 实际前景/背景集合与哈希已加固。Python 用 `uv.lock`、R 用 `renv.lock` 锁定，Linux CI
-> （run 39560317764）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
+> （run 39773442191）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
 > exit `0xC0000005` 导致 11 个 R 相关测试失败，非零退出保护保留、不忽略。公开 RA 案例（MeSH D001172）
-> 已在 Linux Docker 本地完成 0.10/0.05 计算与独立超几何/BH 核查；但 CTD/STP 再分发许可未确认，
-> **不可公开发布**，疾病/STP/结果仅本地保存；HGNC 已按 CC0 冻结。
+> 已在 Linux Docker 本地完成 0.10/0.05 计算与独立超几何/BH 核查；STP 已于 2026-10-23 书面确认
+> 八份原生 XLSX 表适用 **CC BY 4.0**（需署名、原表不修改），本地候选包已准备；但 **CTD 许可仍待确认，
+> 整体公开案例仍 blocked**，疾病/CTD 派生结果仅本地保存；HGNC 已按 CC0 冻结。
+> 见 `docs/stp-permission-2026-10-23.md` 与 `docs/public-release-candidate-checklist-2026-10-26.md`。
 > 可移植真实案例入口：`scripts/case_run.py`（严格校验日志结构/CID/哈希、固定双阈值配置、跑全链、
 > 调用 `scripts/case_check.py`、记录 `case_provenance.json`；只有分析 + manifest + 独立核查全部成功
 > 才标记 `complete`）。源码哈希使用版本化 `case-source-hash-v2` 范围（案例相关源码/入口/锁文件，

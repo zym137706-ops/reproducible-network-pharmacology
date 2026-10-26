@@ -1,36 +1,44 @@
-# Case inputs and public-release handoff
+# Case inputs, permissions and release handoff
 
-The local RA case is **computed and independently checked**. No local scientific input is missing.
-The only remaining gate is **public redistribution permission** for CTD and STP data/derived tables.
-HGNC is CC0 and committed; disease/STP/results stay outside git until permission is clarified.
+The local RA case is **computed and independently checked**. STP's written confirmation (2026-10-23)
+covers the eight native XLSX tables under **CC BY 4.0** with attribution and no modification; a
+review-only release candidate is prepared locally. The overall public case remains **blocked** because
+CTD permission/redistribution is still pending.
 
 | # | Item | Local evidence | Status |
 |---|---|---|---|
-| 1 | CTD disease extract | `data/local/case/disease_genes.txt`; 179 genes; SHA-256 `321e5441…`; query/rules in `inputs/CTD-QUERY.md` | **provided + verified locally**; public commit pending permission |
-| 2 | Eight manual STP XLSX exports | external local `stp/` directory; explicit `.xlsx` bindings; 800 rows; 676/740 at 0.10/0.05 | **provided + verified locally**; public redistribution pending |
-| 3 | Completed submission log | external local `STP-SUBMISSION-LOG.tsv`; 8 rows; per-file SHA-256; date-only submitted date; LastWriteTime download proxy; URL/job ID `not_saved` | **provided + verified locally**; public commit pending |
+| 1 | CTD disease extract | `data/local/case/disease_genes.txt`; 179 genes; query/rules in `inputs/CTD-QUERY.md` | **local prepared/used; public permission pending** |
+| 2 | Eight manual STP XLSX exports | external local `stp/`; explicit `.xlsx` bindings; 800 rows; 676/740 at 0.10/0.05 | **CC BY 4.0 confirmed 2026-10-23; candidate prepared; not committed/published** |
+| 3 | Completed submission log | external local `STP-SUBMISSION-LOG.tsv`; 8 rows; per-file SHA-256; date-only / LastWriteTime proxy; URL/job ID `not_saved` | **local only; not covered by the STP table clearance; do not publish without separate review** |
 | 4 | HGNC snapshot | `examples/demo/inputs/hgnc_map.tsv` (2026-10-16, 45,277 Approved, CC0) | **frozen + committed** |
-| 5 | Conditional backgrounds | `data/local/case/run-2026-10-21/backgrounds/`; T_r 239/267; foreground 15/17 | **generated + verified locally**; public commit pending |
-| 6 | Licence/source evidence | `examples/demo/CASE-FREEZE.yaml`; CTD legal page; STP Terms of Use | **public-release gate pending** |
+| 5 | Conditional backgrounds | `data/local/case/run-2026-10-21/backgrounds/`; T_r 239/267; foreground 15/17 | **generated + verified locally; public commit blocked with upstream data** |
+| 6 | Licence/source evidence | `docs/stp-permission-2026-10-23.md`; `examples/demo/CASE-FREEZE.yaml` | **STP confirmed tables-only; CTD pending** |
+
+## STP release candidate
+
+Local, review-only, outside Git:
+
+`C:/DSH/rnp-stp-release-candidate-2026-10-21/`
+
+It contains eight byte-identical XLSX files, `SHA256SUMS.tsv`, `FILES.tsv`, `README.md`,
+`ATTRIBUTION.md` and `DATA-LICENSE.md`. The original tables are unmodified; normalization/filtering/
+deduplication would be separate derived files. It excludes the private submission log, structures,
+CTD data and detailed results. See `docs/stp-permission-2026-10-23.md`.
 
 ## Local run already completed (not public)
 
 Linux Docker (`bioconductor/bioconductor_docker:RELEASE_3_22`, R 4.5.2, clusterProfiler 4.18.4,
-DOSE 4.4.0, org.Hs.eg.db 3.22.0) completed both thresholds. Results are under
-`data/local/case/run-2026-10-21/` and are not committed. Independent check recomputed
-hypergeometric p-values/BH for 704 (0.10) and 747 (0.05) rows and verified all stage audits and
-`manifest --check-inputs` (10 inputs, no drift).
+DOSE 4.4.0, org.Hs.eg.db 3.22.0) completed both thresholds. Current entry point and independent
+checker are documented in `docs/case-run.md`; results are under `data/local/case/run-2026-10-21/` and
+are not committed. The later clean-clone run is in `docs/case-entry-clean-run-2026-10-22.md`.
 
-The repository's `inputs/STP-SUBMISSION-LOG.tsv` is an intentionally blank **template**; the
-completed log is the local handoff file. Do not commit the completed log or XLSX files without
-permission. The pending list `inputs/STP-PENDING-SUBMISSIONS.tsv` is public metadata only (CID,
-species, expected filename, log row) and contains no structures or predictions.
+## Remaining public-release actions
 
-## After permission clarification
-
-1. Record the official reply; do not treat this handoff or the project record as permission.
-2. If permitted, add the covered subset with attribution/licence, then rerun from a clean clone.
-3. If not permitted, keep the local case and publish only code, synthetic examples, the query/filter
-   recipe and checksums; keep the public-case gate **not passed**.
-4. Do not automate STP submission, and do not change the local-completed status into a public-case
-   pass without the permission gate.
+1. Record CTD's official reply; do not treat silence as permission.
+2. Review the local STP candidate and its attribution/hash record; publish only the cleared tables
+   and only after the researcher approves the release scope.
+3. Keep CTD genes, evidence tables, intersections, networks, enrichment tables and detailed reports
+   local until CTD permission is confirmed.
+4. If CTD does not permit the subset, publish only code, synthetic examples, the query/filter recipe
+   and checksums; keep the public case blocked.
+5. Do not publish private submission logs, school/private correspondence or full permission screenshots.

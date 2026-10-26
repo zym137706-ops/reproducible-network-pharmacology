@@ -1,7 +1,7 @@
 # RA public-data case: local calculation state
 
-Status: **locally computed, NOT public-releaseable (blocked).** The machine-readable freeze is
-[`CASE-FREEZE.yaml`](CASE-FREEZE.yaml); acceptance checklist:
+Status: **locally computed, STP tables CC BY 4.0-confirmed, overall public case still blocked by CTD.**
+The machine-readable freeze is [`CASE-FREEZE.yaml`](CASE-FREEZE.yaml); acceptance checklist:
 [`docs/public-case-checklist.md`](../../docs/public-case-checklist.md), sources:
 [`docs/public-case-sources.md`](../../docs/public-case-sources.md).
 
@@ -34,9 +34,14 @@ DOSE 4.4.0, org.Hs.eg.db 3.22.0. Results: `data/local/case/run-2026-10-21/` (ign
 
 ## Why it is not public
 
-The CTD disease extract, STP XLSX files, submission log and result tables are **local only**:
-CTD/STP redistribution permission is not confirmed. HGNC is CC0 and committed; provenance/rule
-records are committed. Local computation does not equal public-release clearance.
+STP confirmed on **2026-10-23** that the eight native XLSX tables are **CC BY 4.0**, with attribution,
+the actual prediction date and no modification of the originals. A local review candidate is at
+`C:/DSH/rnp-stp-release-candidate-2026-10-21/`; it is not committed or published.
+
+The CTD disease extract and the detailed results that depend on it remain **local and blocked**:
+CTD redistribution/permission is not confirmed. HGNC is CC0 and committed; the private submission
+log, compound structures and full permission correspondence are also not public. STP's reply does
+not clear CTD, PubChem or mixed-source derived outputs.
 
 Reproduction requires the local materials (`C:\DSH\rnp-case-inputs\handoff-2026-10-21` and
 `C:\DSH\rnp-case-inputs\stp`) and the commands recorded in `CASE-FREEZE.yaml` /

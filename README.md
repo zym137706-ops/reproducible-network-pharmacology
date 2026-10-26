@@ -10,11 +10,14 @@ and hashes, and every output can be regenerated from a single config file.
 
 > Status: **unreleased v0.1 development** (package version 0.0.1). The pipeline and the
 > wrapper-layer exit-code guard, engine-effective gene sets and hash-checked report are implemented.
-> Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (run 39544786310 green).
+> Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (run 39773442191 green).
 > Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
 > guard is intentionally kept. The public RA case (MeSH D001172) is **locally computed** in Linux for
-> 0.10 and 0.05, with independent hypergeometric/BH checks; it is **not public-releaseable** because
-> CTD/STP redistribution permission is missing. Disease/STP/results stay local; HGNC is frozen (CC0).
+> 0.10 and 0.05, with independent hypergeometric/BH checks. STP confirmed on 2026-10-23 that the eight
+> native XLSX tables are **CC BY 4.0** (attribution/no modification); a local release candidate is
+> prepared. The **overall public case remains blocked by CTD permission**, so disease/CTD-derived
+> results stay local; HGNC is frozen (CC0). See `docs/stp-permission-2026-10-23.md` and
+> `docs/public-release-candidate-checklist-2026-10-26.md`.
 > The thin Skill has a final-revision Codex real-agent acceptance (normal/missing/partial/tamper/zero;
 > Linux enrichment/report via Docker; one shell-wrapper caveat) plus a separate DSH session; see
 > `docs/skill-acceptance.md` and `docs/skill-agent-acceptance-2026-10-21.md`. This is not a general
@@ -110,10 +113,12 @@ overwrite an existing output directory unless `--force` is passed. Downstream co
 incomplete upstream stage unless `--allow-partial` is passed, and the override is recorded in the
 audit. Ingest creates a persistent compound-ID registry; a re-run reuses the same IDs.
 
-The public-data RA case (`examples/demo/`) is **locally computed and independently checked** but
-**not public-releaseable**: CTD/STP redistribution permission is pending. Its data/license checklist
-is in [docs/public-case-checklist.md](docs/public-case-checklist.md); STP exports are produced by
-hand. The synthetic demo is an engineering test, not a scientific result.
+The public-data RA case (`examples/demo/`) is **locally computed and independently checked**;
+STP's eight native tables are **CC BY 4.0-confirmed** with attribution/no-modification requirements,
+and a local candidate is prepared. The **overall public case remains blocked by CTD permission**, not
+by an STP table-scope question. Its data/license checklist is in
+[docs/public-case-checklist.md](docs/public-case-checklist.md); STP exports are produced by hand and
+the candidate is not published. The synthetic demo is an engineering test, not a scientific result.
 
 For a user-supplied real case, [`scripts/case_run.py`](scripts/case_run.py) verifies explicit
 bindings/hashes and exact submitted structures when a log is supplied, fixes both threshold configs,

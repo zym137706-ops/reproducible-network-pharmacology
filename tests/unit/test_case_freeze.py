@@ -26,12 +26,13 @@ def test_public_case_gate_is_not_confused_with_local_completion() -> None:
         "local_inputs_verified": True,
         "local_linux_calculation": "complete",
         "local_independent_check": "passed",
-        "public_redistribution": "pending_official_clarification",
+        "public_redistribution": "partial_stp_confirmed_ctd_pending",
         "public_case_claim": False,
         "final_skill_acceptance": "passed_codex_2026-10-21_with_environment_caveat",
+        "stp_permission": "confirmed_2026-10-23_tables_only",
     }
     gaps = {item["id"] for item in data["public_release_gaps"]}
-    assert {"ctd_permission", "stp_permission", "public_artifacts"} == gaps
+    assert {"ctd_permission", "stp_candidate_review", "public_artifacts"} == gaps
     assert data["public_release_gate"]["not_a_data_gap"]
     assert data["disease"]["term"] == "Arthritis, Rheumatoid"
     assert data["disease"]["mesh_id"] == "MESH:D001172"
@@ -40,8 +41,11 @@ def test_public_case_gate_is_not_confused_with_local_completion() -> None:
     assert data["disease"]["status"] == "local_prepared_not_committed"
     assert data["enrichment_background"]["status"] == "generated_and_frozen_local_not_committed"
     assert data["enrichment_background"]["thresholds"] == [0.10, 0.05]
-    assert data["stp_exports"]["status"] == "local_verified_not_committed"
-    assert data["stp_exports"]["public_redistribution"] == "blocked"
+    assert data["stp_exports"]["status"] == "local_verified_license_confirmed_not_committed"
+    assert data["stp_exports"]["public_redistribution"] == "confirmed_cc_by_4_0_tables_only"
+    assert data["stp_exports"]["permission"]["reply_date"] == "2026-10-23"
+    assert data["stp_exports"]["permission"]["license"] == "CC BY 4.0"
+    assert "do not modify" in data["stp_exports"]["permission"]["requirements"][2]
     runs = data["local_calculation"]["runs"]
     assert runs["0.10"]["T_r"] == 239 and runs["0.10"]["foreground"] == 15
     assert runs["0.05"]["T_r"] == 267 and runs["0.05"]["foreground"] == 17

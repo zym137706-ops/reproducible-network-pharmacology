@@ -3,10 +3,12 @@ status: local_complete_public_release_pending
 frozen_at_utc: '2026-10-20T10:45:00Z'
 case_computed_in_linux: true
 public_case_claim: false
-reason: 'The local Linux calculation is complete for both thresholds, but public release
-  is blocked: CTD and STP upstream redistribution/permission is not confirmed. Disease
-  genes, structures, STP results and generated results remain local-only; the repository
-  commits only public HGNC and provenance/rule records.'
+reason: 'The local Linux calculation is complete for both thresholds. STP confirmed on
+  2026-10-23 that the eight native XLSX tables are CC BY 4.0, with attribution and no
+  modification; a local candidate is prepared but not published. The overall public release
+  remains blocked because CTD redistribution/permission is not confirmed. CTD genes,
+  PubChem structures, the private submission log and CTD-derived detailed results remain
+  local-only; the repository commits only public HGNC and provenance/rule records.'
 recorded_scientific_decisions:
   compound_list:
     file: inputs/compounds.tsv
@@ -107,9 +109,9 @@ stp_exports:
   - submitted_date and result_file association
   - retrieved_date and result SHA-256
   - SwissTargetPrediction service-terms evidence
-  status: local_verified_not_committed
+  status: local_verified_license_confirmed_not_committed
   note: never automate submission; download exports manually.
-  public_redistribution: blocked
+  public_redistribution: confirmed_cc_by_4_0_tables_only
   local_handoff:
     directory: C:/DSH/rnp-case-inputs/handoff-2026-10-21
     compounds_sha256: b2e571f96fa2290258ff325cb27e47cb50221d01b24b56e1b61e187cbd54152a
@@ -130,6 +132,20 @@ stp_exports:
       ignored directory, never overwrite the official inputs, and do not merge/replace
       without a new researcher decision, new log, and full rerun.
     automatic_submission: Forbidden for the official case.
+  permission:
+    status: confirmed
+    reply_date: '2026-10-23'
+    scope: eight native XLSX export tables generated 2026-10-21 (Homo sapiens)
+    license: CC BY 4.0
+    requirements:
+    - cite SwissTargetPrediction website and actual prediction date
+    - cite Daina & Zoete, Communications Chemistry 7, 105 (2024), doi:10.1038/s42004-024-01179-2
+    - do not modify the original tables
+    - derived analyses permitted; mixed-source outputs need separate per-source review
+    evidence: local screenshot archived; .eml/full headers not supplied, authenticity
+      not claimed
+    summary_record: docs/stp-permission-2026-10-23.md
+    candidate_path: C:/DSH/rnp-stp-release-candidate-2026-10-21/
 enrichment_background:
   file: inputs/universe-0.10.txt
   required: true
@@ -216,12 +232,13 @@ data_sources:
       proxy
     release_or_date: manual submission 2026-10-21; date-only; no service release version
     sha256: 8 per-file hashes recorded in the local submission log; not committed
-    license_status: STP Terms grant CC BY 4.0 to Licensed Materials; coverage of these
-      exports/derived outputs is pending clarification; not public
+    license_status: CC BY 4.0 confirmed 2026-10-23 for eight native tables; attribution/no-modification
+      required; candidate local
     raw_rows: 800
     invalid_rows: 0
     rows_at_0.10: 676
     rows_at_0.05: 740
+    permission_record: docs/stp-permission-2026-10-23.md
 verification_environment:
   linux_ci:
     workflow: .github/workflows/ci.yml
@@ -321,11 +338,12 @@ local_calculation:
       '0.05': a54954e8e0af4da060febee028dba2600517e18fcee3e851ba9ab05533974dc5
     status: complete; strict log structure/CID/hash checks; both manifests no drift;
       case_check executed and passed
-public_release_status: 'blocked: upstream data redistribution/permission not confirmed;
-  results and local inputs not committed'
+public_release_status: 'blocked: CTD permission pending; STP tables confirmed CC BY
+  4.0 but candidate not published'
 input_freeze_status:
   disease: prepared locally; redistribution permission pending
-  stp: 8 XLSX locally received and verified; public redistribution blocked
+  stp: 8 XLSX locally received, verified and CC BY 4.0-confirmed; candidate prepared
+    locally; not committed
   hgnc: frozen CC0 and committed
   background: generated and frozen locally for 0.10/0.05
   claims: not public
@@ -333,14 +351,15 @@ status_dimensions:
   local_inputs_verified: true
   local_linux_calculation: complete
   local_independent_check: passed
-  public_redistribution: pending_official_clarification
+  public_redistribution: partial_stp_confirmed_ctd_pending
   public_case_claim: false
   final_skill_acceptance: passed_codex_2026-10-21_with_environment_caveat
+  stp_permission: confirmed_2026-10-23_tables_only
 public_release_gate:
   status: blocked
-  reason: Official clarification is pending for CTD redistribution and for whether
-    the eight STP exports/derived tables fall under CC BY 4.0. Local computation and
-    inspection are allowed.
+  reason: CTD redistribution/permission is still pending; STP native tables are CC
+    BY 4.0-confirmed but the candidate still needs researcher review and must not
+    be mixed with CTD-derived outputs.
   not_a_data_gap: The disease extract, STP XLSX files, submission log, backgrounds
     and detailed results all exist locally and were used for the completed calculation.
 local_input_handoff:
@@ -363,22 +382,32 @@ public_release_gaps:
     public GitHub/releases
   owner: researcher + CTD
   status: pending
-- id: stp_permission
-  what: confirmation whether the eight exports and derived tables are Licensed Materials
-    under CC BY 4.0
-  owner: researcher + STP
+- id: stp_candidate_review
+  what: researcher review of the local STP candidate package, attribution, byte-identical
+    tables and publication scope
+  owner: researcher + agent
   status: pending
 - id: public_artifacts
-  what: commit restricted inputs/expected outputs only if permission covers them;
-    otherwise publish query/filtering recipe and checksums
+  what: publish code/synthetic and only cleared STP data; keep CTD/mixed detailed
+    outputs local pending permission
   owner: researcher + agent
   status: pending
 public_release_actions:
-- record the official replies; do not treat the current project record as written
-  permission
-- if permitted, add the covered subset/results with attribution/licence and rerun
-  from a clean clone
-- if not permitted, keep the local case and publish only code, synthetic examples,
-  a reproducible query/filtering recipe and checksums
-- do not change the completed local status into a public-case pass without the permission
-  gate
+- archive the STP reply screenshot locally and record de-identified confirmation;
+  do not commit private correspondence
+- review the local STP candidate package and preserve the original tables unmodified
+- keep CTD genes, evidence, intersections, networks, enrichment tables and detailed
+  reports local until CTD permission is confirmed
+- record official CTD reply; do not treat silence as permission
+- publish code/synthetic/query recipe separately; do not turn the overall public case
+  into complete without CTD clearance
+permission_requests:
+  stp:
+    submitted: 2026-10-22 (date; exact time not recorded)
+    reply_date: '2026-10-23'
+    status: confirmed_cc_by_4_0_tables_only
+    record: docs/stp-permission-2026-10-23.md
+  ctd:
+    submitted: 2026-10-22 (date; exact time not recorded)
+    status: submitted_awaiting_reply
+    no_permission_yet: true
