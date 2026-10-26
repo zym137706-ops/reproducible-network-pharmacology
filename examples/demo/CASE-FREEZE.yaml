@@ -3,12 +3,13 @@ status: local_complete_public_release_pending
 frozen_at_utc: '2026-10-20T10:45:00Z'
 case_computed_in_linux: true
 public_case_claim: false
-reason: 'The local Linux calculation is complete for both thresholds. STP confirmed on
-  2026-10-23 that the eight native XLSX tables are CC BY 4.0, with attribution and no
-  modification; a local candidate is prepared but not published. The overall public release
-  remains blocked because CTD redistribution/permission is not confirmed. CTD genes,
-  PubChem structures, the private submission log and CTD-derived detailed results remain
-  local-only; the repository commits only public HGNC and provenance/rule records.'
+reason: The local Linux calculation is complete for both thresholds. STP confirmed
+  on 2026-10-23 that the eight native XLSX tables are CC BY 4.0, with attribution
+  and no modification; a local candidate is prepared but not published. The overall
+  public release remains blocked because CTD redistribution/permission is not confirmed.
+  CTD genes, PubChem structures, the private submission log and CTD-derived detailed
+  results remain local-only; the repository commits only public HGNC and provenance/rule
+  records.
 recorded_scientific_decisions:
   compound_list:
     file: inputs/compounds.tsv
@@ -403,11 +404,11 @@ public_release_actions:
   into complete without CTD clearance
 permission_requests:
   stp:
-    submitted: 2026-10-22 (date; exact time not recorded)
+    submitted: October 2026 (exact date/time not recorded; to be verified)
     reply_date: '2026-10-23'
     status: confirmed_cc_by_4_0_tables_only
     record: docs/stp-permission-2026-10-23.md
   ctd:
-    submitted: 2026-10-22 (date; exact time not recorded)
+    submitted: October 2026 (exact date/time not recorded; to be verified)
     status: submitted_awaiting_reply
     no_permission_yet: true
