@@ -143,8 +143,8 @@ stp_exports:
     - cite Daina & Zoete, Communications Chemistry 7, 105 (2024), doi:10.1038/s42004-024-01179-2
     - do not modify the original tables
     - derived analyses permitted; mixed-source outputs need separate per-source review
-    evidence: local screenshot archived; .eml/full headers not supplied, authenticity
-      not claimed
+    evidence: local screenshot and original .eml/full headers archived; headers parsed,
+      independent cryptographic signature verification not claimed
     summary_record: docs/stp-permission-2026-10-23.md
     candidate_path: C:/DSH/rnp-stp-release-candidate-2026-10-21/
 enrichment_background:
@@ -405,10 +405,14 @@ public_release_actions:
 permission_requests:
   stp:
     submitted: October 2026 (exact date/time not recorded; to be verified)
+    submission_relation: Same day as CTD Contact request; researcher confirmation 2026-10-26,
+      exact calendar date/time not independently established
     reply_date: '2026-10-23'
     status: confirmed_cc_by_4_0_tables_only
     record: docs/stp-permission-2026-10-23.md
   ctd:
     submitted: October 2026 (exact date/time not recorded; to be verified)
+    submission_relation: Same day as STP Contact request; researcher confirmation 2026-10-26,
+      no CTD submission screenshot saved
     status: submitted_awaiting_reply
     no_permission_yet: true

@@ -5,6 +5,22 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### STP original EML archive and submission-date clarification — 2026-10-26
+
+- Archived the original 2026-10-23 SwissDrugDesign reply EML outside Git in the local evidence
+  directory; SHA-256 `4085f48a…`; original bytes preserved and removed from the candidate package.
+- Parsed full headers: Date `Fri, 23 Oct 2026 11:40:44 +0200` (`2026-10-23T17:40:44+08:00`). The
+  receiver headers report SPF pass / DKIM permerror / DMARC none; no independent cryptographic
+  signature verification is claimed.
+- Recorded the researcher's 2026-10-26 confirmation that the CTD and STP Contact requests were sent
+  on the same day. No CTD submission screenshot exists; exact calendar date/time remains unverified.
+  The EML Date is the reply date and the quoted 2026-10-21 is prediction generation, not Contact
+  submission.
+- Updated the de-identified permission summary and CASE-FREEZE evidence/submission-relation fields.
+  CTD still awaits a reply; no redistribution permission is inferred from the EML metadata.
+- The EML, headers, screenshot and private correspondence remain local-only; no Git/CI/release
+  upload, no tag/release/visibility change.
+
 ### STP permission confirmation and local release candidate — 2026-10-26
 
 - Recorded the 2026-10-23 SwissDrugDesign reply: the eight native XLSX tables are **CC BY 4.0**;

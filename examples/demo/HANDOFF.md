@@ -12,7 +12,7 @@ CTD permission/redistribution is still pending.
 | 3 | Completed submission log | external local `STP-SUBMISSION-LOG.tsv`; 8 rows; per-file SHA-256; date-only / LastWriteTime proxy; URL/job ID `not_saved` | **local only; not covered by the STP table clearance; do not publish without separate review** |
 | 4 | HGNC snapshot | `examples/demo/inputs/hgnc_map.tsv` (2026-10-16, 45,277 Approved, CC0) | **frozen + committed** |
 | 5 | Conditional backgrounds | `data/local/case/run-2026-10-21/backgrounds/`; T_r 239/267; foreground 15/17 | **generated + verified locally; public commit blocked with upstream data** |
-| 6 | Licence/source evidence | `docs/stp-permission-2026-10-23.md`; `examples/demo/CASE-FREEZE.yaml` | **STP confirmed tables-only; CTD pending** |
+| 6 | Licence/source evidence | `docs/stp-permission-2026-10-23.md`; `examples/demo/CASE-FREEZE.yaml` | **STP confirmed tables-only; original EML/screenshot archived locally; CTD pending** |
 
 ## STP release candidate
 
