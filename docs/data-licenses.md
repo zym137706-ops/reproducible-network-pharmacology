@@ -11,7 +11,7 @@ CTD, PubChem, private logs or mixed-source derived outputs.
 | [GO](https://geneontology.org/) | enrichment gene sets | no bulk data; results derived | CC BY 4.0, attribution required |
 | [Reactome](https://reactome.org/) | alternative gene sets (planned) | no bulk data | CC0 |
 | [STRING](https://string-db.org/) | PPI input (planned) | no bulk network files | CC BY 4.0; record version (e.g. 12.0) |
-| [CTD](https://ctdbase.org/) | disease gene sets (RA case) | **no** (local extract only) | Research/education use; reproduction or commercial use requires permission; cite/notify CTD. The current project record is not written permission; ask for the 179-gene subset and derived GitHub/release scope. Query/rules in `examples/demo/inputs/CTD-QUERY.md`; data not committed |
+| [CTD](https://ctdbase.org/) | disease gene sets (RA case) | **local candidate only, not committed** | CTD ticket **#8545** (2026-10-26) permits public non-profit research including GitHub for the requested 179-gene RA subset/derived outputs, with CTD citation and a data date-stamp; notify CTD of the public link. Commercial use is separate; do not relicense as MIT/CC0/CC BY. Query/rules: `examples/demo/inputs/CTD-QUERY.md`; permission: `docs/ctd-permission-2026-10-26.md` |
 | [PubMed](https://pubmed.ncbi.nlm.nih.gov/) | literature evidence (planned) | no | NCBI terms of use |
 | **GeneCards** | disease genes | **never** | commercial terms; do not redistribute |
 | **OMIM** | disease genes | **never** | Johns Hopkins terms; do not redistribute |

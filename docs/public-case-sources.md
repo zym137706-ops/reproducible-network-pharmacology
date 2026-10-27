@@ -1,11 +1,12 @@
 # Public case: candidate data sources and license checklist
 
-Status: **STP tables CC BY 4.0-confirmed; overall public release still pending CTD.** The disease
-extract, eight STP XLSX exports, submission log and detailed results are local-only and were used for
-the completed local calculation. HGNC is frozen/committed (CC0). STP's 2026-10-23 reply covers the
-eight native tables only; a review-only candidate is local and not committed. No restricted dataset
-is committed and the local result is not a public case. This page records the source/license checks.
-For acceptance conditions see [public-case-checklist.md](public-case-checklist.md).
+Status: **STP tables CC BY 4.0-confirmed; CTD public non-profit research permission confirmed
+(ticket #8545); complete candidate prepared; publication decision/candidate review pending.**
+The disease extract, eight STP XLSX exports, submission log and detailed results are local-only and
+were used for the completed local calculation. HGNC is frozen/committed (CC0). PubChem structure
+terms remain separately pending. No restricted dataset is committed; the candidate is not published.
+This page records the source/license checks. For acceptance conditions see
+[public-case-checklist.md](public-case-checklist.md).
 
 ## Candidate public sources
 
@@ -18,7 +19,7 @@ URL is not by itself permission to redistribute.
 | Compound structures | ChEMBL | ChEMBL ID, canonical SMILES, release number | CC BY-SA 4.0 (attribution + share-alike obligations); record release | candidate |
 | Compound names / natural products | NPASS / COCONUT | compound ID, source organism, SMILES | Check each database's academic-use terms; do not assume redistribution rights | candidate |
 | Disease genes | Open Targets Platform | Ensembl gene IDs, disease ID, score, release | CC BY 4.0 typically; record release and attribution | candidate |
-| Disease genes | CTD | exact MeSH `D001172` (Arthritis, Rheumatoid), no child expansion; direct marker/mechanism or therapeutic evidence | Research/education use; redistribution not confirmed; local extract only, query/rules in `examples/demo/inputs/CTD-QUERY.md` | **local prepared, not committed** |
+| Disease genes | CTD | exact MeSH `D001172` (Arthritis, Rheumatoid), no child expansion; direct marker/mechanism or therapeutic evidence | **CTD ticket #8545 (2026-10-26): public non-profit research incl. GitHub; cite CTD and date-stamp; commercial separate**; query/rules in `examples/demo/inputs/CTD-QUERY.md` | **permission confirmed; candidate local; not published** |
 | Disease genes (excluded) | GeneCards / OMIM | — | Repository policy excludes vendored GeneCards/OMIM content | excluded |
 | Gene identifiers | HGNC | complete set, HGNC ID, symbol, alias, UniProt | CC0; attribution recommended; frozen derived table with source record | **frozen** |
 | PPI (optional) | STRING | v12.0, confidence cutoff, `protein.links` | CC BY 4.0; record attribution | optional |
@@ -55,16 +56,15 @@ redistribution use. STP submission still requires the researcher's manual export
 
 ## Open decisions (researcher / upstream)
 
-- Whether CTD permits public redistribution of the 179-gene subset and derived outputs.
-- Review the local STP candidate package and decide whether to publish the cleared native tables
-  and/or selected STP-only derived outputs.
-- If CTD permission is not granted, whether to publish only the query/filter recipe and checksums, or
-  choose a case with clear redistribution terms.
+- Review the complete candidate package and decide data inclusion, repository visibility and
+  versioned release.
+- Separately review PubChem structure/source terms before publishing the compound structure table;
+  STP/CTD replies do not clear PubChem.
+- Notify CTD of the public project link when publication occurs (recommended by CTD).
 
 ## Next step after local verification
 
-The R lock is restored and the local dual-threshold chain plus independent checks are complete. STP's
-table scope is confirmed; the remaining public gate is CTD permission in
-`examples/demo/CASE-FREEZE.yaml`. Record the official CTD reply, then either publish the covered
-subset/results with attribution or keep them local and publish only the reproducible
-recipe/checksums. Until then, no public-case claim is allowed.
+The R lock is restored, the local dual-threshold chain plus independent checks are complete, and the
+complete candidate has been reproduced from a clean clone. STP and CTD permissions cover the requested
+public non-profit scope; the remaining decisions are candidate review, PubChem structure terms, data
+inclusion and publication. Until the researcher approves publication, no public-case claim is allowed.

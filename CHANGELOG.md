@@ -5,6 +5,21 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### CTD public non-profit permission and complete candidate — 2026-10-27
+
+- Recorded CTD ticket **#8545** (2026-10-26): public non-profit research including GitHub is permitted
+  for the requested 179-gene RA subset/derived outputs, with CTD citation and a data date-stamp;
+  commercial use remains separate. Original EML archived locally (`d63991ff…`); full headers parsed,
+  no independent cryptographic signature verification claimed; private EML/screenshot not committed.
+- Updated source records, CASE-FREEZE, README, handoff/checklist/plan: CTD permission confirmed;
+  publication decision and candidate review pending; PubChem structure terms still separately pending.
+- Prepared a 33-file complete review candidate outside Git with relative-path configs, STP XLSX,
+  actual submitted structures, de-identified log, CTD genes/evidence/query, HGNC, both universes and
+  foregrounds, permission/citation files, expected counts and `SHA256SUMS.tsv`.
+- Reproduced the candidate from clean commit `90f3178` in Linux: both thresholds complete, checker
+  passed, supplied universe hashes matched, manifest no drift; counts match frozen expectations.
+- No real data/private correspondence uploaded; no tag/release/visibility change.
+
 ### STP original EML archive and submission-date clarification — 2026-10-26
 
 - Archived the original 2026-10-23 SwissDrugDesign reply EML outside Git in the local evidence

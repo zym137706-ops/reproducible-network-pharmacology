@@ -10,9 +10,12 @@
 > （run 39773442191）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
 > exit `0xC0000005` 导致 11 个 R 相关测试失败，非零退出保护保留、不忽略。公开 RA 案例（MeSH D001172）
 > 已在 Linux Docker 本地完成 0.10/0.05 计算与独立超几何/BH 核查；STP 已于 2026-10-23 书面确认
-> 八份原生 XLSX 表适用 **CC BY 4.0**（需署名、原表不修改），本地候选包已准备；但 **CTD 许可仍待确认，
-> 整体公开案例仍 blocked**，疾病/CTD 派生结果仅本地保存；HGNC 已按 CC0 冻结。
-> 见 `docs/stp-permission-2026-10-23.md` 与 `docs/public-release-candidate-checklist-2026-10-26.md`。
+> 八份原生 XLSX 表适用 **CC BY 4.0**（需署名、原表不修改）。CTD 工单 **#8545**（2026-10-26）确认
+> 本项目请求的 179 基因子集/派生物可用于公开非营利研究（含 GitHub），需引用 CTD 并注明数据日期；
+> 商业用途另走官方渠道。完整候选包已准备并从干净 clone 复现，但**发布仍需研究者决定**；PubChem
+> 结构条款和最终可见性/release 仍待处理。HGNC 已按 CC0 冻结。见
+> `docs/stp-permission-2026-10-23.md`、`docs/ctd-permission-2026-10-26.md` 与
+> `docs/public-candidate-reproduction-2026-10-27.md`。
 > 可移植真实案例入口：`scripts/case_run.py`（严格校验日志结构/CID/哈希、固定双阈值配置、跑全链、
 > 调用 `scripts/case_check.py`、记录 `case_provenance.json`；只有分析 + manifest + 独立核查全部成功
 > 才标记 `complete`）。源码哈希使用版本化 `case-source-hash-v2` 范围（案例相关源码/入口/锁文件，

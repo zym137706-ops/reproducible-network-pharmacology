@@ -14,10 +14,13 @@ and hashes, and every output can be regenerated from a single config file.
 > Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
 > guard is intentionally kept. The public RA case (MeSH D001172) is **locally computed** in Linux for
 > 0.10 and 0.05, with independent hypergeometric/BH checks. STP confirmed on 2026-10-23 that the eight
-> native XLSX tables are **CC BY 4.0** (attribution/no modification); a local release candidate is
-> prepared. The **overall public case remains blocked by CTD permission**, so disease/CTD-derived
-> results stay local; HGNC is frozen (CC0). See `docs/stp-permission-2026-10-23.md` and
-> `docs/public-release-candidate-checklist-2026-10-26.md`.
+> native XLSX tables are **CC BY 4.0** (attribution/no modification). CTD ticket **#8545** (2026-10-26)
+> confirms public non-profit research including GitHub for the requested 179-gene subset/derived
+> outputs, with CTD citation and a data date-stamp; commercial use is separate. A complete review
+> candidate is prepared and reproduced, but **publication is pending the researcher's decision**;
+> PubChem structure terms and final visibility/release remain open. HGNC is frozen (CC0). See
+> `docs/stp-permission-2026-10-23.md`, `docs/ctd-permission-2026-10-26.md`, and
+> `docs/public-candidate-reproduction-2026-10-27.md`.
 > The thin Skill has a final-revision Codex real-agent acceptance (normal/missing/partial/tamper/zero;
 > Linux enrichment/report via Docker; one shell-wrapper caveat) plus a separate DSH session; see
 > `docs/skill-acceptance.md` and `docs/skill-agent-acceptance-2026-10-21.md`. This is not a general

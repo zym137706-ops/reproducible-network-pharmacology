@@ -18,27 +18,30 @@ FREEZE = DEMO / "CASE-FREEZE.yaml"
 def test_public_case_gate_is_not_confused_with_local_completion() -> None:
     data = yaml.safe_load(FREEZE.read_text(encoding="utf-8"))
     assert data["case_id"] == "demo-public-compounds"
-    assert data["status"] == "local_complete_public_release_pending"
+    assert data["status"] == "local_complete_publication_decision_pending"
     assert data["public_case_claim"] is False
     assert data["case_computed_in_linux"] is True
-    assert data["public_release_status"].startswith("blocked")
+    assert data["public_release_status"].startswith("permission_confirmed")
     assert data["status_dimensions"] == {
         "local_inputs_verified": True,
         "local_linux_calculation": "complete",
         "local_independent_check": "passed",
-        "public_redistribution": "partial_stp_confirmed_ctd_pending",
+        "public_redistribution": "stp_and_ctd_permission_confirmed_publication_pending",
         "public_case_claim": False,
         "final_skill_acceptance": "passed_codex_2026-10-21_with_environment_caveat",
         "stp_permission": "confirmed_2026-10-23_tables_only",
+        "ctd_permission": "confirmed_public_nonprofit_2026-10-26_ticket_8545",
     }
     gaps = {item["id"] for item in data["public_release_gaps"]}
-    assert {"ctd_permission", "stp_candidate_review", "public_artifacts"} == gaps
-    assert data["public_release_gate"]["not_a_data_gap"]
+    assert {"researcher_publication_decision", "candidate_review", "pubchem_terms_review"} == gaps
+    assert data["public_release_gate"]["status"] == (
+        "permission_confirmed_publication_decision_pending"
+    )
     assert data["disease"]["term"] == "Arthritis, Rheumatoid"
     assert data["disease"]["mesh_id"] == "MESH:D001172"
     assert data["disease"]["row_count"] == 179
-    assert data["disease"]["license_status"] == "restricted_redistribution_not_confirmed"
-    assert data["disease"]["status"] == "local_prepared_not_committed"
+    assert data["disease"]["license_status"] == "public_nonprofit_research_permission_2026-10-26"
+    assert data["disease"]["status"] == "local_prepared_permission_confirmed_not_committed"
     assert data["enrichment_background"]["status"] == "generated_and_frozen_local_not_committed"
     assert data["enrichment_background"]["thresholds"] == [0.10, 0.05]
     assert data["stp_exports"]["status"] == "local_verified_license_confirmed_not_committed"
@@ -140,7 +143,9 @@ def test_freeze_matches_run_yaml_and_binding_files() -> None:
     }
     assert export_files <= expected_files, f"unbound STP exports: {export_files - expected_files}"
     if export_files != expected_files:
-        assert freeze["public_release_gate"]["status"] == "blocked"
+        assert freeze["public_release_gate"]["status"] == (
+            "permission_confirmed_publication_decision_pending"
+        )
     else:
         # Once all exports exist, the log must contain the real submission evidence.
         required = {

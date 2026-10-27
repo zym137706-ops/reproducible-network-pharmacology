@@ -25,30 +25,32 @@
 > 公开案例 RA（MeSH D001172）已完成**本地 Linux 双阈值计算**：0.10 得 676 行、T_r 239、前景 15、
 > 交集 15、有效背景 234、704 terms、0 significant；0.05 得 740 行、T_r 267、前景 17、交集 17、
 > 有效背景 262、747 terms、2 significant；独立超几何/BH 复核通过。STP 已于 2026-10-23 书面确认
-> 八份原生 XLSX 表适用 CC BY 4.0（署名、原表不修改）；CTD 许可仍待确认，疾病/CTD 派生结果仍只在本
-> 地，整体公开状态为 **blocked**；HGNC 2026-10-16 已按 CC0 提交。STP 本地候选包已准备但未发布。
-> 背景规则/T_r 生成器、待提交/提交日志、查询记录和双阈值配置均已记录。
+> 八份原生 XLSX 表适用 CC BY 4.0（署名、原表不修改）；CTD 工单 #8545（2026-10-26）确认本项目请求的
+> 179 基因子集/派生物可用于公开非营利研究（含 GitHub），需引用 CTD 并注明数据日期；商业用途另走官方
+> 渠道。完整候选包已准备并从干净 clone 复现，但发布仍需研究者决定；PubChem 结构条款仍待处理。HGNC
+> 2026-10-16 已按 CC0 提交。背景规则/T_r 生成器、待提交/提交日志、查询记录和双阈值配置均已记录。
 > R 恢复入口已修复：PowerShell 每次 R 调用检查 `$LASTEXITCODE`，失败非零退出；默认/显式库均解析
 > 精确绝对路径；`restore_r.sh` 为可执行模式；CI 改为调用项目脚本并验证 Python 启动的 R 使用该库。
 > Skill 已完成一次真实 Agent 会话验收（DeepSeek Harness/`deepseek-flash`，5/5 场景通过，enrichment
 > 因 Windows native exit 跳过，未用 pytest 冒充）；报告见 `docs/skill-agent-acceptance-2026-10-20.md`。
-> 仍未完成：公开案例的 CTD 再分发许可与 CTD 派生结果发布（STP 表许可已确认；本地计算、干净 clone
-> 复算与独立核查已完成）、Windows native exit 根因。最终版 Codex Skill 真实会话验收已完成（含 Linux
-> enrichment/report 的 Docker 调用与 shell 退出码显示限制），报告见
-> `docs/skill-agent-acceptance-2026-10-21.md`。公开案例不得因 STP 放行或本地计算完成而宣称已发布。
+> 仍未完成：完整公开候选包的最终发布决定/可见性/release、PubChem 结构条款、Windows native exit
+> 根因。最终版 Codex Skill 真实会话验收已完成（含 Linux enrichment/report 的 Docker 调用与 shell
+> 退出码显示限制），报告见 `docs/skill-agent-acceptance-2026-10-21.md`。公开案例不得因许可确认或
+> 本地计算完成而宣称已发布。
 
 ## 1. 定位与当前状态
 
 定位：可独立运行、可追溯、可复算的网络药理学分析工具，以及调用同一 CLI 的薄 Codex Skill 层。
 展示重点：输入身份与分析决策可靠、统计计算可核验、Agent 能识别异常；预测关联和对接结果不构成机制或疗效验证。
 
-截至 2026-10-26：v0.1 的 `validate → ingest → intersect → network → enrich → report → manifest`
+截至 2026-10-27：v0.1 的 `validate → ingest → intersect → network → enrich → report → manifest`
 链路已实现；包装层非零退出码、report 父链/产物哈希、富集有效前景/背景集合均有回归测试。
 Linux CI 从 `renv.lock` 恢复并通过完整合成 quickstart 与正式入口合成双阈值；Windows 因 R native
 exit 0xC0000005 仍有 11 个 R 相关测试失败，不能作为验证环境。真实 RA 案例已在本地 Linux Docker
-完成双阈值计算与独立超几何/BH 核查；STP 表许可已确认，CTD 许可未确认，整体公开状态仍 blocked、
-不得宣称公开案例通过。Skill 场景测试通过，最终版 Codex 真实会话验收已完成；后续仅增加策略边界
-说明，不改分析行为，其安装版哈希与验收记录同步记录在 `docs/skill-agent-acceptance-2026-10-21.md`。
+完成双阈值计算与独立超几何/BH 核查；STP 表许可和 CTD 公开非营利研究许可均已确认，完整候选包
+已准备并从干净 clone 复现；发布仍需研究者决定（含 PubChem 结构条款），因此不得宣称公开案例已发布。
+Skill 场景测试通过，最终版 Codex 真实会话验收已完成；后续仅增加策略边界说明，不改分析行为，
+其安装版哈希与验收记录同步记录在 `docs/skill-agent-acceptance-2026-10-21.md`。
 v0.0.1 是包版本/骨架标识，不能据此称为已经发布的 GitHub release；尚未打 `v0.1.0` tag。
 
 状态统一使用：设计中 → 已实现 → 在指定环境验证 → 已发布。每项状态附 commit、运行记录或 release 链接。

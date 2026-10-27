@@ -1,28 +1,29 @@
 # Public case: data and license checklist
 
-Status: **local calculation complete; STP tables CC BY 4.0-confirmed; overall public release BLOCKED
-pending CTD permission.** The recorded decisions and evidence are in
-[`examples/demo/CASE-FREEZE.yaml`](../examples/demo/CASE-FREEZE.yaml). The synthetic demo
-(`scripts/synthetic_demo.py`) is an engineering test, not a public scientific case. Do not describe
-the local case as a public case until the CTD gate is cleared.
+Status: **local calculation complete; STP tables CC BY 4.0-confirmed; CTD public non-profit research
+permission confirmed (ticket #8545); publication decision/candidate review pending.** The recorded
+decisions and evidence are in [`examples/demo/CASE-FREEZE.yaml`](../examples/demo/CASE-FREEZE.yaml).
+The synthetic demo (`scripts/synthetic_demo.py`) is an engineering test, not a public scientific case.
+Do not describe the candidate as a published public case until the researcher approves publication.
 
-Current public-release blocker: CTD redistribution permission for the 179-gene subset and derived
-outputs. STP confirmed on 2026-10-23 that the eight native XLSX tables are CC BY 4.0, with attribution
-and no modification; a local candidate is prepared but not committed/published. Disease/STP/
-backgrounds and detailed results exist locally and were used for the completed calculation; they are
-**not missing local inputs**. HGNC is frozen and committed (CC0).
+STP confirmed on 2026-10-23 that the eight native XLSX tables are CC BY 4.0, with attribution and no
+modification. CTD confirmed on 2026-10-26 (ticket #8545) that the requested 179-gene RA subset and
+derived outputs may be used for public non-profit research including GitHub, with CTD citation and a
+data date-stamp; commercial use is separate. Disease/STP/backgrounds and detailed results exist
+locally and were used for the completed calculation; they are **not missing local inputs**. HGNC is
+frozen and committed (CC0). PubChem structure terms remain separately pending.
 
 ## What the case must contain
 
 | Item | Required detail | License / provenance check | Status |
 |---|---|---|---|
-| Compound list | stable `compound_id`, name, SMILES or documented structure source; explicit `stp_file` binding | public compounds; PubChem CID and retrieval date recorded | local verified: 8 CIDs; actual `.xlsx` bindings; structures local-only |
-| SwissTargetPrediction exports | one export per compound, species recorded, retrieval date, submission log | **CC BY 4.0 confirmed 2026-10-23 for eight native tables**; cite website/date/Daina & Zoete 2024; originals unmodified; candidate local | **confirmed; candidate prepared; not published** |
-| Disease gene list | exact MeSH D001172 (Arthritis, Rheumatoid); CTD query and direct evidence rule | CTD redistribution not confirmed; extract local-only; query/rules in `inputs/CTD-QUERY.md` | local prepared + used; public commit pending |
+| Compound list | stable `compound_id`, name, SMILES or documented structure source; explicit `stp_file` binding | public compounds; PubChem CID and retrieval date recorded | local verified: 8 CIDs; actual `.xlsx` bindings; PubChem structure terms pending |
+| SwissTargetPrediction exports | one export per compound, species recorded, retrieval date, submission log | **CC BY 4.0 confirmed 2026-10-23 for eight native tables**; cite website/date/Daina & Zoete 2024; originals unmodified | **confirmed; candidate prepared; not published** |
+| Disease gene list | exact MeSH D001172 (Arthritis, Rheumatoid); CTD query and direct evidence rule | **CTD ticket #8545: public non-profit research incl. GitHub; cite CTD/date-stamp; commercial separate** | **permission confirmed; candidate local; not published** |
 | HGNC snapshot | complete-set TSV version/date; which release | CC0; attribution recorded | FROZEN: 2026-10-16, 45,277 Approved |
 | STRING/PPI (optional) | version, confidence cutoff, retrieval date | CC BY 4.0; attribution | not used |
 | Enrichment gene sets | GO BP release; explicit conditional background | GO CC BY 4.0; background rule documented | local GO.db 3.22.0; T_r=239/267; effective 234/262 |
-| Demo commands + expected tables | exact command log, independently checked expected counts | public/synthetic only for committed artifacts | local commands/check passed; no public expected tables yet |
+| Demo commands + expected tables | exact command log, independently checked expected counts | candidate expected counts documented | local commands/check passed; candidate review pending |
 
 ## Acceptance for calling it a "public case"
 
@@ -35,15 +36,16 @@ backgrounds and detailed results exist locally and were used for the completed c
 
 ## Open decisions for the researcher
 
-- Whether CTD permits the 179-gene subset and derived outputs on public GitHub/releases.
-- Review the local STP candidate package and decide whether to publish the cleared tables (and, if
-  any, selected STP-only derived outputs).
-- If CTD does not permit the data, whether to keep the local case and publish only a query/filter
-  recipe plus checksums, or choose another case with clear redistribution terms.
+- Review the complete candidate package (inputs/expected/attribution/hashes) and decide data
+  inclusion, repository visibility and versioned release.
+- Separate review of PubChem structure/source terms before publishing compounds/structure tables;
+  STP/CTD replies do not clear PubChem.
+- Whether to notify CTD of the public project link when publication occurs (recommended by CTD).
+- Do not relabel CTD data as MIT/CC0/CC BY or claim commercial rights.
 
 ## Explicit non-goals
 
 - No automatic STP submission.
 - No bulk migration of historical docking tasks.
-- No claim that a public case exists before the permission and redistribution gates are complete.
-- No inference that public accessibility or non-commercial intent automatically grants permission.
+- No claim that the candidate is a published public case before the researcher's publication decision.
+- No inference that public accessibility or a permission reply grants commercial/unrestricted rights.

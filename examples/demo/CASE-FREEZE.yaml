@@ -1,15 +1,14 @@
 case_id: demo-public-compounds
-status: local_complete_public_release_pending
+status: local_complete_publication_decision_pending
 frozen_at_utc: '2026-10-20T10:45:00Z'
 case_computed_in_linux: true
 public_case_claim: false
-reason: The local Linux calculation is complete for both thresholds. STP confirmed
-  on 2026-10-23 that the eight native XLSX tables are CC BY 4.0, with attribution
-  and no modification; a local candidate is prepared but not published. The overall
-  public release remains blocked because CTD redistribution/permission is not confirmed.
-  CTD genes, PubChem structures, the private submission log and CTD-derived detailed
-  results remain local-only; the repository commits only public HGNC and provenance/rule
-  records.
+reason: 'The local Linux calculation, independent check and public-candidate reproduction
+  are complete. STP tables are CC BY 4.0-confirmed; CTD ticket #8545 confirms public
+  non-profit research use including GitHub with citation/date-stamp. The public candidate
+  is prepared outside Git but has not been published; the researcher must review and
+  decide data inclusion/visibility/release; PubChem structure terms remain separately
+  pending.'
 recorded_scientific_decisions:
   compound_list:
     file: inputs/compounds.tsv
@@ -82,11 +81,14 @@ disease:
     marker/mechanism: 175
     marker/mechanism|therapeutic: 3
     therapeutic: 1
-  license_evidence: 'CTD legal: research/educational use; reproduction or commercial
-    use requires permission; cite/notify CTD. Redistribution not confirmed.'
-  license_status: restricted_redistribution_not_confirmed
+  license_evidence: 'CTD reply ticket #8545 (2026-10-26): public non-profit research
+    including GitHub; cite CTD and include a data date-stamp; commercial licensing
+    separate. Not MIT/CC0/CC BY.'
+  license_status: public_nonprofit_research_permission_2026-10-26
   source_record: inputs/CTD-QUERY.md
-  status: local_prepared_not_committed
+  status: local_prepared_permission_confirmed_not_committed
+  license_ticket: '#8545'
+  permission_record: docs/ctd-permission-2026-10-26.md
 stp_exports:
   directory: inputs/stp
   count: 8
@@ -207,8 +209,10 @@ data_sources:
     raw_sha256: 3742a52f6ed0662098b240beac3a3cf28159a46d73e3642b4fa35ff8878d0fac
     row_count: 179
     local_path: data/local/case/disease_genes.txt
-    license_status: restricted; reproduction/commercial use needs permission; not
-      committed
+    license_status: 'public non-profit research permission 2026-10-26 (ticket #8545);
+      cite/date-stamp; commercial separate; data not yet committed'
+    permission_record: docs/ctd-permission-2026-10-26.md
+    permission_ticket: '#8545'
   hgnc:
     used_for: gene-symbol normalization
     url: https://www.genenames.org/download/archive/
@@ -339,10 +343,12 @@ local_calculation:
       '0.05': a54954e8e0af4da060febee028dba2600517e18fcee3e851ba9ab05533974dc5
     status: complete; strict log structure/CID/hash checks; both manifests no drift;
       case_check executed and passed
-public_release_status: 'blocked: CTD permission pending; STP tables confirmed CC BY
-  4.0 but candidate not published'
+public_release_status: 'permission_confirmed_publication_decision_pending: STP and
+  CTD cleared for the requested public non-profit scope; candidate ready outside Git;
+  not published'
 input_freeze_status:
-  disease: prepared locally; redistribution permission pending
+  disease: local prepared/used; public non-profit research permission confirmed; not
+    committed
   stp: 8 XLSX locally received, verified and CC BY 4.0-confirmed; candidate prepared
     locally; not committed
   hgnc: frozen CC0 and committed
@@ -352,17 +358,17 @@ status_dimensions:
   local_inputs_verified: true
   local_linux_calculation: complete
   local_independent_check: passed
-  public_redistribution: partial_stp_confirmed_ctd_pending
+  public_redistribution: stp_and_ctd_permission_confirmed_publication_pending
   public_case_claim: false
   final_skill_acceptance: passed_codex_2026-10-21_with_environment_caveat
   stp_permission: confirmed_2026-10-23_tables_only
+  ctd_permission: confirmed_public_nonprofit_2026-10-26_ticket_8545
 public_release_gate:
-  status: blocked
-  reason: CTD redistribution/permission is still pending; STP native tables are CC
-    BY 4.0-confirmed but the candidate still needs researcher review and must not
-    be mixed with CTD-derived outputs.
-  not_a_data_gap: The disease extract, STP XLSX files, submission log, backgrounds
-    and detailed results all exist locally and were used for the completed calculation.
+  status: permission_confirmed_publication_decision_pending
+  reason: STP tables CC BY 4.0 and CTD public non-profit research permission are confirmed.
+    Remaining gates are researcher review/publication decision, PubChem structure
+    terms, and final data inclusion/tag/release; silence is no longer a permission
+    blocker.
 local_input_handoff:
   STP_directory: C:/DSH/rnp-case-inputs/stp
   handoff_directory: C:/DSH/rnp-case-inputs/handoff-2026-10-21
@@ -378,41 +384,51 @@ local_input_handoff:
   result_url: not_saved
   job_id: not_saved
 public_release_gaps:
-- id: ctd_permission
-  what: written/clarified permission for the 179-gene subset and derived outputs on
-    public GitHub/releases
-  owner: researcher + CTD
+- id: researcher_publication_decision
+  what: researcher review of the complete candidate and explicit decision on data
+    inclusion, repository visibility and versioned release
+  owner: researcher
   status: pending
-- id: stp_candidate_review
-  what: researcher review of the local STP candidate package, attribution, byte-identical
-    tables and publication scope
+- id: candidate_review
+  what: check candidate files, attribution/citation/date-stamp, SHA256SUMS and private-data
+    separation before publication
   owner: researcher + agent
   status: pending
-- id: public_artifacts
-  what: publish code/synthetic and only cleared STP data; keep CTD/mixed detailed
-    outputs local pending permission
+- id: pubchem_terms_review
+  what: separate PubChem structure/source terms review before publishing compounds/structure
+    table; STP/CTD replies do not clear this
   owner: researcher + agent
   status: pending
 public_release_actions:
-- archive the STP reply screenshot locally and record de-identified confirmation;
-  do not commit private correspondence
-- review the local STP candidate package and preserve the original tables unmodified
-- keep CTD genes, evidence, intersections, networks, enrichment tables and detailed
-  reports local until CTD permission is confirmed
-- record official CTD reply; do not treat silence as permission
-- publish code/synthetic/query recipe separately; do not turn the overall public case
-  into complete without CTD clearance
+- researcher reviews the complete candidate and decides publication scope/visibility/release
+- review and clear PubChem structure terms separately; keep structures local until
+  then
+- if published, cite CTD with a data date-stamp and notify CTD of the public project
+  link
+- do not relabel CTD data as MIT/CC0/CC BY or claim commercial rights
+- preserve STP original tables unmodified and include attribution/citation
+- no tag/release/visibility change without the researcher decision
 permission_requests:
   stp:
     submitted: October 2026 (exact date/time not recorded; to be verified)
-    submission_relation: Same day as CTD Contact request; researcher confirmation 2026-10-26,
-      exact calendar date/time not independently established
+    submission_relation: Same day as CTD Contact request; researcher confirmation
+      2026-10-26, exact calendar date/time not independently established
     reply_date: '2026-10-23'
     status: confirmed_cc_by_4_0_tables_only
     record: docs/stp-permission-2026-10-23.md
   ctd:
-    submitted: October 2026 (exact date/time not recorded; to be verified)
-    submission_relation: Same day as STP Contact request; researcher confirmation 2026-10-26,
-      no CTD submission screenshot saved
-    status: submitted_awaiting_reply
-    no_permission_yet: true
+    displayed_request_date: 2026-10-21 (quoted time 07:47:25; no timezone)
+    reply_date: '2026-10-26'
+    ticket: '#8545'
+    status: confirmed_public_nonprofit_research
+    scope: 179-gene RA subset and requested derived outputs; public GitHub/releases;
+      non-profit research
+    citation: cite CTD and include a data date-stamp; notify CTD of public link
+    evidence: local EML archived; sha256 d63991ff0f869ba2401055da57452c6e05ad02329860ccdfd58d7c33cde6e1d1;
+      no independent cryptographic signature verification claimed
+public_case_candidate:
+  path: C:/DSH/rnp-public-case-candidate-2026-10-21/
+  files: 33
+  sha256_file: SHA256SUMS.tsv
+  reproduction_record: docs/public-candidate-reproduction-2026-10-27.md
+  status: review_only_not_published

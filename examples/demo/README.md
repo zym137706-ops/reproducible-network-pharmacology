@@ -1,7 +1,8 @@
 # RA public-data case: local calculation state
 
-Status: **locally computed, STP tables CC BY 4.0-confirmed, overall public case still blocked by CTD.**
-The machine-readable freeze is [`CASE-FREEZE.yaml`](CASE-FREEZE.yaml); acceptance checklist:
+Status: **locally computed; STP CC BY 4.0 and CTD public non-profit research permission confirmed;
+complete candidate prepared; publication decision pending.** The machine-readable freeze is
+[`CASE-FREEZE.yaml`](CASE-FREEZE.yaml); acceptance checklist:
 [`docs/public-case-checklist.md`](../../docs/public-case-checklist.md), sources:
 [`docs/public-case-sources.md`](../../docs/public-case-sources.md).
 
@@ -32,17 +33,21 @@ DOSE 4.4.0, org.Hs.eg.db 3.22.0. Results: `data/local/case/run-2026-10-21/` (ign
 - Independent check: hypergeometric p and BH recomputed for all 704/747 result rows; T_r/foreground
   rederived from targets + HGNC + CTD genes. Passed.
 
-## Why it is not public
+## Publication status
 
 STP confirmed on **2026-10-23** that the eight native XLSX tables are **CC BY 4.0**, with attribution,
-the actual prediction date and no modification of the originals. A local review candidate is at
-`C:/DSH/rnp-stp-release-candidate-2026-10-21/`; it is not committed or published.
+the actual prediction date and no modification of the originals. CTD confirmed on **2026-10-26**
+(ticket **#8545**) that the requested 179-gene RA subset and derived outputs may be used for public
+non-profit research including GitHub, with CTD citation and a data date-stamp; commercial use is
+separate. The complete review candidate is at
+`C:/DSH/rnp-public-case-candidate-2026-10-21/` and is outside Git.
 
-The CTD disease extract and the detailed results that depend on it remain **local and blocked**:
-CTD redistribution/permission is not confirmed. HGNC is CC0 and committed; the private submission
-log, compound structures and full permission correspondence are also not public. STP's reply does
-not clear CTD, PubChem or mixed-source derived outputs.
+The candidate has been reproduced from a clean clone; its expected counts are recorded there.
+Publication remains pending the researcher's explicit decision on data inclusion, repository
+visibility and release. PubChem structure/source terms are still separately pending and are not
+cleared by the STP/CTD replies. HGNC is CC0 and committed; private EMLs, screenshots, submission
+correspondence and full logs remain uncommitted.
 
-Reproduction requires the local materials (`C:\DSH\rnp-case-inputs\handoff-2026-10-21` and
-`C:\DSH\rnp-case-inputs\stp`) and the commands recorded in `CASE-FREEZE.yaml` /
-`docs/environment.md`; do not upload them to CI without permission.
+Reproduction uses the complete candidate or the local materials
+(`C:\DSH\rnp-case-inputs\handoff-2026-10-21` and `C:\DSH\rnp-case-inputs\stp`) with the commands
+recorded in `CASE-FREEZE.yaml` / `docs/environment.md`; do not upload private material to CI.
