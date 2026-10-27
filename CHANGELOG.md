@@ -5,6 +5,23 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Candidate README, image provenance and PubChem review — 2026-10-27
+
+- Replaced the candidate README's mixed-directory command with an explicit two-directory workflow:
+  run from the repository clone and point `--compounds/--stp-dir/...` and
+  `--config-template` at `$CANDIDATE`; verified the command from the repo against the candidate.
+- Re-ran the candidate in Linux with explicit `RNP_CONTAINER_IMAGE*` values. New
+  `case_provenance.json` records image tag/ID/digest (not null); the earlier image-null run is kept
+  historical and was not backfilled.
+- Completed PubChem source/field/terms/citation review for the eight CIDs: PUG REST
+  `SMILES`/`ConnectivitySMILES` are computed descriptors; per-record OEChem/PubChem releases and
+  raw-response hashes are recorded. NCBI states no restrictions by NCBI but submitters may retain
+  rights; no CC license is asserted. Added per-CID provenance table and updated candidate/docs;
+  publication remains a researcher decision.
+- Candidate now has 34 files and refreshed `SHA256SUMS.tsv`; no private/local paths in candidate
+  configs/docs, no EML/screenshot/private correspondence included.
+- No tag/release/visibility change.
+
 ### CTD public non-profit permission and complete candidate — 2026-10-27
 
 - Recorded CTD ticket **#8545** (2026-10-26): public non-profit research including GitHub is permitted

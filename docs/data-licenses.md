@@ -7,7 +7,7 @@ CTD, PubChem, private logs or mixed-source derived outputs.
 | Source | Used for | Redistribution in this repo | Notes |
 |---|---|---|---|
 | [HGNC](https://www.genenames.org/) | gene-symbol normalization | derived `hgnc_map.tsv` committed (CC0) | CC0; attribution recommended and recorded in `examples/demo/inputs/HGNC-SOURCE.md` |
-| [PubChem](https://pubchem.ncbi.nlm.nih.gov/) | public compound identity/structures | local fetched table only (not committed) | check PubChem terms before redistribution; the fetch script writes to `data/local/` |
+| [PubChem](https://pubchem.ncbi.nlm.nih.gov/) | public compound identity/structures | local candidate/table only (not committed) | Reviewed 2026-10-27: NCBI places no restrictions on use/distribution of molecular data, but submitters may claim third-party rights and NCBI cannot provide unrestricted permission; no CC license asserted. Cite PubChem/record URLs and NCBI policy; publication decision pending. See `docs/pubchem-structure-review-2026-10-27.md` |
 | [GO](https://geneontology.org/) | enrichment gene sets | no bulk data; results derived | CC BY 4.0, attribution required |
 | [Reactome](https://reactome.org/) | alternative gene sets (planned) | no bulk data | CC0 |
 | [STRING](https://string-db.org/) | PPI input (planned) | no bulk network files | CC BY 4.0; record version (e.g. 12.0) |

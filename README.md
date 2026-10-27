@@ -18,7 +18,8 @@ and hashes, and every output can be regenerated from a single config file.
 > confirms public non-profit research including GitHub for the requested 179-gene subset/derived
 > outputs, with CTD citation and a data date-stamp; commercial use is separate. A complete review
 > candidate is prepared and reproduced, but **publication is pending the researcher's decision**;
-> PubChem structure terms and final visibility/release remain open. HGNC is frozen (CC0). See
+> PubChem source/terms review is complete with a residual third-party caveat; final structure
+> publication/visibility/release remain researcher decisions. HGNC is frozen (CC0). See
 > `docs/stp-permission-2026-10-23.md`, `docs/ctd-permission-2026-10-26.md`, and
 > `docs/public-candidate-reproduction-2026-10-27.md`.
 > The thin Skill has a final-revision Codex real-agent acceptance (normal/missing/partial/tamper/zero;

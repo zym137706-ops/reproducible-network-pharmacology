@@ -196,9 +196,11 @@ data_sources:
     local_path: data/local/case/pubchem_structures.tsv
     metadata_path: data/local/case/metadata.json
     raw_responses_recorded: true
-    license_status: fetched locally by scripts/fetch_pubchem_structures.py; local
-      use only until PubChem terms for redistribution are checked, so the structure
-      table is not committed
+    license_status: 'reviewed 2026-10-27: NCBI no restrictions + third-party caveat;
+      no CC license; candidate local'
+    review_record: docs/pubchem-structure-review-2026-10-27.md
+    field_provenance: PUG REST SMILES/ConnectivitySMILES are computed descriptors;
+      per-record OEChem/PubChem release references in docs/pubchem-structure-review-2026-10-27.md
   ctd:
     used_for: disease genes
     url: https://ctdbase.org/downloads/
@@ -394,18 +396,18 @@ public_release_gaps:
     separation before publication
   owner: researcher + agent
   status: pending
-- id: pubchem_terms_review
-  what: separate PubChem structure/source terms review before publishing compounds/structure
-    table; STP/CTD replies do not clear this
-  owner: researcher + agent
+- id: pubchem_publication_decision
+  what: decide whether to publish PubChem computed structures after the completed
+    source/terms review; residual third-party caveat
+  owner: researcher
   status: pending
 public_release_actions:
 - researcher reviews the complete candidate and decides publication scope/visibility/release
-- review and clear PubChem structure terms separately; keep structures local until
-  then
+- consider the completed PubChem source/terms review and residual third-party caveat
+  for the structure table
 - if published, cite CTD with a data date-stamp and notify CTD of the public project
   link
-- do not relabel CTD data as MIT/CC0/CC BY or claim commercial rights
+- do not relabel CTD or PubChem data as MIT/CC0/CC BY or claim commercial rights
 - preserve STP original tables unmodified and include attribution/citation
 - no tag/release/visibility change without the researcher decision
 permission_requests:
@@ -428,7 +430,12 @@ permission_requests:
       no independent cryptographic signature verification claimed
 public_case_candidate:
   path: C:/DSH/rnp-public-case-candidate-2026-10-21/
-  files: 33
+  files: 34
   sha256_file: SHA256SUMS.tsv
   reproduction_record: docs/public-candidate-reproduction-2026-10-27.md
   status: review_only_not_published
+  image: bioconductor/bioconductor_docker:RELEASE_3_22
+  image_id: sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
+  image_digest: bioconductor/bioconductor_docker@sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
+  source_sha256: 67e57b00517df811bfc00d8f007d8b81ec966a5b0993518021a8cea664c641d1
+  reproduction_commit: 90f3178

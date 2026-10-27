@@ -33,7 +33,11 @@ def test_public_case_gate_is_not_confused_with_local_completion() -> None:
         "ctd_permission": "confirmed_public_nonprofit_2026-10-26_ticket_8545",
     }
     gaps = {item["id"] for item in data["public_release_gaps"]}
-    assert {"researcher_publication_decision", "candidate_review", "pubchem_terms_review"} == gaps
+    assert {
+        "researcher_publication_decision",
+        "candidate_review",
+        "pubchem_publication_decision",
+    } == gaps
     assert data["public_release_gate"]["status"] == (
         "permission_confirmed_publication_decision_pending"
     )

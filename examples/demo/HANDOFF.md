@@ -5,7 +5,8 @@ The local RA case is **computed, independently checked, and reproduced from a cl
 modification. CTD ticket **#8545** (2026-10-26) confirms **public non-profit research including
 GitHub** for the requested 179-gene RA subset and derived outputs, with CTD citation and a data
 date-stamp; commercial use is separate. A complete review candidate is prepared outside Git, but
-nothing is published, and **PubChem structure terms remain separately pending**.
+nothing is published, and **PubChem source/terms review is complete with a residual third-party
+caveat; structure publication remains a researcher decision**.
 
 | # | Item | Local evidence | Status |
 |---|---|---|---|
@@ -24,7 +25,7 @@ Local, review-only, outside Git:
 
 It contains relative-path `run-0.10.yaml`/`run-0.05.yaml`, STP XLSX, compounds with actual submitted
 structures, de-identified submission log, CTD genes/evidence/query metadata, HGNC, both universes and
-foregrounds, PubChem source note, permissions, expected counts and `SHA256SUMS.tsv` (33 files). It was
+foregrounds, PubChem source note, permissions, expected counts and `SHA256SUMS.tsv` (34 files). It was
 reproduced from clean commit `90f3178`; see `docs/public-candidate-reproduction-2026-10-27.md`.
 Private EMLs, screenshots, full headers, school email and IP/session data are excluded.
 

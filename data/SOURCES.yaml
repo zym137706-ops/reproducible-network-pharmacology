@@ -9,15 +9,23 @@ hgnc:
   note: derived hgnc_map.tsv committed under examples/demo/inputs; raw file local
     only
 pubchem:
-  name: PubChem compound structures
+  name: PubChem (NCBI/NLM)
   url: https://pubchem.ncbi.nlm.nih.gov/
-  license: verify PubChem terms before redistribution; fetched structures stay in
-    data/local
-  redistribute: false
-  release: retrieved 2026-10-20
+  license: NCBI places no restrictions on use/distribution of molecular data, but
+    submitters may claim third-party rights and NCBI cannot provide unrestricted permission;
+    no CC license asserted; cite PubChem/record URLs
+  redistribute: reviewed_residual_caveat
+  release: records returned 2025.04.14 / 2025.09.15 computed-descriptor references;
+    retrieval 2026-10-20
   retrieved: '2026-10-20T12:40:37Z'
-  sha256: c43811542fe1ef1856c8e9aefd2c1805e400d0c87d6093117565c04e9ebc6d02
-  note: SMILES + ConnectivitySMILES; local derivation only; regenerate with scripts/fetch_pubchem_structures.py
+  sha256: pubchem_structures.tsv c43811542fe1ef1856c8e9aefd2c1805e400d0c87d6093117565c04e9ebc6d02
+  fields:
+  - SMILES
+  - ConnectivitySMILES
+  field_provenance: computed by OEChem references from PubChem PUG View; see docs/pubchem-structure-review-2026-10-27.md
+  review_record: docs/pubchem-structure-review-2026-10-27.md
+  note: Local candidate only; not committed. No STP/CTD reply clears PubChem. Publication
+    decision remains with researcher.
 go:
   name: Gene Ontology
   url: https://geneontology.org/docs/download-ontology/

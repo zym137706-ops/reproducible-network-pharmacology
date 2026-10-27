@@ -11,13 +11,14 @@ modification. CTD confirmed on 2026-10-26 (ticket #8545) that the requested 179-
 derived outputs may be used for public non-profit research including GitHub, with CTD citation and a
 data date-stamp; commercial use is separate. Disease/STP/backgrounds and detailed results exist
 locally and were used for the completed calculation; they are **not missing local inputs**. HGNC is
-frozen and committed (CC0). PubChem structure terms remain separately pending.
+frozen and committed (CC0). PubChem structure source/terms/citation review is complete with a
+residual third-party caveat; publication remains a separate researcher decision.
 
 ## What the case must contain
 
 | Item | Required detail | License / provenance check | Status |
 |---|---|---|---|
-| Compound list | stable `compound_id`, name, SMILES or documented structure source; explicit `stp_file` binding | public compounds; PubChem CID and retrieval date recorded | local verified: 8 CIDs; actual `.xlsx` bindings; PubChem structure terms pending |
+| Compound list | stable `compound_id`, name, SMILES or documented structure source; explicit `stp_file` binding | public compounds; PubChem CID and retrieval date recorded; source/terms review complete with residual caveat | local verified: 8 CIDs; actual `.xlsx` bindings; publication decision pending |
 | SwissTargetPrediction exports | one export per compound, species recorded, retrieval date, submission log | **CC BY 4.0 confirmed 2026-10-23 for eight native tables**; cite website/date/Daina & Zoete 2024; originals unmodified | **confirmed; candidate prepared; not published** |
 | Disease gene list | exact MeSH D001172 (Arthritis, Rheumatoid); CTD query and direct evidence rule | **CTD ticket #8545: public non-profit research incl. GitHub; cite CTD/date-stamp; commercial separate** | **permission confirmed; candidate local; not published** |
 | HGNC snapshot | complete-set TSV version/date; which release | CC0; attribution recorded | FROZEN: 2026-10-16, 45,277 Approved |

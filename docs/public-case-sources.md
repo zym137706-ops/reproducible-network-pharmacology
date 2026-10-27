@@ -15,7 +15,7 @@ URL is not by itself permission to redistribute.
 
 | Layer | Candidate source | Access / identifiers | License / redistribution check | Status |
 |---|---|---|---|---|
-| Compound structures | PubChem | CID, SMILES/ConnectivitySMILES | Terms for redistribution not confirmed; 8 rows fetched locally, not committed | **local fetched, not committed** |
+| Compound structures | PubChem | CID, SMILES/ConnectivitySMILES | Source/terms review completed 2026-10-27: computed descriptors from PUG REST; NCBI no-restriction statement + submitter-rights caveat; no CC license. Candidate local; publication decision pending | **reviewed; candidate local** |
 | Compound structures | ChEMBL | ChEMBL ID, canonical SMILES, release number | CC BY-SA 4.0 (attribution + share-alike obligations); record release | candidate |
 | Compound names / natural products | NPASS / COCONUT | compound ID, source organism, SMILES | Check each database's academic-use terms; do not assume redistribution rights | candidate |
 | Disease genes | Open Targets Platform | Ensembl gene IDs, disease ID, score, release | CC BY 4.0 typically; record release and attribution | candidate |
@@ -66,5 +66,6 @@ redistribution use. STP submission still requires the researcher's manual export
 
 The R lock is restored, the local dual-threshold chain plus independent checks are complete, and the
 complete candidate has been reproduced from a clean clone. STP and CTD permissions cover the requested
-public non-profit scope; the remaining decisions are candidate review, PubChem structure terms, data
-inclusion and publication. Until the researcher approves publication, no public-case claim is allowed.
+public non-profit scope; PubChem source/terms review is complete with a residual third-party caveat.
+The remaining decisions are candidate review, data inclusion, structure publication and final release.
+Until the researcher approves publication, no public-case claim is allowed.
