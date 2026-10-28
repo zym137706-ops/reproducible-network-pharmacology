@@ -52,6 +52,16 @@ manifest/config digests and the run's provenance/report paths. The old run remai
 new run is the main verification record in `docs/public-candidate-reproduction-2026-10-28.md` and the
 candidate `VERIFICATION.md`.
 
+Final run facts:
+
+- output: `C:/DSH/rnp-public-candidate-launch-2026-10-28/`
+- container name: `rnp-final-attestation-2026-10-28`
+- observed container `.Image`: `sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a`
+- observed local image `.Id`: the same `e341…` value in this image store (recorded explicitly as
+  local inspect, separate from the registry config digest)
+- `linux/amd64`; registry platform manifest `67ab…`; config `7da6…`
+- provenance/report hashes: see the 2026-10-28 reproduction record and `launch-attestation.json`
+
 ## Rule
 
 Do not backfill old provenance. Use separate named fields:

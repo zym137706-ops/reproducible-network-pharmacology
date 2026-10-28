@@ -59,3 +59,9 @@ changes in future, affected scenarios must be re-run rather than relying on this
 `tests/unit/test_skill.py` and `tests/skill/test_skill_scenarios.py` remain deterministic regression
 coverage. The session above is separate evidence from Codex's actual tool calls. The final public
 case gate remains blocked pending CTD/STP permission.
+
+**Status update (2026-10-28):** the preceding sentence records the 2026-10-21 state. CTD ticket
+#8545 and STP's 2026-10-23 reply now confirm the requested public non-profit scope; PubChem
+source/terms review is complete with a residual caveat. The case candidate is reproduced, but
+publication still awaits the researcher's final decision. The original Skill session result is
+unchanged and remains valid.

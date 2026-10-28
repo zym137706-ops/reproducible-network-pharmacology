@@ -143,14 +143,14 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 
 | Command | Status | What it does |
 |---|---|---|
-| `rnp validate` | ✅ v0.0.1 | Validate a run config and every declared input path |
-| `rnp ingest stp` | ✅ v0.1 hardened | Bind compounds to exports, parse xlsx/csv (merged title rows, multi-symbol targets, complexes) into `targets.tsv`; quarantine unbound exports; classify file status; stage status |
-| `rnp manifest` | ✅ v0.0.1 | Validate a run manifest and detect drift in recorded input hashes |
-| `rnp intersect` | ✅ v0.1 | HGNC-normalized intersection; refuses partial upstream by default; exclusions and conflicts in audit tables |
-| `rnp network` | ✅ v0.1 | Cytoscape node/edge/MOLlist tables + Venny data; optional R Venn plot (`--venn-plot`); valid empty network for zero hits |
-| `rnp enrich` | ✅ v0.1 | ORA via R `clusterProfiler` per group with an **explicit background**; complete tested-term table + significant view; distinct statuses for no-hit vs failure |
+| `rnp validate` | ✅ | Validate a run config and every declared input path |
+| `rnp ingest stp` | ✅ | Bind compounds to exports, parse xlsx/csv (merged title rows, multi-symbol targets, complexes) into `targets.tsv`; quarantine unbound exports; classify file status; stage status |
+| `rnp manifest` | ✅ | Validate a run manifest and detect drift in recorded input hashes |
+| `rnp intersect` | ✅ | HGNC-normalized intersection; refuses partial upstream by default; exclusions and conflicts in audit tables |
+| `rnp network` | ✅ | Cytoscape node/edge/MOLlist tables + Venny data; optional R Venn plot (`--venn-plot`); valid empty network for zero hits |
+| `rnp enrich` | ✅ | ORA via R `clusterProfiler` per group with an **explicit background**; complete tested-term table + significant view; distinct statuses for no-hit vs failure |
 | `rnp mcode` | 🚧 later extension | Module enrichment from Cytoscape MCODE exports; independent of hub ranking |
-| `rnp report` | ✅ v0.1 | Markdown report from verified stage audits + tables; hash-checked; no claims beyond the evidence |
+| `rnp report` | ✅ | Markdown report from verified stage audits + tables; hash-checked; no claims beyond the evidence |
 | `scripts/case_run.py` | ✅ local case entry | Portable preflight + full CLI chain for user-supplied inputs; records source/config/container provenance |
 | `scripts/case_check.py` | ✅ independent check | Re-derives T_r/foreground and recomputes hypergeometric/BH from result tables |
 | `rnp metabolites import` | 🚧 v0.2 | Import processed metabolomics annotations; confirmed compound lists also supported |

@@ -25,9 +25,11 @@ Local, review-only, outside Git:
 
 It contains relative-path `run-0.10.yaml`/`run-0.05.yaml`, STP XLSX, compounds with actual submitted
 structures, de-identified submission log, CTD genes/evidence/query metadata, HGNC, both universes and
-foregrounds, PubChem source note, permissions, expected counts and `SHA256SUMS.tsv` (34 files). It was
-reproduced from clean commit `90f3178`; see `docs/public-candidate-reproduction-2026-10-27.md`.
-Private EMLs, screenshots, full headers, school email and IP/session data are excluded.
+foregrounds, PubChem per-CID provenance/source note, permissions, citations, expected counts and
+`SHA256SUMS.tsv`. It has **35 payload files + 1 checksum manifest = 36 total** and was reproduced
+from clean commit `49c86ee`; see `docs/public-candidate-reproduction-2026-10-28.md`. The versioned
+zip is `C:/DSH/rnp-case-v0.1.0-2026-10-21.zip` (SHA-256 `5fe85b4e…`). Private EMLs, screenshots,
+full headers, school email and IP/session data are excluded.
 
 ## Local run already completed (not public)
 
@@ -40,7 +42,8 @@ are not committed.
 
 1. Researcher reviews the complete candidate and explicitly decides data inclusion, repository
    visibility and versioned release.
-2. Separately review/clear PubChem structure and source terms; STP/CTD replies do not clear them.
+2. Review the completed PubChem source/terms/citation record and decide whether the structure table
+   is published; the review is complete, with a residual third-party-rights caveat.
 3. If published, cite CTD with a data date-stamp and notify CTD of the public link.
 4. Do not relabel CTD data as MIT/CC0/CC BY or claim commercial rights; keep code and data licenses
    separate.

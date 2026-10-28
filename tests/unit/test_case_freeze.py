@@ -31,6 +31,7 @@ def test_public_case_gate_is_not_confused_with_local_completion() -> None:
         "final_skill_acceptance": "passed_codex_2026-10-21_with_environment_caveat",
         "stp_permission": "confirmed_2026-10-23_tables_only",
         "ctd_permission": "confirmed_public_nonprofit_2026-10-26_ticket_8545",
+        "pubchem_review": "complete_2026-10-27_residual_third_party_caveat",
     }
     gaps = {item["id"] for item in data["public_release_gaps"]}
     assert {

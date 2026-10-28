@@ -1,5 +1,10 @@
 # Public case candidate reproduction — 2026-10-27
 
+> **Historical record.** The main verification record for v0.1.0 is
+> `docs/public-candidate-reproduction-2026-10-28.md` (commit `49c86ee`). This 2026-10-27 run and its
+> report hashes are preserved; its image fields used the index digest for both `image_id` and
+> `image_digest`, so do not use it as the current image attestation.
+
 This run used the complete local candidate, not a new STP/CTD download. Fixed commit:
 `90f317869e97aef96904b872af9f8eefde5a2927` (`90f3178`); clean clone; `git status` empty.
 Candidate: `C:/DSH/rnp-public-case-candidate-2026-10-21/`.
