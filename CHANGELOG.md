@@ -5,6 +5,20 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### Public-release hygiene — 2026-10-28
+
+- Removed the internal historical task prompt `docs/next-steps-dsh.md` and the superseded
+  `examples/demo/HANDOFF.md` and `examples/demo/inputs/STP-PENDING-SUBMISSIONS.tsv` from the repository
+  (originals preserved outside Git). Added `examples/demo/DATA-ACCESS.md` and
+  `docs/evidence-identifiers.md` as the public data-access/reproduction and evidence-label entries.
+- Replaced machine-specific paths in public docs with `<repo>`, `<workspace>`, evidence identifiers or
+  the case-package name; retained dates, scope, hashes, citations and historical error records. The two
+  real-agent acceptance records keep their models, commits, versions, commands, exit codes and failure
+  limitations, with a dated path-normalization note.
+- Replaced the pending-submission test with a frozen-compounds/binding/log-consistency test; scientific
+  decisions, counts and hashes in `CASE-FREEZE.yaml` are unchanged.
+- No repository visibility, tag/release, real-data upload or email change.
+
 ### v0.1.0 release candidate — 2026-10-28
 
 - Raised the software version to **0.1.0** (`pyproject.toml`, `uv.lock`, `src/rnp/__init__.py`,

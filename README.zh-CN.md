@@ -59,7 +59,7 @@ uv run python scripts/synthetic_demo.py --out .demo
 uv run pytest -q
 ```
 
-自包含的 fixture 用于快速开始与测试。公开数据案例**尚未完成**；`examples/demo/` 只是目标契约，数据来源/许可候选见 [docs/public-case-sources.md](docs/public-case-sources.md)。
+自包含的 fixture 用于快速开始与测试。公开数据案例已完成本地双阈值计算、独立核查和候选复现，但尚未发布；完整数据包与复现入口见 [examples/demo/DATA-ACCESS.md](examples/demo/DATA-ACCESS.md)，来源/许可记录见 [docs/public-case-sources.md](docs/public-case-sources.md)。
 
 Windows 注意：确认 `python` 指向 Python 3。装了分子模拟工具的工作站常见 `python` 命中 MGLTools 的 Python 2.7，请用 `py -3.12` 或 `uv run`。
 

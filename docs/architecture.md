@@ -3,7 +3,7 @@
 > Status: current implementation plus explicitly marked target contracts. Updated 2026-10-19.
 > The accepted scope extension is [ADR-0004](adr/0004-staged-upstream-and-docking.md).
 > See the [maintained plan](project-plan.zh-CN.md), [upstream design](upstream.md),
-> [docking design](docking.md) and [next implementation slice](next-steps-dsh.md).
+> and [docking design](docking.md).
 > No new runtime capability is added by these documents.
 
 ## 1. Purpose
@@ -169,7 +169,7 @@ strings), and the lock file / controlled R environment record is still pending.
 
 The workstation this was developed on has MGLTools first on `PATH`, so bare `python` resolves to
 Python 2.7. Use `py -3.12`, `uv run`, or the virtual environment interpreter explicitly. R lives at
-`C:\Program Files\R\R-4.5.2\bin\Rscript.exe`; pass `RNP_RSCRIPT` to tests if it is not on `PATH`.
+`<R_HOME>\bin\Rscript.exe`; pass `RNP_RSCRIPT` to tests if it is not on `PATH`.
 
 ## 13. Accepted extension contracts (not implemented)
 

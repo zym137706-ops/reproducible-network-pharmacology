@@ -20,8 +20,9 @@ uploaded, made public or released. STP/CTD/PubChem review and the publication de
 
 ## 2. Final case package (review only)
 
-- Review candidate: `C:/DSH/rnp-public-case-candidate-2026-10-21/`
-- Versioned release asset: `C:/DSH/rnp-case-v0.1.0-2026-10-21.zip`
+- Review candidate: `CASE-PKG-2026-10-21` (review-only; not committed)
+- Data access and reproduction entry: `examples/demo/DATA-ACCESS.md`
+- Versioned release asset: `rnp-case-v0.1.0-2026-10-21.zip`
 - Zip SHA-256: `5fe85b4ec737ada8b86c88d2e5596e1582105ab89d8dbf4c6c83188e108a3d2c`
 - Package counts: **35 payload files + `SHA256SUMS.tsv` = 36 total files**; 35/35 hashes and sizes
   verified after extraction.

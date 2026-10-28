@@ -30,7 +30,7 @@ and hashes, and every output can be regenerated from a single config file.
 > `docs/case-clean-run-2026-10-21.md`. See the
 > [maintained plan](docs/project-plan.zh-CN.md),
 > [case freeze](examples/demo/CASE-FREEZE.yaml),
-> [public-case sources](docs/public-case-sources.md) and
+> [public-case sources](docs/public-case-sources.md), [data access](examples/demo/DATA-ACCESS.md) and
 > [environment record](docs/environment.md).
 
 ---
@@ -123,7 +123,8 @@ attribution/no-modification requirements; CTD ticket **#8545** confirms the requ
 non-profit research** use (including GitHub) with CTD citation and a data date-stamp. PubChem
 source/terms/citation review is complete with a residual third-party-rights caveat. The complete
 candidate is prepared outside Git, but **publication is pending the researcher's decision** on final
-file inclusion, visibility and release. Its data/license checklist is in
+file inclusion, visibility and release. Its data access/reproduction guide is
+[examples/demo/DATA-ACCESS.md](examples/demo/DATA-ACCESS.md); data/license checklist is in
 [docs/public-case-checklist.md](docs/public-case-checklist.md); STP exports are produced by hand.
 The synthetic demo is an engineering test, not a scientific result.
 

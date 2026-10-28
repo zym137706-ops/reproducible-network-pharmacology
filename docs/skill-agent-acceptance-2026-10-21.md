@@ -1,8 +1,10 @@
 # Final Skill real-agent acceptance — 2026-10-21
 
+> 公开整理说明（2026-10-28）：原始本机路径已统一替换为 `<workspace>`；模型、commit、版本、命令、退出码和失败限制保留未变。
+
 This is a real Codex session record, not pytest and not a DSH-subagent substitute. It validates the
 installed final `skills/np-workflow/SKILL.md` at clean commit **e81f5bf**. Session logs are local
-(`C:/DSH/rnp-skill-logs/`); no restricted data is included.
+(`<workspace>/rnp-skill-logs/`); no restricted data is included.
 
 ## Runtime and installation
 

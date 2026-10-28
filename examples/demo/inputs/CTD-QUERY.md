@@ -1,5 +1,8 @@
 # CTD disease query and inclusion rule
 
+The complete request outputs are already distributed in `CASE-PKG-2026-10-21/inputs/`; the
+`data/local/` paths below are for rebuilding only and are not part of the public repository.
+
 Recorded decision: **Arthritis, Rheumatoid**, exact MeSH ID **D001172**; no child disease expansion.
 
 ## Query

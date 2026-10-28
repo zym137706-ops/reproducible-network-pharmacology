@@ -15,18 +15,18 @@ URL is not by itself permission to redistribute.
 
 | Layer | Candidate source | Access / identifiers | License / redistribution check | Status |
 |---|---|---|---|---|
-| Compound structures | PubChem | CID, SMILES/ConnectivitySMILES | Source/terms review completed 2026-10-27: computed descriptors from PUG REST; NCBI no-restriction statement + submitter-rights caveat; no CC license. Candidate local; publication decision pending | **reviewed; candidate local** |
+| Compound structures | PubChem | CID, SMILES/ConnectivitySMILES | Source/terms review completed 2026-10-27: computed descriptors from PUG REST; NCBI no-restriction statement + submitter-rights caveat; no CC license. Case package; publication decision pending | **reviewed; case package** |
 | Compound structures | ChEMBL | ChEMBL ID, canonical SMILES, release number | CC BY-SA 4.0 (attribution + share-alike obligations); record release | candidate |
 | Compound names / natural products | NPASS / COCONUT | compound ID, source organism, SMILES | Check each database's academic-use terms; do not assume redistribution rights | candidate |
 | Disease genes | Open Targets Platform | Ensembl gene IDs, disease ID, score, release | CC BY 4.0 typically; record release and attribution | candidate |
-| Disease genes | CTD | exact MeSH `D001172` (Arthritis, Rheumatoid), no child expansion; direct marker/mechanism or therapeutic evidence | **CTD ticket #8545 (2026-10-26): public non-profit research incl. GitHub; cite CTD and date-stamp; commercial separate**; query/rules in `examples/demo/inputs/CTD-QUERY.md` | **permission confirmed; candidate local; not published** |
+| Disease genes | CTD | exact MeSH `D001172` (Arthritis, Rheumatoid), no child expansion; direct marker/mechanism or therapeutic evidence | **CTD ticket #8545 (2026-10-26): public non-profit research incl. GitHub; cite CTD and date-stamp; commercial separate**; query/rules in `examples/demo/inputs/CTD-QUERY.md` | **permission confirmed; case package; not published** |
 | Disease genes (excluded) | GeneCards / OMIM | — | Repository policy excludes vendored GeneCards/OMIM content | excluded |
 | Gene identifiers | HGNC | complete set, HGNC ID, symbol, alias, UniProt | CC0; attribution recommended; frozen derived table with source record | **frozen** |
 | PPI (optional) | STRING | v12.0, confidence cutoff, `protein.links` | CC BY 4.0; record attribution | optional |
 | Enrichment sets | GO | GO release, `org.Hs.eg.db` version | GO CC BY 4.0; local GO.db 3.22.0 used through the locked R library | **local used** |
 | Enrichment sets | Reactome | Reactome release, pathway IDs | Check Reactome terms for the release | candidate |
 | Enrichment sets (excluded) | KEGG | — | KEGG is not redistributable in this repository; keep it user-provided | excluded |
-| Target prediction | SwissTargetPrediction export | 8 XLSX, 800 rows, submission log, Homo sapiens | SwissDrugDesign reply 2026-10-23 confirms **CC BY 4.0** for the eight native tables; cite website/prediction date/Daina & Zoete 2024; originals unmodified. Derived analyses allowed; mixed-source outputs need per-source review. Local candidate: `C:/DSH/rnp-stp-release-candidate-2026-10-21/` | **confirmed; candidate local; not published** |
+| Target prediction | SwissTargetPrediction export | 8 XLSX, 800 rows, submission log, Homo sapiens | SwissDrugDesign reply 2026-10-23 confirms **CC BY 4.0** for the eight native tables; cite website/prediction date/Daina & Zoete 2024; originals unmodified. Derived analyses allowed; mixed-source outputs need per-source review. Local candidate: `CASE-PKG-2026-10-21` | **confirmed; case package; not published** |
 
 ## Local data preparation (not committed)
 

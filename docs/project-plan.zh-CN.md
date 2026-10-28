@@ -3,7 +3,7 @@
 > 更新：2026-10-28；修订 v2 的范围、结构身份、候选决策及对接验证要求。
 > 维护入口：仓库内 `docs/project-plan.zh-CN.md`。微信临时目录中的同名规划是本次同步副本，后续以仓库版为准。
 > 本次仅修改设计文档；新增命令、字段、审核门均不代表已经实现。当前行为仍以源码和实际测试为准。
-> 配套设计：[上游与结构契约](upstream.md)、[候选对与对接设计](docking.md)、[ADR-0004](adr/0004-staged-upstream-and-docking.md)、[下一步任务](next-steps-dsh.md)。
+> 配套设计：[上游与结构契约](upstream.md)、[候选对与对接设计](docking.md)、[ADR-0004](adr/0004-staged-upstream-and-docking.md)。
 >
 > **实施状态（2026-10-19 DSH 切片）**：v0.1 加固已完成并通过本机测试：显式成分↔导出绑定与隔离、
 > 文件状态分类（ok/partial/below_threshold/invalid_rows/no_predictions/error/quarantined）、文件计数分离、
@@ -164,7 +164,7 @@ AlphaFold/同源模型后续作为独立适配：pLDDT 不是对接准入的充�
 评分函数、盒子、exhaustiveness、num_modes、energy_range、状态和原始日志。
 固定 seed 不单独保证跨版本/平台逐字相同；规定受控环境重复性与数值/姿势容差，另报跨环境差异。
 
-C:\dock 的数量和版本来自 v2/DSH 历史盘点，本次未重新核验；不能当成当前事实或已完成重构。
+<legacy-dock-dir> 的数量和版本来自 v2/DSH 历史盘点，本次未重新核验；不能当成当前事实或已完成重构。
 配置文件不含 seed/cpu 不等于运行时未设置：核查脚本、命令行和日志中的实际值。
 单一工具路径可简化管理；旧目录、二进制、config 和结果先只读归档并记录哈希，不删除历史证据。
 先迁移一个任务，核对来源/准备/命令/结果与新增控制，再决定批量迁移；旧结果不是新流程的独立验证。

@@ -43,11 +43,11 @@ recorded_scientific_decisions:
       PubChem fields are computed descriptors with per-CID source/hash review; complete
       chemical registration deferred to v0.2
     smiles_evidence:
-      local_pending: data/local/case/STP-PENDING-SUBMISSIONS.tsv
-      local_log: C:/DSH/rnp-case-inputs/handoff-2026-10-21/STP-SUBMISSION-LOG.tsv
-      structures_source: PubChem CID + SMILES/ConnectivitySMILES, fetched 2026-10-20
+      structures_source: PubChem PUG REST, computed SMILES fields; per-CID provenance
+        in CASE-PKG-2026-10-21/inputs/pubchem_record_provenance.tsv
       license_status: 'reviewed 2026-10-27: NCBI no restrictions by NCBI + third-party
         caveat; no CC license; candidate only'
+      log_evidence_id: EVID-HANDOFF-2026-10-21
   stp_probability: 0.1
   sensitivity_probability: 0.05
   enrichment:
@@ -64,7 +64,6 @@ recorded_scientific_decisions:
 disease:
   source: CTD
   repo_file: inputs/disease_genes.txt
-  local_file: data/local/case/disease_genes.txt
   term: Arthritis, Rheumatoid
   mesh_id: MESH:D001172
   query: POST /tools/batchQuery.go?q inputType=disease inputTerms=MeSH:D001172 report=genes_curated
@@ -90,13 +89,12 @@ disease:
   status: local_prepared_permission_confirmed_not_committed
   license_ticket: '#8545'
   permission_record: docs/ctd-permission-2026-10-26.md
+  package_file: CASE-PKG-2026-10-21/inputs/disease_genes.txt
 stp_exports:
   directory: inputs/stp
   count: 8
   binding_file: inputs/compounds.tsv
   submission_log_template: inputs/STP-SUBMISSION-LOG.tsv
-  pending_submission_list: inputs/STP-PENDING-SUBMISSIONS.tsv
-  pending_submission_local_smiles: data/local/case/STP-PENDING-SUBMISSIONS.tsv
   expected_files:
   - Quercetin.xlsx
   - Kaempferol.xlsx
@@ -116,18 +114,6 @@ stp_exports:
   status: local_verified_license_confirmed_not_committed
   note: never automate submission; download exports manually.
   public_redistribution: confirmed_cc_by_4_0_tables_only
-  local_handoff:
-    directory: C:/DSH/rnp-case-inputs/handoff-2026-10-21
-    compounds_sha256: b2e571f96fa2290258ff325cb27e47cb50221d01b24b56e1b61e187cbd54152a
-    log_sha256: 4a9039faac15b290b4e75049ec50cc45c2d991301d3da2ffbcc48093fb4ce63c
-    file_checks_sha256: 3f06c3374c82dce7b06d98c4d7a771becd0c64818f7f0445f3dd8d28d49d35fa
-    raw_rows: 800
-    invalid_rows: 0
-    rows_at_0.10: 676
-    rows_at_0.05: 740
-    files_verified: 8
-    time_precision: submitted_date=date; retrieved=file LastWriteTime proxy, seconds,
-      +08:00; URL/job_id=not_saved
   acquisition_policy:
     official_case: The eight manually submitted XLSX files and the 2026-10-21 submission
       log; frozen and hash-checked.
@@ -149,7 +135,19 @@ stp_exports:
     evidence: local screenshot and original .eml/full headers archived; headers parsed,
       independent cryptographic signature verification not claimed
     summary_record: docs/stp-permission-2026-10-23.md
-    candidate_path: C:/DSH/rnp-stp-release-candidate-2026-10-21/
+    package_id: CASE-PKG-2026-10-21
+  handoff_evidence:
+    evidence_id: EVID-HANDOFF-2026-10-21
+    compounds_sha256: b2e571f96fa2290258ff325cb27e47cb50221d01b24b56e1b61e187cbd54152a
+    log_sha256: 4a9039faac15b290b4e75049ec50cc45c2d991301d3da2ffbcc48093fb4ce63c
+    file_checks_sha256: 3f06c3374c82dce7b06d98c4d7a771becd0c64818f7f0445f3dd8d28d49d35fa
+    raw_rows: 800
+    invalid_rows: 0
+    rows_at_0.10: 676
+    rows_at_0.05: 740
+    files_verified: 8
+    time_precision: submitted_date=date; retrieved=file LastWriteTime proxy, seconds,
+      +08:00; URL/job_id=not_saved
 enrichment_background:
   file: inputs/universe-0.10.txt
   required: true
@@ -194,14 +192,14 @@ data_sources:
     field_meanings:
       SMILES: includes stereochemistry where the PubChem record defines it
       ConnectivitySMILES: connectivity only; no stereochemistry
-    local_path: data/local/case/pubchem_structures.tsv
-    metadata_path: data/local/case/metadata.json
     raw_responses_recorded: true
     license_status: 'reviewed 2026-10-27: NCBI no restrictions + third-party caveat;
-      no CC license; candidate local'
+      no CC license; case package; not published'
     review_record: docs/pubchem-structure-review-2026-10-27.md
     field_provenance: PUG REST SMILES/ConnectivitySMILES are computed descriptors;
       per-record OEChem/PubChem release references in docs/pubchem-structure-review-2026-10-27.md
+    package_path: CASE-PKG-2026-10-21/inputs/pubchem_structures.tsv
+    package_metadata_path: CASE-PKG-2026-10-21/inputs/pubchem_record_provenance.tsv
   ctd:
     used_for: disease genes
     url: https://ctdbase.org/downloads/
@@ -211,11 +209,14 @@ data_sources:
     sha256: 321e5441560904bc7d926be3c8955420654dae22166526f65db69becbb29064a
     raw_sha256: 3742a52f6ed0662098b240beac3a3cf28159a46d73e3642b4fa35ff8878d0fac
     row_count: 179
-    local_path: data/local/case/disease_genes.txt
     license_status: 'public non-profit research permission 2026-10-26 (ticket #8545);
       cite/date-stamp; commercial separate; data not yet committed'
     permission_record: docs/ctd-permission-2026-10-26.md
     permission_ticket: '#8545'
+    note: Data entry is the versioned case package; not committed to Git. Cite CTD
+      and date-stamp; notify CTD when public.
+    package_path: CASE-PKG-2026-10-21/inputs/disease_genes.txt
+    package_id: CASE-PKG-2026-10-21
   hgnc:
     used_for: gene-symbol normalization
     url: https://www.genenames.org/download/archive/
@@ -241,12 +242,15 @@ data_sources:
     release_or_date: manual submission 2026-10-21; date-only; no service release version
     sha256: 8 per-file hashes recorded in the local submission log; not committed
     license_status: CC BY 4.0 confirmed 2026-10-23 for eight native tables; attribution/no-modification
-      required; candidate local
+      required; case package; not published
     raw_rows: 800
     invalid_rows: 0
     rows_at_0.10: 676
     rows_at_0.05: 740
     permission_record: docs/stp-permission-2026-10-23.md
+    note: Original XLSX tables are in the versioned case package; not committed to
+      Git. Cite website/prediction date/Daina & Zoete 2024; do not modify originals.
+    package_id: CASE-PKG-2026-10-21
 verification_environment:
   linux_ci:
     workflow: .github/workflows/ci.yml
@@ -273,7 +277,7 @@ local_calculation:
   status: completed_local_not_public
   environment: bioconductor/bioconductor_docker:RELEASE_3_22; R 4.5.2; clusterProfiler
     4.18.4; DOSE 4.4.0; org.Hs.eg.db 3.22.0
-  results_path: data/local/case/run-2026-10-21
+  results_path: EVID-LOCAL-RUN-2026-10-21
   stage_status:
     '0.10': ingest/intersect/network/enrichment/report complete
     '0.05': ingest/intersect/network/enrichment/report complete
@@ -315,7 +319,7 @@ local_calculation:
   - enrich
   - report
   - manifest --check-inputs
-  independent_check_path: data/local/case/run-2026-10-21/independent-check.json
+  independent_check_path: EVID-LOCAL-RUN-2026-10-21/independent-check.json
   clean_clone_run:
     commit: e81f5bf1e584b98355229df2b31f21297a560f54
     dirty: false
@@ -331,7 +335,7 @@ local_calculation:
     report_sha256:
       '0.10': d16209e8d80f644b7f961898e324578f21770b9b19c4c1948099328c56c4facd
       '0.05': 2f8021c17f30b109ea4d917a34408f916b9ed1daf08436a8b629fd3d24b24edd
-    provenance_path: C:/DSH/rnp-clean-run-e81f5bf/case_provenance.json
+    provenance_path: EVID-CLEAN-RUN-2026-10-21/case_provenance.json
     status: complete; all stages complete; independent check passed; manifest 10 inputs
       no drift
   case_entry_clean_run:
@@ -373,20 +377,6 @@ public_release_gate:
     PubChem source/terms/citation review is complete with a residual third-party-rights
     caveat. Remaining gates are researcher review of the final file list, publication
     decision, and tag/release; no permission silence blocks them.
-local_input_handoff:
-  STP_directory: C:/DSH/rnp-case-inputs/stp
-  handoff_directory: C:/DSH/rnp-case-inputs/handoff-2026-10-21
-  disease: data/local/case/disease_genes.txt
-  backgrounds: data/local/case/run-2026-10-21/backgrounds
-  results: data/local/case/run-2026-10-21
-  files_verified: 8
-  submitted_date_precision: date
-  retrieved_date_basis: user-approved file LastWriteTime proxy
-  retrieved_date_precision: filesystem timestamp seconds
-  time_zone: China Standard Time (UTC+08:00)
-  operator: manual by user; identity not supplied
-  result_url: not_saved
-  job_id: not_saved
 public_release_gaps:
 - id: researcher_publication_decision
   what: researcher review of the complete candidate and explicit decision on data
@@ -431,7 +421,6 @@ permission_requests:
     evidence: local EML archived; sha256 d63991ff0f869ba2401055da57452c6e05ad02329860ccdfd58d7c33cde6e1d1;
       no independent cryptographic signature verification claimed
 public_case_candidate:
-  path: C:/DSH/rnp-public-case-candidate-2026-10-21/
   files: 35
   sha256_file: SHA256SUMS.tsv
   reproduction_record: docs/public-candidate-reproduction-2026-10-28.md
@@ -444,7 +433,26 @@ public_case_candidate:
   image_platform: linux/amd64
   image_manifest_digest: sha256:67ab741591c5cd068f8993ca5f0371794c300da9cc5e0b3b2c1c90c9058e4c6f
   image_config_digest: sha256:7da6175410ad783fab92656b46c247ce6b72473e485e4aca0c176703fb381c63
-  release_asset: C:/DSH/rnp-case-v0.1.0-2026-10-21.zip
+  release_asset: rnp-case-v0.1.0-2026-10-21.zip
   release_asset_sha256: 5fe85b4ec737ada8b86c88d2e5596e1582105ab89d8dbf4c6c83188e108a3d2c
   payload_files: 35
   total_files_including_checksum: 36
+  release_url: null
+  release_url_status: pending_final_release
+  data_access_guide: examples/demo/DATA-ACCESS.md
+  package_id: CASE-PKG-2026-10-21
+input_handoff_evidence:
+  STP_directory: CASE-PKG-2026-10-21/inputs/stp
+  handoff_directory: EVID-HANDOFF-2026-10-21
+  disease: CASE-PKG-2026-10-21/inputs/disease_genes.txt
+  backgrounds: EVID-LOCAL-RUN-2026-10-21/backgrounds
+  results: EVID-LOCAL-RUN-2026-10-21
+  files_verified: 8
+  submitted_date_precision: date
+  retrieved_date_basis: user-approved file LastWriteTime proxy
+  retrieved_date_precision: filesystem timestamp seconds
+  time_zone: China Standard Time (UTC+08:00)
+  operator: manual by user; identity not supplied
+  result_url: not_saved
+  job_id: not_saved
+evidence_identifiers: docs/evidence-identifiers.md

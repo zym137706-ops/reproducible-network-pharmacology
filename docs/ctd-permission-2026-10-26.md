@@ -22,9 +22,13 @@ remain in the local, ignored evidence directory and are not committed.
 
 ## Evidence status
 
+Evidence identifiers are defined in [evidence identifiers](evidence-identifiers.md); the
+original attachments remain local and are not distributed.
+
+
 | Item | Status |
 |---|---|
-| Original EML | local: `C:/DSH/rnp-case-inputs/permission-evidence-ctd-2026-10-26/CTD-reply-ticket-8545-2026-10-26.eml` |
+| Original EML | evidence ID: `EVID-CTD-2026-10-26/eml` |
 | EML SHA-256 | `d63991ff0f869ba2401055da57452c6e05ad02329860ccdfd58d7c33cde6e1d1` |
 | Full headers | available; receiver reports DKIM pass / DMARC pass / SPF none; no independent cryptographic signature verification claimed |
 | Full EML/headers in Git | **not committed** (contains private correspondence, IP/session/contact details) |

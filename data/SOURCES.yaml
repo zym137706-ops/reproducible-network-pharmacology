@@ -64,9 +64,10 @@ ctd:
   sha256: 321e5441560904bc7d926be3c8955420654dae22166526f65db69becbb29064a
   permission_record: docs/ctd-permission-2026-10-26.md
   permission_ticket: '#8545'
-  candidate_path: C:/DSH/rnp-public-case-candidate-2026-10-21/
+  candidate_path: CASE-PKG-2026-10-21
   note: Local CTD subset used for the RA case; not yet committed. Cite CTD and date-stamp;
     notify CTD when public.
+  release_asset: rnp-case-v0.1.0-2026-10-21.zip
 kegg:
   name: KEGG pathways
   url: https://www.kegg.jp/kegg/download/
@@ -108,6 +109,7 @@ swisstargetprediction:
   permission: 'SwissDrugDesign team reply 2026-10-23: CC BY 4.0; cite website, prediction
     date and Daina & Zoete 2024; do not modify original tables'
   permission_record: docs/stp-permission-2026-10-23.md
-  candidate_path: C:/DSH/rnp-stp-release-candidate-2026-10-21/
+  candidate_path: CASE-PKG-2026-10-21
   note: Manual submission only; never automate STP submissions. Candidate is outside
     Git and not published.
+  release_asset: rnp-case-v0.1.0-2026-10-21.zip

@@ -10,7 +10,7 @@ a separate permissive data license.
 - Requested fields: **`SMILES`** (stereochemistry included where the record defines it) and
   **`ConnectivitySMILES`** (connectivity only; no stereochemistry). No local RDKit normalization,
   salt stripping or structure rewriting was applied.
-- The eight CID records are listed in `data/local/case/pubchem_record_provenance.tsv` with:
+- The eight CID records are listed in `CASE-PKG-2026-10-21/inputs/pubchem_record_provenance.tsv` with:
   CID, record title, record URL, PUG View URL, PUG REST URL, the exact returned SMILES fields,
   retrieval time and raw-response SHA-256.
 - PUG View `Computed Descriptors` identifies these SMILES as **computed** descriptors, not
@@ -48,5 +48,5 @@ Citation/reference practice for this case:
 
 PubChem structure source/field/terms/citation review is **complete**, with the residual caveat that
 third-party rights in contributed records cannot be excluded by NCBI. The eight structures are
-review-only in the local candidate; the researcher must decide whether to publish them. This review
+review-only in the case package; the researcher must decide whether to publish them. This review
 does not authorize commercial use and does not relicense PubChem data.

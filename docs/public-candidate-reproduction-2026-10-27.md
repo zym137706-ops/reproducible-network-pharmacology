@@ -7,7 +7,7 @@
 
 This run used the complete local candidate, not a new STP/CTD download. Fixed commit:
 `90f317869e97aef96904b872af9f8eefde5a2927` (`90f3178`); clean clone; `git status` empty.
-Candidate: `C:/DSH/rnp-public-case-candidate-2026-10-21/`.
+Candidate: `CASE-PKG-2026-10-21`.
 
 ## Environment and commands
 
@@ -39,7 +39,7 @@ Candidate: `C:/DSH/rnp-public-case-candidate-2026-10-21/`.
 - Independent checker passed; all stage statuses complete.
 - Report hashes vary with paths/time and are not cross-run equality tests.
 
-Candidate local output: `C:/DSH/rnp-public-candidate-image-2026-10-27/` (not committed).
+Candidate local output: `EVID-LAUNCH-2026-10-27/` (not committed).
 
 ## Boundaries
 

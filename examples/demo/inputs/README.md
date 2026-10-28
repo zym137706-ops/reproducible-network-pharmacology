@@ -1,15 +1,18 @@
-# Public demo inputs: freeze status
+# Public demo inputs: repository templates and case package
 
-This directory contains the recorded compound list and the frozen HGNC normalization table. The
-other scientific inputs are missing and must not be substituted:
+This repository publishes **code, templates and public reference tables**, not the real RA case data.
+The complete case inputs and expected outputs are distributed as the versioned release asset
+[`rnp-case-v0.1.0-2026-10-21.zip`](../DATA-ACCESS.md); they are not committed here.
 
-| Input | Status | Required evidence |
+| Input | In this repository | Complete case package |
 |---|---|---|
-| `compounds.tsv` | present (8 PubChem CIDs) | CIDs are public; SMILES local-only from PubChem |
-| `disease_genes.txt` | **missing** | exact CTD term/query, release, retrieval date, license evidence, SHA-256 |
-| `hgnc_map.tsv` | present, frozen (CC0) | release/last-modified, hash and attribution in [`HGNC-SOURCE.md`](HGNC-SOURCE.md) |
-| `stp/` exports | **missing** | eight manual SwissTargetPrediction exports + submission/retrieval log; no automation |
-| `expected/` | **missing** | only after inputs are frozen and the full chain runs |
+| `compounds.tsv` | template: 8 PubChem CIDs, no structures | exact submitted SMILES/structures + same CID bindings |
+| `STP-SUBMISSION-LOG.tsv` | blank template with the 8 bindings | de-identified completed 2026-10-21 log with hashes/times/proxy notes |
+| `STP-PENDING-SUBMISSIONS.tsv` | removed (superseded) | not needed; the completed log is authoritative |
+| `disease_genes.txt` | synthetic test fixture only | 179 CTD genes, exact query/release/retrieval metadata |
+| `stp/` exports | empty by design | eight byte-identical native XLSX tables |
+| `hgnc_map.tsv` | frozen public CC0 table | same public snapshot |
+| expected counts | not stored here | `expected/EXPECTED.json` and `VERIFICATION.md` |
 
-See [`CASE-FREEZE.yaml`](../CASE-FREEZE.yaml) for the blocker list and
-[`docs/public-case-checklist.md`](../../docs/public-case-checklist.md) for acceptance.
+Use [`../DATA-ACCESS.md`](../DATA-ACCESS.md) for download, checksum and reproduction steps. Private
+EMLs, screenshots, full headers, school/personal email and IP/session data are never included.

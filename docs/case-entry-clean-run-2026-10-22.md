@@ -58,7 +58,7 @@ uv run python scripts/case_run.py \
 ```
 
 The entry runs validate, ingest, backgrounds, intersect, network, enrich, report, manifest and the
-independent checker. Local outputs are at `C:/DSH/rnp-clean-run-2dc3947/` and are not committed.
+independent checker. Local outputs are at `EVID-CLEAN-RUN-2026-10-22/` and are not committed.
 
 ## Boundaries
 

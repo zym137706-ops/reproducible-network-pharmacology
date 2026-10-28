@@ -1,5 +1,7 @@
 # Real-agent acceptance report — `np-workflow` skill (2026-10-20)
 
+> 公开整理说明（2026-10-28）：原始本机路径已统一替换为 `<workspace>`；模型、commit、版本、命令、退出码和失败限制保留未变。
+
 **This was a real agent session, not pytest.** No test file was read, no `pytest` command was
 executed, and no test was imported or invoked. The only access to `tests/` was indirect: the
 supplied YAML configs declare data paths under `tests/fixtures/`, and the `rnp` CLI read those
@@ -11,8 +13,8 @@ from tests.
 - Agent: DeepSeek Harness (DSH) delegated subagent
 - Model route: `deepseek-flash` (as reported by the session runtime; the exact model build/version
   is **unknown** and was not exposed to the agent)
-- Working sandbox: `C:\DSH\rnp-skill-agent-run`
-- Repository under test: `C:\DSH\reproducible-network-pharmacology`
+- Working sandbox: `<workspace>\rnp-skill-agent-run`
+- Repository under test: `<workspace>\reproducible-network-pharmacology`
 - OS: Microsoft Windows 11 家庭版 中文版, version 10.0.26200, build 26200, 64-bit
   (`platform.platform()` = `Windows-11-10.0.26200-SP0`); CPU: 12th Gen Intel Core i7-12800HX
 - Toolchain: `uv 0.12.5`, project venv Python 3.12.5, `rnp 0.0.1`
@@ -26,7 +28,7 @@ from tests.
 ## 1. Method
 
 The five scenarios were run in the order requested: normal, missing, partial, tamper, zero. Each
-command below was executed from `C:\DSH\reproducible-network-pharmacology` with
+command below was executed from `<workspace>\reproducible-network-pharmacology` with
 `uv run rnp ...`. Exit codes were captured from the process (`$LASTEXITCODE`); structured audit
 files and report provenance were read after each stage. No generated file was edited except the
 single intentional `targets.tsv` newline append required by the tamper scenario.
@@ -38,7 +40,7 @@ ends at `report` + `manifest --check-inputs`, and the reports correctly show
 
 ## 2. Configurations used
 
-All five configs live in `C:\DSH\rnp-skill-agent-run\`. Their SHA-256 values were computed locally
+All five configs live in `<workspace>\rnp-skill-agent-run\`. Their SHA-256 values were computed locally
 and cross-checked against the `config_sha256` values emitted by `rnp validate`/audits.
 
 | Config | SHA-256 | Purpose |
@@ -71,16 +73,16 @@ No scenario failed, and no scenario required fabricating data or overriding a ha
 ## 4. Scenario 1 — normal (canonical run `normal-acceptance-20261020`)
 
 Canonical run directory:
-`C:\DSH\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020`
+`<workspace>\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020`
 
 | # | Exact command | Exit | Key status/audit output |
 |---|---|---|---|
-| 1 | `uv run rnp validate --config C:\DSH\rnp-skill-agent-run\normal.yaml` | 0 | `status: ok`; config sha `55597917…`; `export_files: 2` |
-| 2 | `uv run rnp ingest stp --config C:\DSH\rnp-skill-agent-run\normal.yaml --run-id normal-acceptance-20261020` | 0 | `stage_status: complete`; files 2, bound 2, quarantined 0, missing 0; rows total 7, valid 7, used 6, below threshold 1, invalid 0; compounds 2; warnings 2, errors 0 |
-| 3 | `uv run rnp intersect --config C:\DSH\rnp-skill-agent-run\normal.yaml --targets C:\DSH\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020\targets.tsv` | 0 | `stage_status: complete`; compounds 2, linked 1, edges 4, targets 4, disease 10, intersection 2, target_only 2, disease_only 8, union 12; `compounds_without_edges: ["Kaempferol"]`; exclusions `multi_symbol_common_name: 2`; warnings 0 |
-| 4 | `uv run rnp network --config C:\DSH\rnp-skill-agent-run\normal.yaml --intersect C:\DSH\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020\intersect` | 0 | `stage_status: complete`; nodes 4, edges 4; compound–target edges 2, disease edges 2; all invariant checks passed |
-| 5 | `uv run rnp report --config C:\DSH\rnp-skill-agent-run\normal.yaml --run-dir C:\DSH\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020` | 0 | `stage_status: complete`; stages ingest/intersect/network all `complete`; warnings 0; `report_sha256: 6f3b5fdbbe4ff767dd0f3f8c84066a040f7b0f58dbac09cc2bab09f8938da552` |
-| 6 | `uv run rnp manifest --run-dir C:\DSH\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020 --check-inputs` | 0 | `status: ok`; `inputs_checked: 4`; `drift: []`; tool `reproducible-network-pharmacology 0.0.1` |
+| 1 | `uv run rnp validate --config <workspace>\rnp-skill-agent-run\normal.yaml` | 0 | `status: ok`; config sha `55597917…`; `export_files: 2` |
+| 2 | `uv run rnp ingest stp --config <workspace>\rnp-skill-agent-run\normal.yaml --run-id normal-acceptance-20261020` | 0 | `stage_status: complete`; files 2, bound 2, quarantined 0, missing 0; rows total 7, valid 7, used 6, below threshold 1, invalid 0; compounds 2; warnings 2, errors 0 |
+| 3 | `uv run rnp intersect --config <workspace>\rnp-skill-agent-run\normal.yaml --targets <workspace>\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020\targets.tsv` | 0 | `stage_status: complete`; compounds 2, linked 1, edges 4, targets 4, disease 10, intersection 2, target_only 2, disease_only 8, union 12; `compounds_without_edges: ["Kaempferol"]`; exclusions `multi_symbol_common_name: 2`; warnings 0 |
+| 4 | `uv run rnp network --config <workspace>\rnp-skill-agent-run\normal.yaml --intersect <workspace>\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020\intersect` | 0 | `stage_status: complete`; nodes 4, edges 4; compound–target edges 2, disease edges 2; all invariant checks passed |
+| 5 | `uv run rnp report --config <workspace>\rnp-skill-agent-run\normal.yaml --run-dir <workspace>\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020` | 0 | `stage_status: complete`; stages ingest/intersect/network all `complete`; warnings 0; `report_sha256: 6f3b5fdbbe4ff767dd0f3f8c84066a040f7b0f58dbac09cc2bab09f8938da552` |
+| 6 | `uv run rnp manifest --run-dir <workspace>\rnp-skill-agent-run\runs\normal\normal-acceptance-20261020 --check-inputs` | 0 | `status: ok`; `inputs_checked: 4`; `drift: []`; tool `reproducible-network-pharmacology 0.0.1` |
 
 Observations:
 
@@ -110,7 +112,7 @@ Probe run (auto-generated id `20261020T112207Z_55597917`, retained for transpare
 
 | # | Exact command | Exit | Output |
 |---|---|---|---|
-| 1 | `uv run rnp validate --config C:\DSH\rnp-skill-agent-run\missing.yaml` | 2 | `error: declared inputs are missing` / `- inputs.disease_genes: not a file: C:\DSH\rnp-skill-agent-run\inputs\missing-disease.txt` |
+| 1 | `uv run rnp validate --config <workspace>\rnp-skill-agent-run\missing.yaml` | 2 | `error: declared inputs are missing` / `- inputs.disease_genes: not a file: <workspace>\rnp-skill-agent-run\inputs\missing-disease.txt` |
 
 Observations: the failure is clean, names the exact missing path and config key, and writes
 nothing (`runs\missing` does not exist). The missing file was **not** created and no filename-match
@@ -118,15 +120,15 @@ fallback was used. Per SKILL, this is the expected `exit 2` behavior.
 
 ## 6. Scenario 3 — partial (`partial.yaml`)
 
-Run directory: `C:\DSH\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c`
+Run directory: `<workspace>\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c`
 
 | # | Exact command | Exit | Key status/audit output |
 |---|---|---|---|
-| 1 | `uv run rnp ingest stp --config C:\DSH\rnp-skill-agent-run\partial.yaml` | 3 | `status: partial`, `stage_status: partial`; files 1, bound 1, missing 1; rows total 1, valid 1, used 1; errors 1; `missing_exports: [{compound_id: CMP0002, stp_file: b.csv, status: error, reason: missing_export}]` |
-| 2 | `uv run rnp intersect --config C:\DSH\rnp-skill-agent-run\partial.yaml --targets C:\DSH\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c\targets.tsv` | 2 | `error: upstream ingest stage is 'partial', not 'complete'` / `- fix the upstream inputs and re-run, or pass --allow-partial to explicitly continue with an audited override`; no `intersect` dir created |
-| 3 | `uv run rnp intersect --config C:\DSH\rnp-skill-agent-run\partial.yaml --targets C:\DSH\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c\targets.tsv --allow-partial` | 0 | `stage_status: partial_override`; compounds 2, linked 1, edges 1, targets 1, disease 10, intersection 1, target_only 0, disease_only 9, union 10; `compounds_without_edges: ["B"]`; warnings 1 |
-| 4 | `uv run rnp report --config C:\DSH\rnp-skill-agent-run\partial.yaml --run-dir C:\DSH\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c` | 2 | `error: run contains incomplete stages; report would be summarised as partial` / `- ingest: partial` / `- intersect: partial_override` / `- fix/re-run the stages, or pass --allow-partial to render a partial report`; no report written |
-| 5 | `uv run rnp report --config C:\DSH\rnp-skill-agent-run\partial.yaml --run-dir C:\DSH\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c --allow-partial` | 0 | `stage_status: partial_override`; stages ingest `partial`, intersect `partial_override`; warnings 1; `report_sha256: e1d9d4d6b76a4d55d971625ada940a6e1733dd7c4a97c11d7cfa2f8988d2fbab` |
+| 1 | `uv run rnp ingest stp --config <workspace>\rnp-skill-agent-run\partial.yaml` | 3 | `status: partial`, `stage_status: partial`; files 1, bound 1, missing 1; rows total 1, valid 1, used 1; errors 1; `missing_exports: [{compound_id: CMP0002, stp_file: b.csv, status: error, reason: missing_export}]` |
+| 2 | `uv run rnp intersect --config <workspace>\rnp-skill-agent-run\partial.yaml --targets <workspace>\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c\targets.tsv` | 2 | `error: upstream ingest stage is 'partial', not 'complete'` / `- fix the upstream inputs and re-run, or pass --allow-partial to explicitly continue with an audited override`; no `intersect` dir created |
+| 3 | `uv run rnp intersect --config <workspace>\rnp-skill-agent-run\partial.yaml --targets <workspace>\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c\targets.tsv --allow-partial` | 0 | `stage_status: partial_override`; compounds 2, linked 1, edges 1, targets 1, disease 10, intersection 1, target_only 0, disease_only 9, union 10; `compounds_without_edges: ["B"]`; warnings 1 |
+| 4 | `uv run rnp report --config <workspace>\rnp-skill-agent-run\partial.yaml --run-dir <workspace>\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c` | 2 | `error: run contains incomplete stages; report would be summarised as partial` / `- ingest: partial` / `- intersect: partial_override` / `- fix/re-run the stages, or pass --allow-partial to render a partial report`; no report written |
+| 5 | `uv run rnp report --config <workspace>\rnp-skill-agent-run\partial.yaml --run-dir <workspace>\rnp-skill-agent-run\runs\partial\20261020T112231Z_75825a7c --allow-partial` | 0 | `stage_status: partial_override`; stages ingest `partial`, intersect `partial_override`; warnings 1; `report_sha256: e1d9d4d6b76a4d55d971625ada940a6e1733dd7c4a97c11d7cfa2f8988d2fbab` |
 
 Observations: B has no `b.csv`, so ingest is partial (exit 3) and intersect refuses by default
 (exit 2). The user **pre-authorized** the `--allow-partial` validation override for this run; it was
@@ -139,16 +141,16 @@ export, and network/enrichment were not run for this run.
 
 ## 7. Scenario 4 — tamper (`tamper.yaml`)
 
-Run directory: `C:\DSH\rnp-skill-agent-run\runs\tamper\20261020T112249Z_e6473c0a`
+Run directory: `<workspace>\rnp-skill-agent-run\runs\tamper\20261020T112249Z_e6473c0a`
 
 | # | Exact command | Exit | Key status/audit output |
 |---|---|---|---|
-| 1 | `uv run rnp validate --config C:\DSH\rnp-skill-agent-run\tamper.yaml` | 0 | `status: ok`; config sha `e6473c0a…`; `export_files: 2` |
-| 2 | `uv run rnp ingest stp --config C:\DSH\rnp-skill-agent-run\tamper.yaml` | 0 | `stage_status: complete`; 2/2 exports bound; 7 rows, 6 used, 1 below threshold; warnings 2, errors 0 |
-| 3 | `uv run rnp intersect --config C:\DSH\rnp-skill-agent-run\tamper.yaml --targets C:\DSH\rnp-skill-agent-run\runs\tamper\20261020T112249Z_e6473c0a\targets.tsv` | 0 | `stage_status: complete`; edges 4, targets 4, disease 10, intersection 2; warnings 0 |
-| 4 | `uv run rnp network --config C:\DSH\rnp-skill-agent-run\tamper.yaml --intersect C:\DSH\rnp-skill-agent-run\runs\tamper\20261020T112249Z_e6473c0a\intersect` | 0 | `stage_status: complete`; nodes 4, edges 4; checks passed |
+| 1 | `uv run rnp validate --config <workspace>\rnp-skill-agent-run\tamper.yaml` | 0 | `status: ok`; config sha `e6473c0a…`; `export_files: 2` |
+| 2 | `uv run rnp ingest stp --config <workspace>\rnp-skill-agent-run\tamper.yaml` | 0 | `stage_status: complete`; 2/2 exports bound; 7 rows, 6 used, 1 below threshold; warnings 2, errors 0 |
+| 3 | `uv run rnp intersect --config <workspace>\rnp-skill-agent-run\tamper.yaml --targets <workspace>\rnp-skill-agent-run\runs\tamper\20261020T112249Z_e6473c0a\targets.tsv` | 0 | `stage_status: complete`; edges 4, targets 4, disease 10, intersection 2; warnings 0 |
+| 4 | `uv run rnp network --config <workspace>\rnp-skill-agent-run\tamper.yaml --intersect <workspace>\rnp-skill-agent-run\runs\tamper\20261020T112249Z_e6473c0a\intersect` | 0 | `stage_status: complete`; nodes 4, edges 4; checks passed |
 | 5 | mutation, executed as `$p` = the run's `targets.tsv`: `Add-Content -LiteralPath $p -Value "" -NoNewline:$false` (one intentional newline append; Windows CRLF, +2 bytes) | 0 | before: 919 bytes, SHA-256 `94a917a5e1b8a811d7f948ac1554bc4f8aa7bec175d77c6d7767b94562cbc8f8`; after: 921 bytes, SHA-256 `7243fa84aefd2c2edfd06671f0337768ef24246386c8c9c7a6fd711b8598b83a` |
-| 6 | `uv run rnp report --config C:\DSH\rnp-skill-agent-run\tamper.yaml --run-dir C:\DSH\rnp-skill-agent-run\runs\tamper\20261020T112249Z_e6473c0a` | 2 | `error: artifact changed since upstream stage: targets.tsv`; no `report` dir created |
+| 6 | `uv run rnp report --config <workspace>\rnp-skill-agent-run\tamper.yaml --run-dir <workspace>\rnp-skill-agent-run\runs\tamper\20261020T112249Z_e6473c0a` | 2 | `error: artifact changed since upstream stage: targets.tsv`; no `report` dir created |
 
 Observations: the recorded hash in `stp_audit.json` was
 `94a917a5e1b8a811d7f948ac1554bc4f8aa7bec175d77c6d7767b94562cbc8f8`; after the append it no longer
@@ -159,15 +161,15 @@ repair was performed because the purpose was the refusal.
 
 ## 8. Scenario 5 — zero (`zero.yaml`)
 
-Run directory: `C:\DSH\rnp-skill-agent-run\runs\zero\20261020T112306Z_4bba48e1`
+Run directory: `<workspace>\rnp-skill-agent-run\runs\zero\20261020T112306Z_4bba48e1`
 
 | # | Exact command | Exit | Key status/audit output |
 |---|---|---|---|
-| 1 | `uv run rnp validate --config C:\DSH\rnp-skill-agent-run\zero.yaml` | 0 | `status: ok`; config sha `4bba48e1…`; disease file `inputs\zero-disease.txt` |
-| 2 | `uv run rnp ingest stp --config C:\DSH\rnp-skill-agent-run\zero.yaml` | 0 | `stage_status: complete`; 2/2 exports bound; 7 rows, 6 used, 1 below threshold; warnings 2, errors 0 |
-| 3 | `uv run rnp intersect --config C:\DSH\rnp-skill-agent-run\zero.yaml --targets C:\DSH\rnp-skill-agent-run\runs\zero\20261020T112306Z_4bba48e1\targets.tsv` | 0 | `stage_status: complete`; compounds 2, linked 1, edges 4, targets 4, disease 1, **intersection 0**, target_only 4, disease_only 1, union 5; exclusions `multi_symbol_common_name: 2` |
-| 4 | `uv run rnp network --config C:\DSH\rnp-skill-agent-run\zero.yaml --intersect C:\DSH\rnp-skill-agent-run\runs\zero\20261020T112306Z_4bba48e1\intersect` | 0 | `status: empty`, `stage_status: empty`; `groups: {}`; no network tables written (only audit + manifest) |
-| 5 | `uv run rnp report --config C:\DSH\rnp-skill-agent-run\zero.yaml --run-dir C:\DSH\rnp-skill-agent-run\runs\zero\20261020T112306Z_4bba48e1` | 0 | `status: ok`, `stage_status: empty`; stages ingest/intersect `complete`, network `empty`; warnings 0; `report_sha256: c79a6f7127bd275bb78c84e542e2c173307ba37f4a4d46f90ce3368e2566fa69` |
+| 1 | `uv run rnp validate --config <workspace>\rnp-skill-agent-run\zero.yaml` | 0 | `status: ok`; config sha `4bba48e1…`; disease file `inputs\zero-disease.txt` |
+| 2 | `uv run rnp ingest stp --config <workspace>\rnp-skill-agent-run\zero.yaml` | 0 | `stage_status: complete`; 2/2 exports bound; 7 rows, 6 used, 1 below threshold; warnings 2, errors 0 |
+| 3 | `uv run rnp intersect --config <workspace>\rnp-skill-agent-run\zero.yaml --targets <workspace>\rnp-skill-agent-run\runs\zero\20261020T112306Z_4bba48e1\targets.tsv` | 0 | `stage_status: complete`; compounds 2, linked 1, edges 4, targets 4, disease 1, **intersection 0**, target_only 4, disease_only 1, union 5; exclusions `multi_symbol_common_name: 2` |
+| 4 | `uv run rnp network --config <workspace>\rnp-skill-agent-run\zero.yaml --intersect <workspace>\rnp-skill-agent-run\runs\zero\20261020T112306Z_4bba48e1\intersect` | 0 | `status: empty`, `stage_status: empty`; `groups: {}`; no network tables written (only audit + manifest) |
+| 5 | `uv run rnp report --config <workspace>\rnp-skill-agent-run\zero.yaml --run-dir <workspace>\rnp-skill-agent-run\runs\zero\20261020T112306Z_4bba48e1` | 0 | `status: ok`, `stage_status: empty`; stages ingest/intersect `complete`, network `empty`; warnings 0; `report_sha256: c79a6f7127bd275bb78c84e542e2c173307ba37f4a4d46f90ce3368e2566fa69` |
 
 Observations: the disease set contains only `ICAM1`; the intersection is genuinely empty
 (`intersection_genes.tsv` contains only the header; the network audit has `groups: {}`; the report
@@ -204,7 +206,7 @@ inspecting the CLI source; it did not require a human decision.
 
 ## 10. Artifacts produced
 
-Everything is under `C:\DSH\rnp-skill-agent-run\runs\` (96 files total). No repository file was
+Everything is under `<workspace>\rnp-skill-agent-run\runs\` (96 files total). No repository file was
 written.
 
 | Scenario | Run directory (relative to `runs\`) | Files | Key artifacts |
@@ -251,7 +253,7 @@ Recorded hashes (from CLI output/local computation, not invented):
    (including `skills/np-workflow/SKILL.md`, `examples/demo/*`, `tests/unit/*`, docs) plus 2
    untracked files. During the session, additional changes appeared in the shared checkout
    (`data/SOURCES.yaml`, `docs/data-licenses.md`, `docs/public-case-sources.md`,
-   `examples/demo/HANDOFF.md`, `scripts/fetch_pubchem_structures.py`; timestamps 19:21:59–19:22:46
+   `examples/demo/DATA-ACCESS.md`, `scripts/fetch_pubchem_structures.py`; timestamps 19:21:59–19:22:46
    local). Those paths are unrelated to `rnp` and no command in this session targeted them; they
    are attributed to a concurrent process sharing the workspace, not to this acceptance run. All
    outputs from this session are confined to `runs/` and this report. Consequently the manifests'
@@ -270,7 +272,7 @@ Recorded hashes (from CLI output/local computation, not invented):
 
 I, the agent, read `skills/np-workflow/SKILL.md` and `rnp-skill-agent-run/README.md`, inspected the
 five YAML configs, ran the existing `rnp` CLI through `uv run` in the repository checkout, captured
-every exit code and audit output, and wrote only under `C:\DSH\rnp-skill-agent-run\runs` plus this
+every exit code and audit output, and wrote only under `<workspace>\rnp-skill-agent-run\runs` plus this
 report. I did not read or run anything under `tests/` (beyond fixture data implicitly consumed by
 the CLI), did not run `pytest`, and did not modify the repository working tree. This report is a
 factual record of that real session.

@@ -71,7 +71,7 @@ evidence.
 ## Windows native exit: observed, not suppressed
 
 Codex reproduced the real process status on commit `0cf3584` with
-`RNP_RSCRIPT=C:\Program Files\R\R-4.5.2\bin\Rscript.exe` and `R_LIBS=C:\DSH\rnp-renv-clean\lib2`:
+`RNP_RSCRIPT=<R_HOME>\bin\Rscript.exe` and `R_LIBS=<rlib>`:
 
 - R subprocess exit `3221225477` (`0xC0000005`) while `enrichment_meta.json` said `status=ok` and
   result files were written;
@@ -90,11 +90,11 @@ not relax the exit-code check. Use Linux CI for case computation.
 ## Reproduction commands
 
 ```powershell
-cd C:\DSH\reproducible-network-pharmacology
+cd <repo>
 uv sync --locked --extra dev
-.\scripts\restore_r.ps1 -Library C:\DSH\rnp-rlib
-$env:R_LIBS = "C:\DSH\rnp-rlib"
-$env:RNP_RSCRIPT = "C:\Program Files\R\R-4.5.2\bin\Rscript.exe"
+.\scripts\restore_r.ps1 -Library <rlib>
+$env:R_LIBS = "<rlib>"
+$env:RNP_RSCRIPT = "<R_HOME>\bin\Rscript.exe"
 uv run ruff check .
 uv run pytest -q
 ```

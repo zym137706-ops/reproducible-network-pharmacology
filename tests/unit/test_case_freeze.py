@@ -73,7 +73,10 @@ def test_freeze_reuses_recorded_decisions_without_inventing_sources() -> None:
     assert compounds[0]["pubchem_cid"] == "5280343"
     assert all(entry["stp_file"].endswith(".xlsx") for entry in compounds)
     assert "pending_v0.2" not in decisions["compound_list"]["smiles_status"]
-    assert decisions["compound_list"]["smiles_evidence"]["local_pending"]
+    assert decisions["compound_list"]["smiles_evidence"]["log_evidence_id"] == (
+        "EVID-HANDOFF-2026-10-21"
+    )
+    assert "PubChem" in decisions["compound_list"]["smiles_evidence"]["structures_source"]
     assert data["public_release_gaps"]
     assert data["verification_environment"]["windows"]["status"] == "unverified_blocked"
 
@@ -208,16 +211,25 @@ def test_local_ctd_metadata_matches_freeze_if_present() -> None:
     assert len(set(genes)) == 179
 
 
-def test_pending_stp_submission_list_matches_bindings() -> None:
+def test_frozen_compounds_bindings_and_log_are_consistent() -> None:
     freeze = yaml.safe_load(FREEZE.read_text(encoding="utf-8"))
-    pending = read_table(DEMO / "inputs" / "STP-PENDING-SUBMISSIONS.tsv")
-    assert len(pending) == 8
-    assert {row["expected_export_file"] for row in pending} == set(
-        freeze["stp_exports"]["expected_files"]
-    )
-    assert {row["pubchem_cid"] for row in pending} == {
-        row["pubchem_cid"]
-        for row in read_table(DEMO / "inputs" / "compounds.tsv")
+    assert not (DEMO / "inputs" / "STP-PENDING-SUBMISSIONS.tsv").exists()
+    assert "pending_submission_list" not in freeze["stp_exports"]
+    assert freeze["stp_exports"]["submission_log_template"] == "inputs/STP-SUBMISSION-LOG.tsv"
+
+    compounds = read_table(DEMO / "inputs" / "compounds.tsv")
+    log = read_table(DEMO / "inputs" / "STP-SUBMISSION-LOG.tsv")
+    expected = set(freeze["stp_exports"]["expected_files"])
+    assert len(compounds) == len(log) == freeze["stp_exports"]["count"] == 8
+    assert {row["stp_file"] for row in compounds} == expected
+    assert {row["stp_file"] for row in log} == expected
+    assert {row["pubchem_cid"] for row in compounds} == {
+        entry["pubchem_cid"]
+        for entry in freeze["recorded_scientific_decisions"]["compound_list"]["compounds"]
     }
-    assert all(row["species"] == "Homo sapiens" for row in pending)
-    assert all(row["submission_log_path"].endswith("STP-SUBMISSION-LOG.tsv") for row in pending)
+
+    by_file = {row["stp_file"]: row for row in compounds}
+    for row in log:
+        compound = by_file[row["stp_file"]]
+        assert row["compound"] == compound["name"]
+        assert row["pubchem_cid"] == compound["pubchem_cid"]

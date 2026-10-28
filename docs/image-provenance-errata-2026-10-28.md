@@ -2,7 +2,7 @@
 
 ## What was wrong
 
-The historical run output `C:/DSH/rnp-public-candidate-image-2026-10-27/` recorded:
+The historical run output `EVID-LAUNCH-2026-10-27/` recorded:
 
 ```json
 "image": "bioconductor/bioconductor_docker:RELEASE_3_22",
@@ -54,7 +54,7 @@ candidate `VERIFICATION.md`.
 
 Final run facts:
 
-- output: `C:/DSH/rnp-public-candidate-launch-2026-10-28/`
+- output: `EVID-LAUNCH-2026-10-28/`
 - container name: `rnp-final-attestation-2026-10-28`
 - observed container `.Image`: `sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a`
 - observed local image `.Id`: the same `e341…` value in this image store (recorded explicitly as

@@ -62,7 +62,7 @@ from the earlier 2026-10-21 run because the report embeds run path/time context;
 The 0.05 significant terms remain conditional enrichment within predicted targets, not mechanism or
 efficacy evidence.
 
-Local outputs: `C:/DSH/rnp-clean-run-e81f5bf/` (not committed). Provenance:
+Local outputs: `EVID-CLEAN-RUN-2026-10-21/` (not committed). Provenance:
 `case_provenance.json`; independent check: `independent-check.json`.
 
 ## Clean-clone synthetic quickstart

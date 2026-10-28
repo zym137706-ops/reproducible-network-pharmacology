@@ -4,8 +4,8 @@ Main verification record for the v0.1.0 release candidate. The 2026-10-27 run re
 
 ## Inputs and source
 
-- Candidate package: `C:/DSH/rnp-public-case-candidate-2026-10-21/`
-- Clean clone: `C:/DSH/rnp-clean-clone-49c86ee`
+- Candidate package: `CASE-PKG-2026-10-21`
+- Clean clone: `EVID-CLEAN-CHECKOUT-49c86ee`
 - Commit: `49c86ee0e09c05433c22102011d705c60df72f45` (`49c86ee`), dirty `false`
 - Source hash (`case-source-hash-v2` combined):
   `fc6784e6f46fe5dff71cc8c00a943980ded31d495689c237fb280fb17fcc8aca`
@@ -29,7 +29,7 @@ was captured before removal. The old 2026-10-27 container was removed with `--rm
 `docs/image-provenance-errata-2026-10-28.md`.
 
 Launch attestation (local output):
-`C:/DSH/rnp-public-candidate-launch-2026-10-28/launch-attestation.json`
+`EVID-LAUNCH-2026-10-28/launch-attestation.json`
 SHA-256 `dda160d31d42cb5d49e50626cc30f3253b32c6416b8026d4b16580826b23233a`.
 
 ## Result
@@ -51,8 +51,8 @@ SHA-256 `dda160d31d42cb5d49e50626cc30f3253b32c6416b8026d4b16580826b23233a`.
 - Report hashes are path/time-dependent; they are not cross-path equality tests. Counts are the
   invariant.
 
-Final output: `C:/DSH/rnp-public-candidate-launch-2026-10-28/` (not committed).
-Older run `C:/DSH/rnp-public-candidate-image-2026-10-27/` remains historical with report hashes
+Final output: `EVID-LAUNCH-2026-10-28/` (not committed).
+Older run `EVID-LAUNCH-2026-10-27/` remains historical with report hashes
 `2e02dc0a…`/`c8e6ab18…` and the original ambiguous image fields; it is not the main record.
 
 ## Boundaries

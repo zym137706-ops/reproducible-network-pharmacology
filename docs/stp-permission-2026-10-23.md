@@ -21,9 +21,13 @@ not committed.
 
 ## Evidence status
 
+Evidence identifiers are defined in [evidence identifiers](evidence-identifiers.md); the
+original attachments remain local and are not distributed.
+
+
 | Item | Status |
 |---|---|
-| Reply screenshot | local: `C:/DSH/rnp-case-inputs/permission-evidence-2026-10-23/STP-reply-2026-10-23.png`; SHA-256 `2880a09200e778040af76a909c2e4ca48068a0f10fbcc7ea0d8a185661c4f085` |
+| Reply screenshot | evidence ID: `EVID-STP-2026-10-23/screenshot`; SHA-256 `2880a09200e778040af76a909c2e4ca48068a0f10fbcc7ea0d8a185661c4f085` |
 | Original `.eml` / full mail headers | supplied and archived locally on 2026-10-26: `STP-reply-2026-10-23.eml`; SHA-256 `4085f48ac8e2760627324be162f51e57e1968e30537e8b974a9d3961873b42fb`; headers parsed, no independent cryptographic signature verification claimed |
 | Full screenshot in Git | **not committed** (contains private correspondence/address) |
 | Scope of confirmation | STP tables only; CTD/PubChem/other upstream sources are separate |
@@ -38,7 +42,7 @@ in the email describes prediction generation and must not be substituted for the
 
 Prepared outside Git for review only:
 
-`C:/DSH/rnp-public-case-candidate-2026-10-21/`
+`CASE-PKG-2026-10-21`
 
 It contains the STP XLSX exports, complete RA-case inputs, expected counts, attribution,
 permission summaries and SHA-256 manifest. The candidate is reproduced but **not published**.

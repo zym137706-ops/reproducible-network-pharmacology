@@ -1,7 +1,7 @@
 # Portable case run and independent check
 
 `scripts/case_run.py` is the portable orchestrator for a real case; `scripts/case_check.py` is an
-independent checker. Both accept user-provided paths and contain no host-specific `C:\DSH` path.
+independent checker. Both accept user-provided paths and contain no host-specific `<repo>` path.
 Every analysis step remains the `rnp` CLI.
 
 ## Inputs (user-supplied, never auto-downloaded)
