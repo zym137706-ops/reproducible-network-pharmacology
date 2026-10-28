@@ -220,7 +220,7 @@ wheels = [
 
 [[package]]
 name = "reproducible-network-pharmacology"
-version = "0.0.1"
+version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },

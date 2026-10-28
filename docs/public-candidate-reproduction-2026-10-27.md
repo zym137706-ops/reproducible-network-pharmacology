@@ -40,5 +40,6 @@ Candidate local output: `C:/DSH/rnp-public-candidate-image-2026-10-27/` (not com
 
 - Results are predicted associations/annotation overlap, not experimental validation.
 - STP tables CC BY 4.0; CTD public non-profit research permission (ticket #8545) with citation and
-  date-stamp; PubChem structure terms remain pending; no MIT/CC relicense.
+  date-stamp; PubChem source/terms/citation review complete with residual third-party-rights caveat;
+  no MIT/CC relicense.
 - The candidate is review-only and not published. No tag/release/visibility change was made.

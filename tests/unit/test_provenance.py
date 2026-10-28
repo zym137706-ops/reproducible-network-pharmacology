@@ -33,9 +33,18 @@ def test_host_attestation_is_labelled_and_not_a_git_claim(monkeypatch) -> None:
 def test_container_identity_is_only_what_the_host_supplied(monkeypatch) -> None:
     monkeypatch.setenv("RNP_CONTAINER_IMAGE", "bioconductor/test:1")
     monkeypatch.setenv("RNP_CONTAINER_IMAGE_DIGEST", "sha256:" + "c" * 64)
+    monkeypatch.setenv("RNP_CONTAINER_IMAGE_ID", "sha256:" + "d" * 64)
+    monkeypatch.setenv("RNP_CONTAINER_IMAGE_PLATFORM", "linux/amd64")
+    monkeypatch.setenv("RNP_CONTAINER_IMAGE_MANIFEST_DIGEST", "sha256:" + "e" * 64)
+    monkeypatch.setenv("RNP_CONTAINER_IMAGE_CONFIG_DIGEST", "sha256:" + "f" * 64)
     monkeypatch.setenv("RNP_R_VERSION", "4.5.2")
     identity = container_identity()
     assert identity["image"].endswith(":1")
+    assert identity["image_id"].startswith("sha256:")
+    assert identity["image_digest"].startswith("sha256:")
+    assert identity["image_platform"] == "linux/amd64"
+    assert identity["image_manifest_digest"].startswith("sha256:")
+    assert identity["image_config_digest"].startswith("sha256:")
     assert identity["r_version"] == "4.5.2"
     assert "r_lib" not in identity
 
@@ -44,6 +53,9 @@ def test_manifest_schema_accepts_attestation_and_container(monkeypatch) -> None:
     monkeypatch.setenv("RNP_CODE_SOURCE_SHA256", "b" * 64)
     monkeypatch.setenv("RNP_CODE_SOURCE_SCOPE", "case-relevant source, not full repository")
     monkeypatch.setenv("RNP_CONTAINER_IMAGE_DIGEST", "sha256:" + "c" * 64)
+    monkeypatch.setenv("RNP_CONTAINER_IMAGE_PLATFORM", "linux/amd64")
+    monkeypatch.setenv("RNP_CONTAINER_IMAGE_MANIFEST_DIGEST", "sha256:" + "e" * 64)
+    monkeypatch.setenv("RNP_CONTAINER_IMAGE_CONFIG_DIGEST", "sha256:" + "f" * 64)
     manifest = build_manifest(
         run_id="test",
         command="validate",
@@ -59,6 +71,9 @@ def test_manifest_schema_accepts_attestation_and_container(monkeypatch) -> None:
     assert manifest["code"]["source_attestation"]["origin"] == "host_declared"
     assert manifest["code"]["source_attestation"]["scope"].startswith("case-relevant")
     assert manifest["container"]["image_digest"].startswith("sha256:")
+    assert manifest["container"]["image_platform"] == "linux/amd64"
+    assert manifest["container"]["image_manifest_digest"].startswith("sha256:")
+    assert manifest["container"]["image_config_digest"].startswith("sha256:")
 
 
 def test_manifest_schema_rejects_bad_digest() -> None:

@@ -1,18 +1,19 @@
 cff-version: 1.2.0
+# v0.1.0 is a release candidate. date-released is intentionally omitted until an actual release.
 message: "If you use this software, please cite it using the metadata below."
 title: "reproducible-network-pharmacology"
 abstract: >-
   A command-line toolkit and agent skill for reproducible network-pharmacology
-  analysis: audited parsing of SwissTargetPrediction exports, gene-symbol
-  normalization, compound–target–disease intersection, Cytoscape network tables,
-  enrichment via R clusterProfiler, module analysis, and per-run provenance.
+  analysis: audited parsing and explicit binding of SwissTargetPrediction exports,
+  HGNC gene-symbol normalization, compound–target–disease intersection, Cytoscape
+  network tables, GO over-representation enrichment via R clusterProfiler with an
+  explicit background, deterministic Markdown reports, and per-run provenance.
 type: software
 authors:
   - family-names: "Zhu"
     given-names: "Yiming"
 license: MIT
-version: "0.0.1"
-date-released: "2026-10-18"
+version: "0.1.0"
 repository-code: "https://github.com/zym137706-ops/reproducible-network-pharmacology"
 keywords:
   - network pharmacology
@@ -20,3 +21,78 @@ keywords:
   - reproducibility
   - agent skills
   - drug target
+references:
+  - type: article
+    title: "Testing the predictive power of reverse screening to infer drug targets, with the help of machine learning"
+    authors:
+      - family-names: "Daina"
+        given-names: "Antoine"
+      - family-names: "Zoete"
+        given-names: "Vincent"
+    year: 2024
+    journal: "Communications Chemistry"
+    doi: "10.1038/s42004-024-01179-2"
+    url: "https://doi.org/10.1038/s42004-024-01179-2"
+  - type: article
+    title: "Comparative Toxicogenomics Database's 20th anniversary: update 2025"
+    authors:
+      - name: "Davis AP"
+      - name: "Wiegers TC"
+      - name: "Sciaky D"
+      - name: "Barkalow F"
+      - name: "Strong M"
+      - name: "Wyatt B"
+      - name: "Wiegers J"
+      - name: "McMorran R"
+      - name: "Abrar S"
+      - name: "Mattingly CJ"
+    year: 2025
+    journal: "Nucleic Acids Research"
+    doi: "10.1093/nar/gkae883"
+    url: "https://doi.org/10.1093/nar/gkae883"
+  - type: article
+    title: "Genenames.org: the HGNC and PGNC resources in 2026"
+    authors:
+      - name: "Seal RL"
+      - name: "Braschi B"
+      - name: "Gray K"
+      - name: "McClay J"
+      - name: "Tweedie S"
+      - name: "Bruford EA"
+    year: 2025
+    journal: "Nucleic Acids Research"
+    doi: "10.1093/nar/gkaf1229"
+    url: "https://doi.org/10.1093/nar/gkaf1229"
+  - type: article
+    title: "PubChem 2025 update"
+    authors:
+      - family-names: "Kim"
+        given-names: "Sunghwan"
+      - family-names: "Chen"
+        given-names: "Jie"
+      - family-names: "Cheng"
+        given-names: "Tiejun"
+      - family-names: "Gindulyte"
+        given-names: "Asta"
+      - family-names: "He"
+        given-names: "Jia"
+      - family-names: "He"
+        given-names: "Siqian"
+      - family-names: "Li"
+        given-names: "Qingliang"
+      - family-names: "Shoemaker"
+        given-names: "Benjamin A."
+      - family-names: "Thiessen"
+        given-names: "Paul A."
+      - family-names: "Yu"
+        given-names: "Bo"
+      - family-names: "Zaslavsky"
+        given-names: "Leonid"
+      - family-names: "Zhang"
+        given-names: "Jian"
+      - family-names: "Bolton"
+        given-names: "Evan E."
+    year: 2025
+    journal: "Nucleic Acids Research"
+    doi: "10.1093/nar/gkae1059"
+    url: "https://doi.org/10.1093/nar/gkae1059"

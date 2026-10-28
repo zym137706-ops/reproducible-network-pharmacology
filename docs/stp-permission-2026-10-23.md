@@ -34,18 +34,22 @@ Contact requests were submitted on the same day; no CTD confirmation screenshot 
 The exact calendar date/time of those requests remains unverified. The 2026-10-21 date quoted
 in the email describes prediction generation and must not be substituted for the Contact date.
 
-## Local release candidate
+## Complete public-case candidate
 
 Prepared outside Git for review only:
 
-`C:/DSH/rnp-stp-release-candidate-2026-10-21/`
+`C:/DSH/rnp-public-case-candidate-2026-10-21/`
 
-It contains byte-identical copies of the eight XLSX files (`data/`), `SHA256SUMS.tsv`, `FILES.tsv`,
-`README.md`, `ATTRIBUTION.md` and `DATA-LICENSE.md`. The candidate has not been published or uploaded.
-The private submission log, compound structures, CTD data and detailed results are excluded.
+It contains the STP XLSX exports, complete RA-case inputs, expected counts, attribution,
+permission summaries and SHA-256 manifest. The candidate is reproduced but **not published**.
+The old STP-only package is superseded; it excluded CTD data and is not the current release
+candidate.
 
 ## Boundary
 
-The overall public RA case remains **blocked** because CTD permission/redistribution is not confirmed.
-STP confirmation does not authorize CTD data, mixed-source derived tables, PubChem structures or the
-private submission log. No email was sent and no repository visibility/tag was changed.
+STP confirmation covers the eight native tables, not CTD, PubChem, mixed-source derived tables or
+private correspondence. CTD ticket **#8545** separately confirms the requested public non-profit
+research scope with citation/date-stamp requirements; PubChem source/terms review is complete with a
+third-party-rights caveat. The complete candidate remains unpublished pending the researcher's
+decision on final file inclusion, visibility and release. No email was sent and no repository
+visibility/tag was changed.

@@ -5,6 +5,27 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
+### v0.1.0 release candidate — 2026-10-28
+
+- Raised the software version to **0.1.0** (`pyproject.toml`, `uv.lock`, `src/rnp/__init__.py`,
+  `CITATION.cff`) while keeping the release explicitly **unreleased**; no date-released, DOI, tag or
+  release was invented.
+- Corrected `CITATION.cff`: removed the unimplemented module-analysis claim, described only current
+  CLI/report/provenance capabilities, and added software-separated upstream references (STP, CTD,
+  HGNC, PubChem). Added `docs/citations.md` as the direct citation sheet.
+- Corrected the publication-status text across README/README.zh-CN, case README, CASE-FREEZE,
+  skill-acceptance (dated status note, original session result preserved) and the candidate
+  permission summaries. Permission review, publication decision and actual release are now separate.
+- Added optional provenance fields for image platform, platform-manifest digest and config digest;
+  `case_provenance.json` and `run_manifest.json` now carry the host-observed values rather than
+  conflating an index digest with a config digest.
+- Prepared the final case package layout: 35 payload files + `SHA256SUMS.tsv` (36 total), renamed
+  `PUBCHEM-SOURCE.md`, added `ATTRIBUTION.md`, and documented the versioned release-asset zip,
+  verification counts, two-directory execution and exact checksum commands.
+- Rebuilt wheel/sdist and installed the wheel into a fresh virtual environment; `rnp --version`
+  reports `0.1.0`, and packaged `schemas/` and `R/` resources are present.
+- No repository visibility, tag/release, real-data upload, email or CTD notification was performed.
+
 ### Candidate README, image provenance and PubChem review — 2026-10-27
 
 - Replaced the candidate README's mixed-directory command with an explicit two-directory workflow:

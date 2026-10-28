@@ -33,9 +33,17 @@ remain in the local, ignored evidence directory and are not committed.
 
 ## Citation / handling
 
-Cite CTD and include a date-stamp. Keep the data license separate from the MIT code license. If the
-project is made public, tell CTD the public link; do not send a new permission request for the same
-scope. Do not treat this reply as permission for arbitrary commercial or third-party uses.
+Cite CTD and include a data date-stamp. Recommended bibliographic citation:
 
-The local candidate package is prepared for researcher review; no CTD data has been committed or
-uploaded to CI in this round.
+> Davis AP, Wiegers TC, Sciaky D, Barkalow F, Strong M, Wyatt B, Wiegers J, McMorran R, Abrar S,
+> Mattingly CJ. Comparative Toxicogenomics Database's 20th anniversary: update 2025.
+> *Nucleic Acids Research* **53**(D1), D1328–D1334 (2025).
+> <https://doi.org/10.1093/nar/gkae883>
+
+Use the CTD data status **September 2026** and retrieval date **2026-10-21** in the case metadata.
+Keep the data license separate from the MIT code license. If the project is made public, tell CTD the
+public link; do not send a new permission request for the same scope. Do not treat this reply as
+permission for arbitrary commercial or third-party uses.
+
+The complete candidate package is prepared and reproduced for researcher review; no CTD data has
+been committed or uploaded to CI. Publication remains pending the researcher's final decision.

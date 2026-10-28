@@ -44,9 +44,11 @@ separate. The complete review candidate is at
 
 The candidate has been reproduced from a clean clone; its expected counts are recorded there.
 Publication remains pending the researcher's explicit decision on data inclusion, repository
-visibility and release. PubChem structure/source terms are still separately pending and are not
-cleared by the STP/CTD replies. HGNC is CC0 and committed; private EMLs, screenshots, submission
-correspondence and full logs remain uncommitted.
+visibility and release. PubChem source/field/terms/citation review is complete against NCBI policy:
+the SMILES fields are computed descriptors, NCBI states no restrictions by NCBI, and a residual
+third-party-rights caveat remains; they are not cleared by the STP/CTD replies and are not relicensed
+as MIT/CC0/CC BY. HGNC is CC0 and committed; private EMLs, screenshots, submission correspondence and
+full logs remain uncommitted.
 
 Reproduction uses the complete candidate or the local materials
 (`C:\DSH\rnp-case-inputs\handoff-2026-10-21` and `C:\DSH\rnp-case-inputs\stp`) with the commands

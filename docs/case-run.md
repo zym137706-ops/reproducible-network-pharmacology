@@ -69,9 +69,21 @@ When run in a Linux container, the caller supplies the observed values (never in
 
 ```text
 RNP_CONTAINER_IMAGE, RNP_CONTAINER_IMAGE_ID, RNP_CONTAINER_IMAGE_DIGEST,
-RNP_CONTAINER_PYTHON, RNP_R_VERSION, RNP_R_LIB,
-RNP_RENV_LOCK_SHA256, RNP_UV_LOCK_SHA256
+RNP_CONTAINER_IMAGE_PLATFORM, RNP_CONTAINER_IMAGE_MANIFEST_DIGEST,
+RNP_CONTAINER_IMAGE_CONFIG_DIGEST, RNP_CONTAINER_PYTHON,
+RNP_R_VERSION, RNP_R_LIB, RNP_RENV_LOCK_SHA256, RNP_UV_LOCK_SHA256
 ```
+
+Use the values actually observed on the host:
+- `RNP_CONTAINER_IMAGE_ID`: the local image ID (for example `docker image inspect --format '{{.Id}}'`);
+- `RNP_CONTAINER_IMAGE_DIGEST`: the RepoDigest/index digest supplied by the registry;
+- `RNP_CONTAINER_IMAGE_PLATFORM`: the actual run platform, e.g. `linux/amd64`;
+- `RNP_CONTAINER_IMAGE_MANIFEST_DIGEST`: the platform manifest digest, when separately known;
+- `RNP_CONTAINER_IMAGE_CONFIG_DIGEST`: the platform manifest's config digest, when separately known.
+
+Do not concatenate strings to invent a digest. If the local Docker store reports the index digest
+as `.Id`, record that observed value and label the registry-derived platform/config digests
+separately; do not claim the registry value was an old container's measured `.Image`.
 
 `case_provenance.json` records these plus the checkout's `git` commit/dirty state. Source hashing uses
 the versioned `case-source-hash-v2` rule: sha256 over sorted repo-relative POSIX paths + NUL + raw

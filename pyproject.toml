@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "reproducible-network-pharmacology"
-version = "0.0.1"
+version = "0.1.0"
 description = "Reproducible network-pharmacology workflows as a CLI and an agent skill"
 readme = "README.md"
 requires-python = ">=3.10"

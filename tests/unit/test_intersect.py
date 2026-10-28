@@ -9,6 +9,7 @@ import jsonschema
 import pytest
 import yaml
 
+from rnp import __version__
 from rnp.analysis.intersect import run_intersect
 from rnp.config import load_config, load_schema
 from rnp.errors import InputError
@@ -102,7 +103,7 @@ def test_intersect_run(ingest_run: Path, run_config_path: Path, tmp_path: Path) 
     )
     jsonschema.validate(manifest, load_schema("run_manifest"))
     assert manifest["parents"][0]["stage"] == "ingest"
-    assert manifest["code"]["version"] == "0.0.1"
+    assert manifest["code"]["version"] == __version__
 
 
 def test_partial_upstream_is_refused_then_allowed(tmp_path: Path) -> None:

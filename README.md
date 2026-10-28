@@ -8,7 +8,7 @@ Turn a folder of prediction exports and a disease gene list into a **traceable, 
 compound–target–disease analysis. Every run records its inputs, reference-data versions, parameters
 and hashes, and every output can be regenerated from a single config file.
 
-> Status: **unreleased v0.1 development** (package version 0.0.1). The pipeline and the
+> Status: **v0.1.0 release candidate, unreleased** (package version 0.1.0). The pipeline and the
 > wrapper-layer exit-code guard, engine-effective gene sets and hash-checked report are implemented.
 > Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (run 39773442191 green).
 > Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
@@ -117,12 +117,15 @@ overwrite an existing output directory unless `--force` is passed. Downstream co
 incomplete upstream stage unless `--allow-partial` is passed, and the override is recorded in the
 audit. Ingest creates a persistent compound-ID registry; a re-run reuses the same IDs.
 
-The public-data RA case (`examples/demo/`) is **locally computed and independently checked**;
-STP's eight native tables are **CC BY 4.0-confirmed** with attribution/no-modification requirements,
-and a local candidate is prepared. The **overall public case remains blocked by CTD permission**, not
-by an STP table-scope question. Its data/license checklist is in
-[docs/public-case-checklist.md](docs/public-case-checklist.md); STP exports are produced by hand and
-the candidate is not published. The synthetic demo is an engineering test, not a scientific result.
+The public-data RA case (`examples/demo/`) is **locally computed, independently checked, and
+reproduced from a clean clone**. STP's eight native tables are **CC BY 4.0-confirmed** with
+attribution/no-modification requirements; CTD ticket **#8545** confirms the requested **public
+non-profit research** use (including GitHub) with CTD citation and a data date-stamp. PubChem
+source/terms/citation review is complete with a residual third-party-rights caveat. The complete
+candidate is prepared outside Git, but **publication is pending the researcher's decision** on final
+file inclusion, visibility and release. Its data/license checklist is in
+[docs/public-case-checklist.md](docs/public-case-checklist.md); STP exports are produced by hand.
+The synthetic demo is an engineering test, not a scientific result.
 
 For a user-supplied real case, [`scripts/case_run.py`](scripts/case_run.py) verifies explicit
 bindings/hashes and exact submitted structures when a log is supplied, fixes both threshold configs,
@@ -212,12 +215,12 @@ Implemented in this slice:
 9. A non-zero R process status is never masked by a plausible meta file; engine-effective
    foreground/background sets are written with hashes and counts.
 
-Still required before calling v0.1 released:
+Still required before calling v0.1.0 released:
 
-- a public scientific case (checklist in [docs/public-case-checklist.md](docs/public-case-checklist.md),
-  candidate sources in [docs/public-case-sources.md](docs/public-case-sources.md));
-- the Skill layer to be validated end-to-end (a thin draft exists but is not claimed validated);
-- recorded CI evidence for the `renv.lock` restore and the full enrich→report chain.
+- researcher approval of the complete public-case candidate, final file inclusion,
+  repository visibility and versioned release (checklist in
+  [docs/public-case-checklist.md](docs/public-case-checklist.md));
+- the final `v0.1.0` tag/release created only after that approval; a green CI run is not a release.
 
 See [architecture](docs/architecture.md) for current gaps and target contracts.
 
@@ -239,7 +242,7 @@ instructions and an adapter; users obtain the data under their own license. See
 | Release | Scope | State |
 |---|---|---|
 | v0.0.1 | Scaffold: package, schemas, CLI, tests, CI, docs | ✅ done |
-| **v0.1** | Core hardening (binding/quarantine, stage status, identity, synthetic demo) ✅; `enrich` ✅; `report` ✅; Skill · public case 🚧 | 🚧 current |
+| **v0.1.0** | Core hardening; `enrich`; `report`; Skill; public-case candidate reproduced | release candidate, not published |
 | v0.2 | Confirmed lists / metabolomics → structure registry → annotation → explicit selection | planned |
 | v0.3 | Minimal docking: reviewed pairs, preparation, controls, redocking and pose QC | planned |
 | Later | PPI topology/RRA, MCODE, predicted receptors and historical batch migration | independently scoped |
@@ -254,8 +257,8 @@ a roadmap, video or DOI is not evidence that a capability works. Detailed design
 本项目把网络药理学的「成分 → 靶点 → 疾病 → 通路」分析，从手工点网站变成可校验、可复现的
 命令行工具 + Agent 技能层。核心设计：**CLI 是唯一事实来源**（不用 Agent 也能跑），每个子命令
 校验输入、显式报错、写审计文件；每次运行生成带哈希与版本信息的 `run_manifest.json`；公开数据
-demo 将用可独立核验的预期结果守住数值；受限数据库不再分发。当前是未发布的 v0.1 开发状态
-（包版本 0.0.1），新增设计不代表命令已实现。完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
+demo 将用可独立核验的预期结果守住数值；受限数据库不再分发。当前是 v0.1.0 发布候选、
+尚未正式发布（包版本 0.1.0），新增设计不代表命令已实现。完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
 
 ## License
 

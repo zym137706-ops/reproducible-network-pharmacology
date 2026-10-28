@@ -46,6 +46,11 @@ Executable evidence: `tests/skill/test_skill_scenarios.py` (all pass in the norm
   inside Linux.
 - The local RA case is computed and independently checked, but `examples/demo/CASE-FREEZE.yaml` is
   **public-release blocked** pending CTD/STP permission. Local completion is not a public case pass.
+  **Status update (2026-10-28):** this bullet records the state at the 2026-10-21 acceptance. CTD ticket
+  #8545 (2026-10-26) and STP's 2026-10-23 reply now confirm the requested public non-profit scope;
+  PubChem source/terms review is complete with a residual caveat. The complete candidate is
+  reproduced, but publication still awaits the researcher's final decision. This update does not
+  change the original session result or claim that a public case has been released.
 - Windows R native exit `0xC0000005` is unresolved; Linux is the verified case environment.
 - The final Skill at commit `e81f5bf` was used for the 2026-10-21 Codex session. Later documentation
   edits do not change its behavior; if `SKILL.md` changes, rerun the affected scenarios.

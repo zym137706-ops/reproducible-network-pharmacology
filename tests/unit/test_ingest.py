@@ -9,6 +9,7 @@ import jsonschema
 import pytest
 import yaml
 
+from rnp import __version__
 from rnp.analysis.ingest import run_ingest
 from rnp.config import load_config, load_schema
 from rnp.errors import InputError
@@ -91,7 +92,7 @@ def test_complete_run_writes_registry_and_audit(tmp_path: Path) -> None:
 
     manifest = json.loads((run_dir / "run_manifest.json").read_text(encoding="utf-8"))
     jsonschema.validate(manifest, load_schema("run_manifest"))
-    assert manifest["code"]["version"] == "0.0.1"
+    assert manifest["code"]["version"] == __version__
     assert manifest["config"]["path"] == str(load_config(config).path)
     assert manifest["stage_status"] == "complete"
 
