@@ -60,5 +60,5 @@ Older run `EVID-LAUNCH-2026-10-27/` remains historical with report hashes
 - Results are predicted associations/annotation overlap, not experimental validation.
 - STP tables CC BY 4.0; CTD public non-profit research permission (ticket #8545, citation and
   date-stamp); PubChem source/terms/citation review complete with residual third-party caveat.
-- The candidate is review-only, not approved for publication. No tag/release/visibility change and
-  no real-data upload to Git/CI.
+- The data-inclusion decision selects this package for the versioned release asset; actual upload,
+  visibility and tag/release remain pending. No real-data upload to Git/CI in this round.

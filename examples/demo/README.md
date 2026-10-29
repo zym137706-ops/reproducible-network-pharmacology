@@ -48,8 +48,8 @@ The candidate has been reproduced from a clean clone; its expected counts are re
 Publication remains pending the researcher's explicit decision on data inclusion, repository
 visibility and release. PubChem source/field/terms/citation review is complete against NCBI policy:
 the SMILES fields are computed descriptors, NCBI states no restrictions by NCBI, and a residual
-third-party-rights caveat remains; they are not cleared by the STP/CTD replies and are not relicensed
-as MIT/CC0/CC BY. HGNC is CC0 and committed; private EMLs, screenshots, submission correspondence and
+third-party-rights caveat remains; the selected data-inclusion decision includes them in the case
+package, but they are not relicensed as MIT/CC0/CC BY and are not cleared by the STP/CTD replies. HGNC is CC0 and committed; private EMLs, screenshots, submission correspondence and
 full logs remain uncommitted.
 
 Reproduction uses the complete case package (`rnp-case-v0.1.0-2026-10-21.zip`) with the commands

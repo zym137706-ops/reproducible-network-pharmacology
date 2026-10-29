@@ -13,8 +13,8 @@ uploaded, made public or released. STP/CTD/PubChem review and the publication de
 | Synthetic quickstart | `examples/quickstart/`, `tests/fixtures/` | complete chain, no restricted data |
 | Portable case entry | `scripts/case_run.py`, `scripts/case_check.py`, `docs/case-run.md` | tested; final candidate reproduction passed |
 | Wheel/sdist | `dist/reproducible_network_pharmacology-0.1.0-*` | built; clean-venv install checked |
-| Wheel SHA-256 | `reproducible_network_pharmacology-0.1.0-py3-none-any.whl` | `42843decc041009366b27e0b7630dface924c2ba946faf7550dc544abf3fca13` |
-| Sdist SHA-256 | `reproducible_network_pharmacology-0.1.0.tar.gz` | `309bfc0d5a9ee34024a8cd75d73c8371542712c7149e06b977e2450db449015e` |
+| Wheel SHA-256 | `reproducible_network_pharmacology-0.1.0-py3-none-any.whl` (70,154 bytes) | `40a0f21339e70a7a2c0422866573f20077ab3d3ed2f9ff8c6db07c049b78c1fb` |
+| Sdist SHA-256 | `reproducible_network_pharmacology-0.1.0.tar.gz` (1,130,191 bytes) | `b945f31581856e338f0a3a8760796706ab778dd24c92c084fbd2c007fee05d46` |
 | Citation/version | `CITATION.cff`, `docs/citations.md` | 0.1.0, unreleased, upstream citations added |
 | Code provenance | `docs/case-entry-clean-run-2026-10-22.md`; final run below | no restricted data |
 
@@ -59,7 +59,8 @@ uploaded, made public or released. STP/CTD/PubChem review and the publication de
 
 ## 5. Final verification
 
-- Commit: `49c86ee0e09c05433c22102011d705c60df72f45` (software v0.1.0 metadata/provenance).
+- Build commit: `a5b9116f4863a050e74a9a40a7d7f155fe7f6258` (clean checkout; v0.1.0 final candidate).
+- Case reproduction commit: `49c86ee0e09c05433c22102011d705c60df72f45` (scientific inputs unchanged).
 - Clean-clone candidate reproduction: both thresholds `complete`; checker passed; manifest no drift;
   source hash `fc6784e6f46fe5dff71cc8c00a943980ded31d495689c237fb280fb17fcc8aca`.
 - Counts: 0.10 T_r 239 / intersection 15 / network 23-67 / effective background 234 / 704 terms /
@@ -68,8 +69,11 @@ uploaded, made public or released. STP/CTD/PubChem review and the publication de
 - Image: tag `bioconductor/bioconductor_docker:RELEASE_3_22`; local image/container identity
   `sha256:e341…`; platform `linux/amd64`; manifest `sha256:67ab…`; config `sha256:7da6…`.
   See `docs/public-candidate-reproduction-2026-10-28.md`.
-- `uv run ruff check .`; `uv run pytest` (160 passed, 17 skipped on Windows host); wheel/sdist build;
-  clean-venv wheel install; `rnp --version` = `0.1.0`; packaged schemas/R resources present.
+- `uv run ruff check .`; `uv run pytest` (160 passed, 17 skipped on Windows host); wheel/sdist built from
+  clean checkout `a5b9116`; clean-venv wheel install; `rnp --version` = `0.1.0`; schemas/R resources present.
+- Archive check: wheel 36 members; sdist 148 members; `next-steps-dsh`, `HANDOFF`, `STP-PENDING` absent;
+  no EML/screenshot/private email/session/key/cache hits. `data/local/README.md` is the tracked public
+  guidance page, not local data.
 - No real restricted data in Git/CI; no history rewrite.
 
 Tracked-file audit (2026-10-28): no real STP XLSX, CTD gene extract, private submission log, full
