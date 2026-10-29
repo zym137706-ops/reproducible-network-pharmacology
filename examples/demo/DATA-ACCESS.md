@@ -1,14 +1,14 @@
 # RA case data access and reproduction
 
-Status: **v0.1.0 release candidate, not published**. This is the formal entry for obtaining the
-case data and reproducing the analysis. The dataset is a **versioned release asset**, not a set of
-files committed to Git; the repository contains only code, templates, rules and public reference
-tables.
+Status: **v0.1.0 release candidate; data-inclusion decision selected; not published**. This is the
+formal entry for obtaining the case data and reproducing the analysis. The dataset is a **versioned
+release asset**, not a set of files committed to Git; the repository contains only code, templates,
+rules and public reference tables.
 
 ## Case package
 
 - Asset: `rnp-case-v0.1.0-2026-10-21.zip`
-- SHA-256: `5fe85b4ec737ada8b86c88d2e5596e1582105ab89d8dbf4c6c83188e108a3d2c`
+- SHA-256: `55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4`
 - Contents: **35 payload files + `SHA256SUMS.tsv` = 36 total files**
 - Release URL: pending researcher approval and upload. Do not invent a URL or tag before that.
 
@@ -23,7 +23,7 @@ private logs are **not** distributed.
 ```bash
 # Download the approved release asset (URL to be supplied with the release).
 sha256sum rnp-case-v0.1.0-2026-10-21.zip
-# expected: 5fe85b4ec737ada8b86c88d2e5596e1582105ab89d8dbf4c6c83188e108a3d2c
+# expected: 55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4
 
 unzip rnp-case-v0.1.0-2026-10-21.zip
 cd rnp-case-v0.1.0-2026-10-21

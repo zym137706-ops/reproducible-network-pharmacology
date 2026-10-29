@@ -18,26 +18,29 @@ uploaded, made public or released. STP/CTD/PubChem review and the publication de
 | Citation/version | `CITATION.cff`, `docs/citations.md` | 0.1.0, unreleased, upstream citations added |
 | Code provenance | `docs/case-entry-clean-run-2026-10-22.md`; final run below | no restricted data |
 
-## 2. Final case package (review only)
+## 2. Final case package (selected inclusion; release execution pending)
 
-- Review candidate: `CASE-PKG-2026-10-21` (review-only; not committed)
+- Review candidate: `CASE-PKG-2026-10-21` (built; not committed)
 - Data access and reproduction entry: `examples/demo/DATA-ACCESS.md`
 - Versioned release asset: `rnp-case-v0.1.0-2026-10-21.zip`
-- Zip SHA-256: `5fe85b4ec737ada8b86c88d2e5596e1582105ab89d8dbf4c6c83188e108a3d2c`
+- Zip SHA-256: `55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4`
 - Package counts: **35 payload files + `SHA256SUMS.tsv` = 36 total files**; 35/35 hashes and sizes
   verified after extraction.
 - Contents: relative-path `run-0.10.yaml`/`run-0.05.yaml`, STP XLSX, compounds with exact submitted
   structures, de-identified submission log, CTD genes/evidence/query metadata, HGNC, both universes
   and foregrounds, PubChem per-CID provenance/source note, permissions, citations, expected counts,
   verification and checksum manifest.
+- **Data-inclusion decision:** the complete case package above is selected for publication as the
+  versioned release asset; real case data is not duplicated into the Git tree.
 - STP: CC BY 4.0; originals unmodified; cite SwissTargetPrediction/prediction date/Daina & Zoete 2024.
 - CTD: public non-profit research permission, ticket #8545; cite CTD (2025 update paper) and include
   the data date-stamp (September 2026; retrieval 2026-10-21); commercial use separate; do not
   relicense as MIT/CC0/CC BY.
-- PubChem: computed descriptors from PUG REST; NCBI no-restrictions-by-NCBI statement plus
-  third-party-rights caveat; no CC license. Publication is a separate researcher decision.
+- PubChem: included in the selected case package; computed descriptors from PUG REST; NCBI
+  no-restrictions-by-NCBI statement plus third-party-rights caveat; no CC license.
 - Code remains MIT; the mixed-source data package is not MIT or CC BY as a whole.
-- The package is **outside Git** and must not be uploaded until the researcher approves.
+- The package is **outside Git** and must not be uploaded until the researcher approves release
+  execution.
 
 ## 3. Still excluded
 
@@ -46,12 +49,11 @@ uploaded, made public or released. STP/CTD/PubChem review and the publication de
 - Unredacted logs or any file not listed in `SHA256SUMS.tsv`.
 - Final version/tag/release and repository visibility changes until the decision below.
 
-## 4. Researcher decisions before release
+## 4. Researcher decisions before release execution
 
-1. Approve the final file list and this package's data inclusion.
-2. Decide whether the PubChem structure table/compounds are published with the documented caveat,
-   deferred, or replaced by a query/source recipe.
-3. Approve repository visibility and the `v0.1.0` tag/release.
+1. Approve the final built file list/checksums (data-inclusion decision is already selected).
+2. Approve repository visibility and the `v0.1.0` tag/release, then upload the approved assets.
+3. Fill the real fixed release URL and verify the downloaded ZIP/checksum and package contents.
 4. After publication, notify CTD of the public project link and include the CTD date-stamp.
 5. Do not send a new CTD/STP permission request for the already-confirmed scope.
 

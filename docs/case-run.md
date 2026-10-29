@@ -36,9 +36,22 @@ This verifies explicit bindings, every file hash, disease/HGNC presence, writes 
 
 ## Full chain
 
+Use the same explicit inputs as preflight (replace the example paths with the extracted case package):
+
 ```bash
-uv run python scripts/case_run.py ...same inputs... --out /path/to/new-case-output
+uv run python scripts/case_run.py \
+  --compounds /path/to/compounds.tsv \
+  --stp-dir /path/to/stp \
+  --disease-genes /path/to/disease_genes.txt \
+  --hgnc-map /path/to/hgnc_map.tsv \
+  --log /path/to/STP-SUBMISSION-LOG.tsv \
+  --config-template /path/to/run-0.10.yaml \
+  --out /path/to/new-case-output
 ```
+
+The exact release-asset paths and environment setup are documented in
+[`examples/demo/DATA-ACCESS.md`](../examples/demo/DATA-ACCESS.md). The command is the same as
+preflight without `--preflight-only`; it is not a shorthand for omitted arguments.
 
 Order: `validate → ingest → build_case_background.py → intersect → network → enrich → report →
 manifest --check-inputs` for each threshold, then **`case_check.py` once across both runs**. The

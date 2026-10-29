@@ -1,22 +1,24 @@
 # Verified environment
 
-Updated 2026-10-20 after Linux CI and an independent Codex verification of commit `0cf3584`.
-**Linux CI is the verified case environment. Windows is not verified** because of a native R exit
-(`0xC0000005`) that is still open; the non-zero exit guard stays in place.
+Updated 2026-10-29 after the final v0.1.0 candidate reproduction. **Linux CI is the verified case
+environment. Windows is not verified** because of a native R exit (`0xC0000005`) that is still open;
+the non-zero exit guard stays in place.
 
 ## Authoritative status
 
 | Environment | Result | Status |
 |---|---|---|
-| Linux GitHub Actions (`r-contract`, run 39415883483) | `renv::restore` from `renv.lock`; 4/4 jobs success; full synthetic enrich→report quickstart passed | **verified for machinery** |
-| Local Linux Docker (2026-10-22) | clean-clone `2dc3947`; `case-source-hash-v2` combined `67e57b00…`; image digest `sha256:e341…`; both RA thresholds + checker complete; synthetic case entry and wrong-structure rejection covered in CI | **verified for the formal case entry** |
-| Local Linux Docker (2026-10-21) | `bioconductor/bioconductor_docker:RELEASE_3_22`; R 4.5.2, clusterProfiler 4.18.4, DOSE 4.4.0, org.Hs.eg.db 3.22.0; clean-clone e81f5bf with source hash `f271…`, image digest `sha256:e341…`; both RA thresholds complete; quickstart complete; `manifest --check-inputs` no drift | historical, **verified for local case calculation** |
-| Windows local working tree (this round) | 138 passed once (4 min 25 s) | one non-reproducible pass; not a stable Windows result |
+| Linux GitHub Actions (current `main` run; see README badge) | `renv::restore` from `renv.lock`; Python 3.10/3.11/3.12 tests and full synthetic enrich→report quickstart passed; current run linked in the release record | **verified for machinery** |
+| Local Linux Docker (2026-10-28) | final candidate commit `49c86ee`; source hash `fc6784e6…`; image tag `bioconductor/bioconductor_docker:RELEASE_3_22`, index/`.Id` `sha256:e341…`, platform `linux/amd64`, manifest `sha256:67ab…`, config `sha256:7da6…`; both RA thresholds + independent checker complete; expected counts unchanged | **verified for the final case candidate** |
+| Linux GitHub Actions (historical, run 39415883483) | `renv::restore`; 4/4 jobs success; synthetic quickstart | historical **verified for machinery** |
+| Local Linux Docker (2026-10-22) | clean-clone `2dc3947`; `case-source-hash-v2` combined `67e57b00…`; both RA thresholds + checker complete | historical |
+| Windows local working tree | 138 passed once (4 min 25 s) | one non-reproducible pass; not a stable Windows result |
 | Windows host / isolated library (Codex, commit `0cf3584`) | 119 passed, 11 failed; R subprocess exit `3221225477` (`0xC0000005`) even when status/results looked normal | **unverified / blocked** |
 
-The RA case was computed locally in Linux Docker, but its upstream CTD/STP data and results are not
-redistributable without permission; local computation is not public release. See
-`examples/demo/CASE-FREEZE.yaml`.
+The RA case was computed locally in Linux Docker. STP/CTD permission is confirmed for the requested
+public non-profit scope, but the complete case package is prepared and not yet published; local
+computation is not a public release. See `examples/demo/CASE-FREEZE.yaml` and
+`docs/public-candidate-reproduction-2026-10-28.md`.
 
 ## Install R 4.5.x, restore the lock, select the library
 

@@ -48,5 +48,5 @@ Citation/reference practice for this case:
 
 PubChem structure source/field/terms/citation review is **complete**, with the residual caveat that
 third-party rights in contributed records cannot be excluded by NCBI. The eight structures are
-review-only in the case package; the researcher must decide whether to publish them. This review
+included in the case package by the selected data-inclusion decision; actual publication is still pending. This review
 does not authorize commercial use and does not relicense PubChem data.

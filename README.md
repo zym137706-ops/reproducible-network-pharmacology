@@ -10,24 +10,24 @@ and hashes, and every output can be regenerated from a single config file.
 
 > Status: **v0.1.0 release candidate, unreleased** (package version 0.1.0). The pipeline and the
 > wrapper-layer exit-code guard, engine-effective gene sets and hash-checked report are implemented.
-> Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (run 39773442191 green).
+> Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (current main run; see badge).
 > Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
 > guard is intentionally kept. The public RA case (MeSH D001172) is **locally computed** in Linux for
 > 0.10 and 0.05, with independent hypergeometric/BH checks. STP confirmed on 2026-10-23 that the eight
 > native XLSX tables are **CC BY 4.0** (attribution/no modification). CTD ticket **#8545** (2026-10-26)
 > confirms public non-profit research including GitHub for the requested 179-gene subset/derived
 > outputs, with CTD citation and a data date-stamp; commercial use is separate. A complete review
-> candidate is prepared and reproduced, but **publication is pending the researcher's decision**;
-> PubChem source/terms review is complete with a residual third-party caveat; final structure
-> publication/visibility/release remain researcher decisions. HGNC is frozen (CC0). See
+> candidate is prepared and reproduced, and the **data-inclusion decision is selected** (the complete
+> case package as a release asset); actual publication/visibility/release remain to be executed.
+> PubChem source/terms review is complete with a residual third-party caveat; HGNC is frozen (CC0). See
 > `docs/stp-permission-2026-10-23.md`, `docs/ctd-permission-2026-10-26.md`, and
-> `docs/public-candidate-reproduction-2026-10-27.md`.
+> `docs/public-candidate-reproduction-2026-10-28.md`.
 > The thin Skill has a final-revision Codex real-agent acceptance (normal/missing/partial/tamper/zero;
 > Linux enrichment/report via Docker; one shell-wrapper caveat) plus a separate DSH session; see
 > `docs/skill-acceptance.md` and `docs/skill-agent-acceptance-2026-10-21.md`. This is not a general
-> validation. The latest portable-entry clean-clone run is recorded in
-> `docs/case-entry-clean-run-2026-10-22.md`; the earlier run remains historical at
-> `docs/case-clean-run-2026-10-21.md`. See the
+> validation. The current final case reproduction is recorded in
+> `docs/public-candidate-reproduction-2026-10-28.md`; earlier runs remain historical at
+> `docs/case-entry-clean-run-2026-10-22.md` and `docs/case-clean-run-2026-10-21.md`. See the
 > [maintained plan](docs/project-plan.zh-CN.md),
 > [case freeze](examples/demo/CASE-FREEZE.yaml),
 > [public-case sources](docs/public-case-sources.md), [data access](examples/demo/DATA-ACCESS.md) and

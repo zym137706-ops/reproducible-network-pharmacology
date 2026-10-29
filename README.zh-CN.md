@@ -7,16 +7,16 @@
 
 > 当前状态：**v0.1.0 发布候选，尚未正式发布**（包版本 0.1.0）。导入/交集/网络/富集/报告已接通；包装层非零退出码、
 > engine 实际前景/背景集合与哈希已加固。Python 用 `uv.lock`、R 用 `renv.lock` 锁定，Linux CI
-> （run 39773442191）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
+> （当前 main run，见 badge）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
 > exit `0xC0000005` 导致 11 个 R 相关测试失败，非零退出保护保留、不忽略。公开 RA 案例（MeSH D001172）
 > 已在 Linux Docker 本地完成 0.10/0.05 计算与独立超几何/BH 核查；STP 已于 2026-10-23 书面确认
 > 八份原生 XLSX 表适用 **CC BY 4.0**（需署名、原表不修改）。CTD 工单 **#8545**（2026-10-26）确认
 > 本项目请求的 179 基因子集/派生物可用于公开非营利研究（含 GitHub），需引用 CTD 并注明数据日期；
 > 商业用途另走官方渠道。完整候选包已准备并从干净 clone 复现；PubChem 来源/字段/条款/引用核查已完成
-> （NCBI 无限制声明 + 第三方权利保留），但**发布仍需研究者决定**，最终文件纳入、可见性和 release 尚未确认。
+> （NCBI 无限制声明 + 第三方权利保留），**数据纳入方案已选定**，但软件/数据尚未执行公开发布。
 > HGNC 已按 CC0 冻结。见
 > `docs/stp-permission-2026-10-23.md`、`docs/ctd-permission-2026-10-26.md` 与
-> `docs/public-candidate-reproduction-2026-10-27.md`。
+> `docs/public-candidate-reproduction-2026-10-28.md`。
 > 可移植真实案例入口：`scripts/case_run.py`（严格校验日志结构/CID/哈希、固定双阈值配置、跑全链、
 > 调用 `scripts/case_check.py`、记录 `case_provenance.json`；只有分析 + manifest + 独立核查全部成功
 > 才标记 `complete`）。源码哈希使用版本化 `case-source-hash-v2` 范围（案例相关源码/入口/锁文件，
@@ -24,8 +24,8 @@
 > Skill 已在最终提交上完成 Codex 真实会话验收（normal/missing/partial/tamper/zero；Linux enrichment/report
 > 由 Codex 调用 Docker；存在一个 PowerShell 退出码显示限制），另有一次 DSH 会话；见
 > `docs/skill-acceptance.md` 与 `docs/skill-agent-acceptance-2026-10-21.md`，不等同通用验证。
-> 最新可移植入口干净 clone 复算记录见 `docs/case-entry-clean-run-2026-10-22.md`；较早记录保留为
-> `docs/case-clean-run-2026-10-21.md`。
+> 当前最终案例复现记录见 `docs/public-candidate-reproduction-2026-10-28.md`；较早记录保留为
+> `docs/case-entry-clean-run-2026-10-22.md` 与 `docs/case-clean-run-2026-10-21.md`。
 > 维护入口：[完整规划 v3](docs/project-plan.zh-CN.md)；[案例冻结](examples/demo/CASE-FREEZE.yaml)；
 > [公开案例来源清单](docs/public-case-sources.md)；[环境记录](docs/environment.md)。
 

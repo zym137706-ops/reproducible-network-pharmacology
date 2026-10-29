@@ -6,14 +6,32 @@ well-scoped contributions are welcome.
 ## Development setup
 
 ```bash
-uv venv
-uv pip install -e ".[dev]"
+uv sync --locked --extra dev
+# Linux/macOS: restore the locked R 4.5.2 / renv library; use the absolute path it prints.
+bash scripts/restore_r.sh /abs/path/to/rlib
+export R_LIBS=/abs/path/to/rlib
+
 uv run pytest -q
 uv run ruff check .
 ```
 
-The enrichment bridge additionally needs R 4.3+ with `clusterProfiler`, `org.Hs.eg.db` and
-`jsonlite`. Without R, the bridge test is skipped and everything else still runs.
+Windows PowerShell equivalent:
+
+```powershell
+uv sync --locked --extra dev
+.\scripts\restore_r.ps1 -Library C:\abs\path\to\rlib
+$env:R_LIBS = "C:\abs\path\to\rlib"
+uv run pytest -q
+uv run ruff check .
+```
+
+The verified case environment is **R 4.5.2 with the `renv.lock` library**, restored by the project
+`restore_r` script (Linux is the verified CI platform; Windows native R still has the documented
+`0xC0000005` limitation). `Rscript` must be discoverable or set via `RNP_RSCRIPT`.
+
+Without a restored R/`Rscript`, only the Rscript-dependent bridge/enrichment tests are skipped
+(`pytest.mark.skipif(Rscript not available)`); the remaining Python tests and lint still run. Skipped
+tests are not evidence that the R bridge passed—run the Linux CI or restore R to exercise them.
 
 ## What a good change looks like
 

@@ -1,5 +1,5 @@
 case_id: demo-public-compounds
-status: local_complete_publication_decision_pending
+status: data_inclusion_selected_release_pending
 frozen_at_utc: '2026-10-20T10:45:00Z'
 case_computed_in_linux: true
 public_case_claim: false
@@ -350,9 +350,9 @@ local_calculation:
       '0.05': a54954e8e0af4da060febee028dba2600517e18fcee3e851ba9ab05533974dc5
     status: complete; strict log structure/CID/hash checks; both manifests no drift;
       case_check executed and passed
-public_release_status: 'permission_confirmed_publication_decision_pending: STP and
-  CTD cleared for the requested public non-profit scope; candidate ready outside Git;
-  not published'
+public_release_status: 'data_inclusion_selected_release_execution_pending: STP/CTD/PubChem/HGNC
+  inclusion in CASE-PKG-2026-10-21 is selected; software/data assets are built and
+  await final asset upload, visibility and tag/release; not published'
 input_freeze_status:
   disease: local prepared/used; public non-profit research permission confirmed; not
     committed
@@ -365,43 +365,44 @@ status_dimensions:
   local_inputs_verified: true
   local_linux_calculation: complete
   local_independent_check: passed
-  public_redistribution: stp_and_ctd_permission_confirmed_publication_pending
+  public_redistribution: stp_ctd_pubchem_inclusion_selected_release_pending
   public_case_claim: false
   final_skill_acceptance: passed_codex_2026-10-21_with_environment_caveat
   stp_permission: confirmed_2026-10-23_tables_only
   ctd_permission: confirmed_public_nonprofit_2026-10-26_ticket_8545
   pubchem_review: complete_2026-10-27_residual_third_party_caveat
+  pubchem_inclusion: selected_in_case_package_release_asset
 public_release_gate:
-  status: permission_confirmed_publication_decision_pending
-  reason: STP tables CC BY 4.0 and CTD public non-profit research permission are confirmed.
-    PubChem source/terms/citation review is complete with a residual third-party-rights
-    caveat. Remaining gates are researcher review of the final file list, publication
-    decision, and tag/release; no permission silence blocks them.
+  status: data_inclusion_selected_release_pending
+  reason: 'Data-inclusion decision is selected: the complete case package will be
+    a release asset, not a duplicate Git tree. STP/CTD/PubChem/HGNC terms and citations
+    are recorded. Remaining execution gates are candidate review, release-asset upload,
+    and researcher approval of visibility/tag/release; no permission or data-inclusion
+    question remains open.'
 public_release_gaps:
-- id: researcher_publication_decision
-  what: researcher review of the complete candidate and explicit decision on data
-    inclusion, repository visibility and versioned release
-  owner: researcher
-  status: pending
 - id: candidate_review
-  what: check candidate files, attribution/citation/date-stamp, SHA256SUMS and private-data
-    separation before publication
+  what: final review of the built software artifacts and case package against the
+    public file list/checksums
   owner: researcher + agent
   status: pending
-- id: pubchem_publication_decision
-  what: decide whether to publish PubChem computed structures after the completed
-    source/terms review; residual third-party caveat
+- id: final_asset_upload
+  what: upload the approved case ZIP and software artifacts as release assets; fill
+    the real release URL
+  owner: researcher
+  status: pending
+- id: researcher_release_approval
+  what: explicit approval to change repository visibility and create the v0.1.0 tag/release
   owner: researcher
   status: pending
 public_release_actions:
-- researcher reviews the complete candidate and decides publication scope/visibility/release
-- consider the completed PubChem source/terms review and residual third-party caveat
-  for the structure table
+- researcher reviews the final software artifacts and case package against the file
+  list/checksums
+- upload the approved assets; fill the actual release URL and verify download/checksum
 - if published, cite CTD with a data date-stamp and notify CTD of the public project
   link
 - do not relabel CTD or PubChem data as MIT/CC0/CC BY or claim commercial rights
 - preserve STP original tables unmodified and include attribution/citation
-- no tag/release/visibility change without the researcher decision
+- no tag/release/visibility change without the researcher release approval
 permission_requests:
   stp:
     submitted: October 2026 (exact date/time not recorded; to be verified)
@@ -424,7 +425,7 @@ public_case_candidate:
   files: 35
   sha256_file: SHA256SUMS.tsv
   reproduction_record: docs/public-candidate-reproduction-2026-10-28.md
-  status: review_only_not_published
+  status: data_inclusion_selected_not_published
   image: bioconductor/bioconductor_docker:RELEASE_3_22
   image_id: sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
   image_digest: bioconductor/bioconductor_docker@sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
@@ -434,11 +435,11 @@ public_case_candidate:
   image_manifest_digest: sha256:67ab741591c5cd068f8993ca5f0371794c300da9cc5e0b3b2c1c90c9058e4c6f
   image_config_digest: sha256:7da6175410ad783fab92656b46c247ce6b72473e485e4aca0c176703fb381c63
   release_asset: rnp-case-v0.1.0-2026-10-21.zip
-  release_asset_sha256: 5fe85b4ec737ada8b86c88d2e5596e1582105ab89d8dbf4c6c83188e108a3d2c
+  release_asset_sha256: 55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4
   payload_files: 35
   total_files_including_checksum: 36
   release_url: null
-  release_url_status: pending_final_release
+  release_url_status: planned_pending_upload
   data_access_guide: examples/demo/DATA-ACCESS.md
   package_id: CASE-PKG-2026-10-21
 input_handoff_evidence:

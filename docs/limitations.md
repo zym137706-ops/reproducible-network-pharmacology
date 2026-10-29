@@ -1,6 +1,6 @@
 # Limitations
 
-Updated 2026-10-19. Implemented behavior and planned safeguards are distinguished below.
+Updated 2026-10-29. Implemented behavior and planned safeguards are distinguished below.
 The accepted extension scope is documented in [ADR-0004](adr/0004-staged-upstream-and-docking.md).
 
 This project is deliberately narrow. The most important limitations are listed here and in the
@@ -22,9 +22,12 @@ report template, so that a result cannot be read as more than it is.
 - **Species and identifier type.** Human-only analysis by default; cross-species mapping is a
   separate decision, not a silent default.
 - **Background/universe.** Using the whole annotated genome, the disease gene set, or the detected
-  gene list gives different p-values. Current R input permits an omitted universe; a background
-  mapping error can leave it NULL. Explicit actual-universe recording and failure handling remain
-  release blockers, not completed safeguards.
+  gene list gives different p-values. The R bridge now requires an explicit universe and rejects an
+  omitted/empty/unresolvable background instead of falling back to NULL or an implicit default.
+  Mapping losses are reported; an enrichment error exits non-zero and is not recorded as a pass. The
+  actual foreground/background sets, their counts and hashes are written with the enrichment audit.
+  Those safeguards prevent silent fallback; they do not make the biological choice of background
+  neutral.
 - **Gene-set redundancy.** GO terms are nested; a "top 20" table often shows one biological theme
   twenty times. Collapse or annotate redundancy before interpreting.
 - **Gene-symbol drift.** Retired symbols and aliases change results across database releases; the
@@ -42,8 +45,11 @@ report template, so that a result cannot be read as more than it is.
 ## Software limitations
 
 - Enrichment depends on R and Bioconductor versions. The bridge records `clusterProfiler`,
-  `DOSE` and OrgDb versions. Current tests check the result contract rather than numerical truth;
-  independent synthetic hypergeometric/BH tests are required alongside live annotation checks.
+  `DOSE`, OrgDb versions and the effective foreground/background sets with hashes. The test suite
+  includes an independent synthetic hypergeometric/BH numerical baseline plus contract and live
+  annotation checks; passing them still does not establish biological mechanism or truth.
+- A failed R process or a mapping/background failure is propagated as a non-zero external-tool
+  failure; a normal-looking metadata file is not accepted as success.
 - KEGG enrichment needs network access; offline runs use GO.
 - The parser accepts the export formats observed in practice, not every possible spreadsheet.
   Unrecognised structures fail loudly with the columns it saw.
