@@ -22,7 +22,7 @@ uploaded, made public or released. STP/CTD/PubChem review and the publication de
 
 - Review candidate: `CASE-PKG-2026-10-21` (built; not committed)
 - Data access and reproduction entry: `examples/demo/DATA-ACCESS.md`
-- Versioned release asset: `rnp-case-v0.1.0-2026-10-21.zip`
+- Versioned release asset: `rnp-case-v0.1.0-2026-10-21.zip` (938,555 bytes)
 - Zip SHA-256: `55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4`
 - Package counts: **35 payload files + `SHA256SUMS.tsv` = 36 total files**; 35/35 hashes and sizes
   verified after extraction.

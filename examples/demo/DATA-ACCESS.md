@@ -7,7 +7,7 @@ rules and public reference tables.
 
 ## Case package
 
-- Asset: `rnp-case-v0.1.0-2026-10-21.zip`
+- Asset: `rnp-case-v0.1.0-2026-10-21.zip` (938,555 bytes)
 - SHA-256: `55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4`
 - Contents: **35 payload files + `SHA256SUMS.tsv` = 36 total files**
 - Release URL: pending researcher approval and upload. Do not invent a URL or tag before that.
