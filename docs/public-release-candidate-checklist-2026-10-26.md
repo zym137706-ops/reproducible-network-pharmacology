@@ -13,8 +13,8 @@ uploaded, made public or released. STP/CTD/PubChem review and the publication de
 | Synthetic quickstart | `examples/quickstart/`, `tests/fixtures/` | complete chain, no restricted data |
 | Portable case entry | `scripts/case_run.py`, `scripts/case_check.py`, `docs/case-run.md` | tested; final candidate reproduction passed |
 | Wheel/sdist | `dist/reproducible_network_pharmacology-0.1.0-*` | built; clean-venv install checked |
-| Wheel SHA-256 | `reproducible_network_pharmacology-0.1.0-py3-none-any.whl` (70,154 bytes) | `40a0f21339e70a7a2c0422866573f20077ab3d3ed2f9ff8c6db07c049b78c1fb` |
-| Sdist SHA-256 | `reproducible_network_pharmacology-0.1.0.tar.gz` (1,130,191 bytes) | `b945f31581856e338f0a3a8760796706ab778dd24c92c084fbd2c007fee05d46` |
+| Wheel | `reproducible_network_pharmacology-0.1.0-py3-none-any.whl` | final hash recorded in Release/SHA256SUMS.txt |
+| Sdist | `reproducible_network_pharmacology-0.1.0.tar.gz` | final hash recorded in Release/SHA256SUMS.txt |
 | Citation/version | `CITATION.cff`, `docs/citations.md` | 0.1.0, unreleased, upstream citations added |
 | Code provenance | `docs/case-entry-clean-run-2026-10-22.md`; final run below | no restricted data |
 
@@ -59,7 +59,7 @@ uploaded, made public or released. STP/CTD/PubChem review and the publication de
 
 ## 5. Final verification
 
-- Build commit: `a5b9116f4863a050e74a9a40a7d7f155fe7f6258` (clean checkout; v0.1.0 final candidate).
+- Build commit: final software build commit, recorded by the release tag.
 - Case reproduction commit: `49c86ee0e09c05433c22102011d705c60df72f45` (scientific inputs unchanged).
 - Clean-clone candidate reproduction: both thresholds `complete`; checker passed; manifest no drift;
   source hash `fc6784e6f46fe5dff71cc8c00a943980ded31d495689c237fb280fb17fcc8aca`.

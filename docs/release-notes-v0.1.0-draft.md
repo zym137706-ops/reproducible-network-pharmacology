@@ -7,10 +7,8 @@ downloadable until the assets are actually uploaded and the URLs verified.
 
 - Version: **0.1.0**
 - Tag target: the final software build commit, recorded in the GitHub Release after build.
-- Wheel: `reproducible_network_pharmacology-0.1.0-py3-none-any.whl` (70,154 bytes)
-  SHA-256 `40a0f21339e70a7a2c0422866573f20077ab3d3ed2f9ff8c6db07c049b78c1fb`
-- Sdist: `reproducible_network_pharmacology-0.1.0.tar.gz` (1,130,191 bytes)
-  SHA-256 `b945f31581856e338f0a3a8760796706ab778dd24c92c084fbd2c007fee05d46`
+- Assets: wheel and sdist; final byte sizes and SHA-256 values are listed in the GitHub Release and
+  its `SHA256SUMS.txt` (recorded after the final build).
 - Code license: MIT.
 
 ### Install and verify
