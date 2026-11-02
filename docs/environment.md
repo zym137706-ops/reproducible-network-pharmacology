@@ -1,6 +1,6 @@
 # Verified environment
 
-Updated 2026-10-29 after the final v0.1.0 candidate reproduction. **Linux CI is the verified case
+Updated 2026-11-02 for the published v0.1.0 release. **Linux CI is the verified case
 environment. Windows is not verified** because of a native R exit (`0xC0000005`) that is still open;
 the non-zero exit guard stays in place.
 
@@ -16,7 +16,7 @@ the non-zero exit guard stays in place.
 | Windows host / isolated library (Codex, commit `0cf3584`) | 119 passed, 11 failed; R subprocess exit `3221225477` (`0xC0000005`) even when status/results looked normal | **unverified / blocked** |
 
 The RA case was computed locally in Linux Docker. STP/CTD permission is confirmed for the requested
-public non-profit scope, but the complete case package is prepared and not yet published; local
+public non-profit scope, and the complete case package is published as the v0.1.0 release asset; local
 computation is not a public release. See `examples/demo/CASE-FREEZE.yaml` and
 `docs/public-candidate-reproduction-2026-10-28.md`.
 

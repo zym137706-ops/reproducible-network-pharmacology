@@ -9,7 +9,7 @@ First formal v0.1.0 release of the audited network-pharmacology CLI and thin Ski
 The complete RA case is distributed separately as `rnp-case-v0.1.0-2026-10-21.zip`; real case data
 is not duplicated in the Git tree. Data terms remain source-specific: STP CC BY 4.0, CTD public
 non-profit research permission (ticket #8545), HGNC CC0, and PubChem source/NCBI-policy caveat; the
-mixed-source package is not MIT/CC BY as a whole. See `docs/release-notes-v0.1.0-draft.md` /
+mixed-source package is not MIT/CC BY as a whole. See `docs/release-notes-v0.1.0.md` /
 the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]

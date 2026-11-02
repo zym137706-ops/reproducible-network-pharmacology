@@ -18,37 +18,35 @@ FREEZE = DEMO / "CASE-FREEZE.yaml"
 def test_public_case_gate_is_not_confused_with_local_completion() -> None:
     data = yaml.safe_load(FREEZE.read_text(encoding="utf-8"))
     assert data["case_id"] == "demo-public-compounds"
-    assert data["status"] == "data_inclusion_selected_release_pending"
-    assert data["public_case_claim"] is False
+    assert data["status"] == "published_v0_1_0_2026_11_02"
+    assert data["public_case_claim"] is True
     assert data["case_computed_in_linux"] is True
-    assert data["public_release_status"].startswith("data_inclusion_selected")
+    assert data["public_release_status"].startswith("published_v0_1_0_2026_11_02")
     assert data["status_dimensions"] == {
         "local_inputs_verified": True,
         "local_linux_calculation": "complete",
         "local_independent_check": "passed",
-        "public_redistribution": "stp_ctd_pubchem_inclusion_selected_release_pending",
-        "public_case_claim": False,
+        "public_redistribution": "published_v0_1_0_2026_11_02_stp_ctd_pubchem",
+        "public_case_claim": True,
         "final_skill_acceptance": "passed_codex_2026-10-21_with_environment_caveat",
         "stp_permission": "confirmed_2026-10-23_tables_only",
         "ctd_permission": "confirmed_public_nonprofit_2026-10-26_ticket_8545",
         "pubchem_review": "complete_2026-10-27_residual_third_party_caveat",
         "pubchem_inclusion": "selected_in_case_package_release_asset",
+        "public_release": "published_2026_11_02",
     }
-    gaps = {item["id"] for item in data["public_release_gaps"]}
-    assert {
-        "candidate_review",
-        "final_asset_upload",
-        "researcher_release_approval",
-    } == gaps
-    assert data["public_release_gate"]["status"] == "data_inclusion_selected_release_pending"
+    assert data["public_release_gaps"] == []
+    assert data["public_release_gate"]["status"] == "published"
+    assert data["public_release_gate"]["tag"] == "v0.1.0"
+    assert data["public_release_gate"]["tag_target"] == "de7ac950fd2da5fde231a36755a7a3af37a5dbe0"
     assert data["disease"]["term"] == "Arthritis, Rheumatoid"
     assert data["disease"]["mesh_id"] == "MESH:D001172"
     assert data["disease"]["row_count"] == 179
     assert data["disease"]["license_status"] == "public_nonprofit_research_permission_2026-10-26"
-    assert data["disease"]["status"] == "local_prepared_permission_confirmed_not_committed"
-    assert data["enrichment_background"]["status"] == "generated_and_frozen_local_not_committed"
+    assert data["disease"]["status"] == "published_in_case_asset_not_git"
+    assert data["enrichment_background"]["status"] == "published_in_case_asset_not_git"
     assert data["enrichment_background"]["thresholds"] == [0.10, 0.05]
-    assert data["stp_exports"]["status"] == "local_verified_license_confirmed_not_committed"
+    assert data["stp_exports"]["status"] == "published_in_case_asset_not_git"
     assert data["stp_exports"]["public_redistribution"] == "confirmed_cc_by_4_0_tables_only"
     assert data["stp_exports"]["permission"]["reply_date"] == "2026-10-23"
     assert data["stp_exports"]["permission"]["license"] == "CC BY 4.0"
@@ -76,7 +74,7 @@ def test_freeze_reuses_recorded_decisions_without_inventing_sources() -> None:
         "EVID-HANDOFF-2026-10-21"
     )
     assert "PubChem" in decisions["compound_list"]["smiles_evidence"]["structures_source"]
-    assert data["public_release_gaps"]
+    assert not data["public_release_gaps"]
     assert data["verification_environment"]["windows"]["status"] == "unverified_blocked"
 
 
@@ -150,7 +148,7 @@ def test_freeze_matches_run_yaml_and_binding_files() -> None:
     }
     assert export_files <= expected_files, f"unbound STP exports: {export_files - expected_files}"
     if export_files != expected_files:
-        assert freeze["public_release_gate"]["status"] == "data_inclusion_selected_release_pending"
+        assert freeze["public_release_gate"]["status"] == "published"
     else:
         # Once all exports exist, the log must contain the real submission evidence.
         required = {

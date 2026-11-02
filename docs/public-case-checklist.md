@@ -19,8 +19,8 @@ residual third-party caveat; publication remains a separate researcher decision.
 | Item | Required detail | License / provenance check | Status |
 |---|---|---|---|
 | Compound list | stable `compound_id`, name, SMILES or documented structure source; explicit `stp_file` binding | public compounds; PubChem CID and retrieval date recorded; source/terms review complete with residual caveat | local verified: 8 CIDs; actual `.xlsx` bindings; publication decision pending |
-| SwissTargetPrediction exports | one export per compound, species recorded, retrieval date, submission log | **CC BY 4.0 confirmed 2026-10-23 for eight native tables**; cite website/date/Daina & Zoete 2024; originals unmodified | **confirmed; candidate prepared; not published** |
-| Disease gene list | exact MeSH D001172 (Arthritis, Rheumatoid); CTD query and direct evidence rule | **CTD ticket #8545: public non-profit research incl. GitHub; cite CTD/date-stamp; commercial separate** | **permission confirmed; case package; not published** |
+| SwissTargetPrediction exports | one export per compound, species recorded, retrieval date, submission log | **CC BY 4.0 confirmed 2026-10-23 for eight native tables**; cite website/date/Daina & Zoete 2024; originals unmodified | **confirmed; candidate prepared; published as v0.1.0 release asset** |
+| Disease gene list | exact MeSH D001172 (Arthritis, Rheumatoid); CTD query and direct evidence rule | **CTD ticket #8545: public non-profit research incl. GitHub; cite CTD/date-stamp; commercial separate** | **permission confirmed; case package; published as release asset** |
 | HGNC snapshot | complete-set TSV version/date; which release | CC0; attribution recorded | FROZEN: 2026-10-16, 45,277 Approved |
 | STRING/PPI (optional) | version, confidence cutoff, retrieval date | CC BY 4.0; attribution | not used |
 | Enrichment gene sets | GO BP release; explicit conditional background | GO CC BY 4.0; background rule documented | local GO.db 3.22.0; T_r=239/267; effective 234/262 |

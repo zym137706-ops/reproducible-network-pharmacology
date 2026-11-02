@@ -45,7 +45,7 @@ Prepared outside Git for review only:
 `CASE-PKG-2026-10-21`
 
 It contains the STP XLSX exports, complete RA-case inputs, expected counts, attribution,
-permission summaries and SHA-256 manifest. The candidate is reproduced but **not published**.
+permission summaries and SHA-256 manifest. The candidate is reproduced and published as the v0.1.0 release asset.
 The old STP-only package is superseded; it excluded CTD data and is not the current release
 candidate.
 

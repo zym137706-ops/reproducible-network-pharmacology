@@ -1,7 +1,7 @@
 # RA public-data case: release-candidate state
 
 Status: **locally computed; STP CC BY 4.0 and CTD public non-profit research permission confirmed;
-complete candidate prepared; publication decision pending.** The machine-readable freeze is
+complete candidate prepared; published as the v0.1.0 release asset.** The machine-readable freeze is
 [`CASE-FREEZE.yaml`](CASE-FREEZE.yaml); data access and reproduction guide:
 [`DATA-ACCESS.md`](DATA-ACCESS.md); acceptance checklist:
 [`docs/public-case-checklist.md`](../../docs/public-case-checklist.md), sources:
@@ -44,9 +44,7 @@ non-profit research including GitHub, with CTD citation and a data date-stamp; c
 separate. The complete review candidate is `CASE-PKG-2026-10-21`, distributed only as the versioned
 release asset `rnp-case-v0.1.0-2026-10-21.zip`; it is outside Git.
 
-The candidate has been reproduced from a clean clone; its expected counts are recorded there.
-Publication remains pending the researcher's explicit decision on data inclusion, repository
-visibility and release. PubChem source/field/terms/citation review is complete against NCBI policy:
+The candidate has been reproduced from a clean clone and is published as the v0.1.0 release asset; its expected counts are recorded there. PubChem source/field/terms/citation review is complete against NCBI policy:
 the SMILES fields are computed descriptors, NCBI states no restrictions by NCBI, and a residual
 third-party-rights caveat remains; the selected data-inclusion decision includes them in the case
 package, but they are not relicensed as MIT/CC0/CC BY and are not cleared by the STP/CTD replies. HGNC is CC0 and committed; private EMLs, screenshots, submission correspondence and

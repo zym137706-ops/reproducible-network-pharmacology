@@ -1,16 +1,16 @@
 # RA case data access and reproduction
 
-Status: **v0.1.0 release candidate; data-inclusion decision selected; not published**. This is the
-formal entry for obtaining the case data and reproducing the analysis. The dataset is a **versioned
-release asset**, not a set of files committed to Git; the repository contains only code, templates,
-rules and public reference tables.
+Status: **published in v0.1.0 on 2026-11-02**. This is the formal entry for obtaining the case data
+and reproducing the analysis. The dataset is a **versioned release asset**, not a set of files
+committed to Git; the repository contains only code, templates, rules and public reference tables.
 
 ## Case package
 
 - Asset: `rnp-case-v0.1.0-2026-10-21.zip` (938,555 bytes)
 - SHA-256: `55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4`
 - Contents: **35 payload files + `SHA256SUMS.tsv` = 36 total files**
-- Release URL: pending researcher approval and upload. Do not invent a URL or tag before that.
+- Release: <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0>
+- Direct asset: <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/download/v0.1.0/rnp-case-v0.1.0-2026-10-21.zip>
 
 The package contains the eight native STP XLSX tables (unmodified), the exact submitted compound
 structures, the de-identified submission log, the 179-gene CTD subset and evidence table, HGNC
@@ -21,7 +21,7 @@ private logs are **not** distributed.
 ## Obtain and verify
 
 ```bash
-# Download the approved release asset (URL to be supplied with the release).
+# Download the v0.1.0 release asset from the URL above, then verify.
 sha256sum rnp-case-v0.1.0-2026-10-21.zip
 # expected: 55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4
 

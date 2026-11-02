@@ -8,18 +8,19 @@ Turn a folder of prediction exports and a disease gene list into a **traceable, 
 compound–target–disease analysis. Every run records its inputs, reference-data versions, parameters
 and hashes, and every output can be regenerated from a single config file.
 
-> Status: **v0.1.0 release candidate, unreleased** (package version 0.1.0). The pipeline and the
-> wrapper-layer exit-code guard, engine-effective gene sets and hash-checked report are implemented.
+> Status: **v0.1.0, published 2026-11-02** (package version 0.1.0). Release:
+> <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0>. The
+> pipeline and the wrapper-layer exit-code guard, engine-effective gene sets and hash-checked report
+> are implemented.
 > Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (current main run; see badge).
 > Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
 > guard is intentionally kept. The public RA case (MeSH D001172) is **locally computed** in Linux for
 > 0.10 and 0.05, with independent hypergeometric/BH checks. STP confirmed on 2026-10-23 that the eight
 > native XLSX tables are **CC BY 4.0** (attribution/no modification). CTD ticket **#8545** (2026-10-26)
 > confirms public non-profit research including GitHub for the requested 179-gene subset/derived
-> outputs, with CTD citation and a data date-stamp; commercial use is separate. A complete review
-> candidate is prepared and reproduced, and the **data-inclusion decision is selected** (the complete
-> case package as a release asset); actual publication/visibility/release remain to be executed.
-> PubChem source/terms review is complete with a residual third-party caveat; HGNC is frozen (CC0). See
+> outputs, with CTD citation and a data date-stamp; commercial use is separate. The complete case
+> package is **published as the v0.1.0 release asset**, not duplicated in Git. PubChem source/terms
+> review is complete with a residual third-party caveat; HGNC is frozen (CC0). See
 > `docs/stp-permission-2026-10-23.md`, `docs/ctd-permission-2026-10-26.md`, and
 > `docs/public-candidate-reproduction-2026-10-28.md`.
 > The thin Skill has a final-revision Codex real-agent acceptance (normal/missing/partial/tamper/zero;
@@ -243,7 +244,7 @@ instructions and an adapter; users obtain the data under their own license. See
 | Release | Scope | State |
 |---|---|---|
 | v0.0.1 | Scaffold: package, schemas, CLI, tests, CI, docs | ✅ done |
-| **v0.1.0** | Core hardening; `enrich`; `report`; Skill; public-case candidate reproduced | release candidate, not published |
+| **v0.1.0** | Core hardening; `enrich`; `report`; Skill; public case as release asset | **published 2026-11-02** |
 | v0.2 | Confirmed lists / metabolomics → structure registry → annotation → explicit selection | planned |
 | v0.3 | Minimal docking: reviewed pairs, preparation, controls, redocking and pose QC | planned |
 | Later | PPI topology/RRA, MCODE, predicted receptors and historical batch migration | independently scoped |
@@ -258,8 +259,8 @@ a roadmap, video or DOI is not evidence that a capability works. Detailed design
 本项目把网络药理学的「成分 → 靶点 → 疾病 → 通路」分析，从手工点网站变成可校验、可复现的
 命令行工具 + Agent 技能层。核心设计：**CLI 是唯一事实来源**（不用 Agent 也能跑），每个子命令
 校验输入、显式报错、写审计文件；每次运行生成带哈希与版本信息的 `run_manifest.json`；公开数据
-demo 将用可独立核验的预期结果守住数值；受限数据库不再分发。当前是 v0.1.0 发布候选、
-尚未正式发布（包版本 0.1.0），新增设计不代表命令已实现。完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
+demo 将用可独立核验的预期结果守住数值；受限数据库不再分发。当前是 v0.1.0 正式发布版本、
+其案例数据作为 Release 资产分发（包版本 0.1.0），新增设计不代表命令已实现。完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
 
 ## License
 

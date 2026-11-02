@@ -1,6 +1,6 @@
 # Citations and data attribution
 
-Status: v0.1.0 release candidate, **not published**. Software and upstream data have separate
+Status: v0.1.0, **published 2026-11-02**. Software and upstream data have separate
 licenses; cite both the software and the sources actually used.
 
 ## Software

@@ -50,4 +50,4 @@ public link; do not send a new permission request for the same scope. Do not tre
 permission for arbitrary commercial or third-party uses.
 
 The complete candidate package is prepared and reproduced for researcher review; no CTD data has
-been committed or uploaded to CI. Publication remains pending the researcher's final decision.
+been committed or uploaded to CI. The complete candidate is published as the v0.1.0 release asset.

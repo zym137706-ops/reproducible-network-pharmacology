@@ -1,8 +1,8 @@
 case_id: demo-public-compounds
-status: data_inclusion_selected_release_pending
+status: published_v0_1_0_2026_11_02
 frozen_at_utc: '2026-10-20T10:45:00Z'
 case_computed_in_linux: true
-public_case_claim: false
+public_case_claim: true
 reason: 'The local Linux calculation, independent check and public-candidate reproduction
   are complete. STP tables are CC BY 4.0-confirmed; CTD ticket #8545 confirms public
   non-profit research use including GitHub with citation/date-stamp. PubChem source/field/terms/citation
@@ -86,7 +86,7 @@ disease:
     separate. Not MIT/CC0/CC BY.'
   license_status: public_nonprofit_research_permission_2026-10-26
   source_record: inputs/CTD-QUERY.md
-  status: local_prepared_permission_confirmed_not_committed
+  status: published_in_case_asset_not_git
   license_ticket: '#8545'
   permission_record: docs/ctd-permission-2026-10-26.md
   package_file: CASE-PKG-2026-10-21/inputs/disease_genes.txt
@@ -111,7 +111,7 @@ stp_exports:
   - submitted_date and result_file association
   - retrieved_date and result SHA-256
   - SwissTargetPrediction service-terms evidence
-  status: local_verified_license_confirmed_not_committed
+  status: published_in_case_asset_not_git
   note: never automate submission; download exports manually.
   public_redistribution: confirmed_cc_by_4_0_tables_only
   acquisition_policy:
@@ -170,7 +170,7 @@ enrichment_background:
   gene_identifier_namespace: HGNC symbol
   row_count: null
   sha256: null
-  status: generated_and_frozen_local_not_committed
+  status: published_in_case_asset_not_git
   files:
     universe-0.10.txt:
       sha256: 0a6cbb2cc37ba29a93f2489cc4bf6cf340df0e2ff55bbe22265a46311ae0f9cb
@@ -194,7 +194,7 @@ data_sources:
       ConnectivitySMILES: connectivity only; no stereochemistry
     raw_responses_recorded: true
     license_status: 'reviewed 2026-10-27: NCBI no restrictions + third-party caveat;
-      no CC license; case package; not published'
+      no CC license; case package; published as release asset'
     review_record: docs/pubchem-structure-review-2026-10-27.md
     field_provenance: PUG REST SMILES/ConnectivitySMILES are computed descriptors;
       per-record OEChem/PubChem release references in docs/pubchem-structure-review-2026-10-27.md
@@ -242,7 +242,7 @@ data_sources:
     release_or_date: manual submission 2026-10-21; date-only; no service release version
     sha256: 8 per-file hashes recorded in the local submission log; not committed
     license_status: CC BY 4.0 confirmed 2026-10-23 for eight native tables; attribution/no-modification
-      required; case package; not published
+      required; case package; published as release asset
     raw_rows: 800
     invalid_rows: 0
     rows_at_0.10: 676
@@ -350,9 +350,9 @@ local_calculation:
       '0.05': a54954e8e0af4da060febee028dba2600517e18fcee3e851ba9ab05533974dc5
     status: complete; strict log structure/CID/hash checks; both manifests no drift;
       case_check executed and passed
-public_release_status: 'data_inclusion_selected_release_execution_pending: STP/CTD/PubChem/HGNC
-  inclusion in CASE-PKG-2026-10-21 is selected; software/data assets are built and
-  await final asset upload, visibility and tag/release; not published'
+public_release_status: 'published_v0_1_0_2026_11_02: software tag/release published;
+  complete case package uploaded as a release asset; real case data not duplicated
+  in Git'
 input_freeze_status:
   disease: local prepared/used; public non-profit research permission confirmed; not
     committed
@@ -365,44 +365,29 @@ status_dimensions:
   local_inputs_verified: true
   local_linux_calculation: complete
   local_independent_check: passed
-  public_redistribution: stp_ctd_pubchem_inclusion_selected_release_pending
-  public_case_claim: false
+  public_redistribution: published_v0_1_0_2026_11_02_stp_ctd_pubchem
+  public_case_claim: true
   final_skill_acceptance: passed_codex_2026-10-21_with_environment_caveat
   stp_permission: confirmed_2026-10-23_tables_only
   ctd_permission: confirmed_public_nonprofit_2026-10-26_ticket_8545
   pubchem_review: complete_2026-10-27_residual_third_party_caveat
   pubchem_inclusion: selected_in_case_package_release_asset
+  public_release: published_2026_11_02
 public_release_gate:
-  status: data_inclusion_selected_release_pending
-  reason: 'Data-inclusion decision is selected: the complete case package will be
-    a release asset, not a duplicate Git tree. STP/CTD/PubChem/HGNC terms and citations
-    are recorded. Remaining execution gates are candidate review, release-asset upload,
-    and researcher approval of visibility/tag/release; no permission or data-inclusion
-    question remains open.'
-public_release_gaps:
-- id: candidate_review
-  what: final review of the built software artifacts and case package against the
-    public file list/checksums
-  owner: researcher + agent
-  status: pending
-- id: final_asset_upload
-  what: upload the approved case ZIP and software artifacts as release assets; fill
-    the real release URL
-  owner: researcher
-  status: pending
-- id: researcher_release_approval
-  what: explicit approval to change repository visibility and create the v0.1.0 tag/release
-  owner: researcher
-  status: pending
+  status: published
+  reason: v0.1.0 is published with code and a separate case-data asset. Source-specific
+    terms and attribution are recorded. Post-release CTD notification remains a follow-up,
+    not a publication gate.
+  release_url: https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0
+  tag: v0.1.0
+  tag_target: de7ac950fd2da5fde231a36755a7a3af37a5dbe0
+  release_date: '2026-11-02'
+public_release_gaps: []
 public_release_actions:
-- researcher reviews the final software artifacts and case package against the file
-  list/checksums
-- upload the approved assets; fill the actual release URL and verify download/checksum
-- if published, cite CTD with a data date-stamp and notify CTD of the public project
-  link
-- do not relabel CTD or PubChem data as MIT/CC0/CC BY or claim commercial rights
-- preserve STP original tables unmodified and include attribution/citation
-- no tag/release/visibility change without the researcher release approval
+- 'post-release: report the public project link and data date-stamp to CTD'
+- keep private EMLs/screenshots/headers outside Git and release assets
+- do not move the published tag or overwrite published asset bytes
+- future changes require a new release/tag per normal process
 permission_requests:
   stp:
     submitted: October 2026 (exact date/time not recorded; to be verified)
@@ -425,7 +410,7 @@ public_case_candidate:
   files: 35
   sha256_file: SHA256SUMS.tsv
   reproduction_record: docs/public-candidate-reproduction-2026-10-28.md
-  status: data_inclusion_selected_not_published
+  status: published_release_asset
   image: bioconductor/bioconductor_docker:RELEASE_3_22
   image_id: sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
   image_digest: bioconductor/bioconductor_docker@sha256:e34177896c1579f66d48b756e4229b58237499183a089da084af72d7aba1d40a
@@ -438,10 +423,12 @@ public_case_candidate:
   release_asset_sha256: 55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4
   payload_files: 35
   total_files_including_checksum: 36
-  release_url: null
-  release_url_status: planned_pending_upload
+  release_url: https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0
+  release_url_status: published
   data_access_guide: examples/demo/DATA-ACCESS.md
   package_id: CASE-PKG-2026-10-21
+  release_tag: v0.1.0
+  release_tag_target: de7ac950fd2da5fde231a36755a7a3af37a5dbe0
 input_handoff_evidence:
   STP_directory: CASE-PKG-2026-10-21/inputs/stp
   handoff_directory: EVID-HANDOFF-2026-10-21
