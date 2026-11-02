@@ -1,5 +1,4 @@
 cff-version: 1.2.0
-# v0.1.0 is a release candidate. date-released is intentionally omitted until an actual release.
 message: "If you use this software, please cite it using the metadata below."
 title: "reproducible-network-pharmacology"
 abstract: >-
@@ -14,6 +13,7 @@ authors:
     given-names: "Yiming"
 license: MIT
 version: "0.1.0"
+date-released: "2026-11-02"
 repository-code: "https://github.com/zym137706-ops/reproducible-network-pharmacology"
 keywords:
   - network pharmacology

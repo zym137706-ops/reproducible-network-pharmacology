@@ -1,24 +1,36 @@
 # v0.1.0 release notes — DRAFT, NOT PUBLISHED
 
-Status: **planned release notes for review**. Do not present these links as downloadable until the
-assets are actually uploaded and the URLs verified.
+Status: **release notes for final review; upload/publication pending**. Do not present these links as
+downloadable until the assets are actually uploaded and the URLs verified.
 
 ## Software
 
 - Version: **0.1.0**
-- Build commit: `a5b9116f4863a050e74a9a40a7d7f155fe7f6258`
+- Tag target: the final software build commit, recorded in the GitHub Release after build.
 - Wheel: `reproducible_network_pharmacology-0.1.0-py3-none-any.whl` (70,154 bytes)
   SHA-256 `40a0f21339e70a7a2c0422866573f20077ab3d3ed2f9ff8c6db07c049b78c1fb`
 - Sdist: `reproducible_network_pharmacology-0.1.0.tar.gz` (1,130,191 bytes)
   SHA-256 `b945f31581856e338f0a3a8760796706ab778dd24c92c084fbd2c007fee05d46`
 - Code license: MIT.
-- Install/check:
+
+### Install and verify
+
+Linux/macOS:
 
 ```bash
-uv venv
-uv pip install reproducible_network_pharmacology-0.1.0-py3-none-any.whl
-rnp --version        # 0.1.0
-rnp --help
+uv venv .venv
+uv pip install --python .venv/bin/python ./reproducible_network_pharmacology-0.1.0-py3-none-any.whl
+.venv/bin/rnp --version    # 0.1.0
+.venv/bin/rnp --help
+```
+
+Windows:
+
+```powershell
+uv venv .venv
+uv pip install --python .venv\Scripts\python.exe .\reproducible_network_pharmacology-0.1.0-py3-none-any.whl
+.\.venv\Scripts\rnp.exe --version    # 0.1.0
+.\.venv\Scripts\rnp.exe --help
 ```
 
 ## Case data asset (selected inclusion; upload pending)
@@ -50,8 +62,9 @@ rnp --help
   date-stamp; commercial use separate; do not relicense as MIT/CC0/CC BY.
 - HGNC: CC0.
 - PubChem: computed descriptors; NCBI places no restrictions by NCBI, but third-party submitters may
-  retain rights and NCBI cannot grant unrestricted permission; no MIT/CC0/CC BY claim. See
-  `examples/demo/inputs/PUBCHEM-SOURCE.md`.
+  retain rights and NCBI cannot grant unrestricted permission; no MIT/CC0/CC BY claim. In the
+  extracted case package see `inputs/PUBCHEM-SOURCE.md`; the repository review record is
+  `docs/pubchem-structure-review-2026-10-27.md`.
 - The mixed-source case package is not MIT/CC BY as a whole; full citations in `ATTRIBUTION.md` and
   `docs/citations.md`.
 
