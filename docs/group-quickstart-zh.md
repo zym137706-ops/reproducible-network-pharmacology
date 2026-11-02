@@ -116,18 +116,11 @@ inputs/
 
 可以直接在群里发，也可以填问卷最后一题。不要发自己的课题数据。
 
-## 5. B 线：完整跑一遍（只在准备好的 Linux 环境）
+## 5. B 线：本轮不安排
 
-如果你的电脑没有 Python/R，**不要为了这次试用硬装**。走 A 线就够了。
+本组电脑都是 Windows，v0.1.0 的 R 路线还没有在 Windows 原生环境验证。**本轮只做 A 线**，不要为了试用在 Windows 上硬装 R。
 
-如果组织者已经给你一个准备好的 Linux 测试副本，按下面的公开说明执行：
-
-- [DATA-ACCESS.md](https://github.com/zym137706-ops/reproducible-network-pharmacology/blob/v0.1.0/examples/demo/DATA-ACCESS.md)
-- 入口脚本：`scripts/case_run.py`
-- 运行前确认输出目录是新的，不要覆盖冻结输入或已发布产物。
-- 这条线记录为“预置环境任务测试”，不是“从零安装复现”。
-
-Windows 原生 R 目前不是稳定支持环境；不要在 Windows 上把 R 报错当成自己的操作问题。
+如果以后准备好 Windows 兼容环境或独立的远程 Linux 测试副本，再按 [DATA-ACCESS.md](https://github.com/zym137706-ops/reproducible-network-pharmacology/blob/v0.1.0/examples/demo/DATA-ACCESS.md) 单独约；那条线记录为“预置环境任务测试”，不是“从零安装复现”。
 
 ## 6. 组织者记录表（不要发给参与者）
 
@@ -136,8 +129,8 @@ Windows 原生 R 目前不是稳定支持环境；不要在 Windows 上把 R 报
 | 字段 | 记录 |
 |---|---|
 | 参与者编号 | P__ |
-| 使用线路 | A / B |
-| 环境 | Windows / macOS / Linux / 预置 Linux |
+| 使用线路 | A（本轮只做 A 线） |
+| 环境 | Windows 10 / Windows 11 / 不确定 |
 | 是否完成 A1–A4 | __/4 |
 | 是否完成结果题 1–5 | __/5 |
 | 总耗时 | ___ 分钟 |
