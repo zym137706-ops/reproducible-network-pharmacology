@@ -18,7 +18,7 @@ Status: **published 2026-11-02**. Repository:
 | [`reproducible_network_pharmacology-0.1.0-py3-none-any.whl`](https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/download/v0.1.0/reproducible_network_pharmacology-0.1.0-py3-none-any.whl) | 70,154 | `40a0f21339e70a7a2c0422866573f20077ab3d3ed2f9ff8c6db07c049b78c1fb` |
 | [`reproducible_network_pharmacology-0.1.0.tar.gz`](https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/download/v0.1.0/reproducible_network_pharmacology-0.1.0.tar.gz) | 1,131,479 | `1dea9b2075396eaa009b2d0eeb96ea6c99fdbf99b2c83432a1f82fb74b84ab5e` |
 | [`rnp-case-v0.1.0-2026-10-21.zip`](https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/download/v0.1.0/rnp-case-v0.1.0-2026-10-21.zip) | 938,555 | `55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4` |
-| [`SHA256SUMS.txt`](https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/download/v0.1.0/SHA256SUMS.txt) | 337 | checksum manifest |
+| [`SHA256SUMS.txt`](https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/download/v0.1.0/SHA256SUMS.txt) | 333 | `3152101ecd2ef9b87a4c33616ed60ce87af95a3fa5e8da11bc5e61250bc8f1bc` |
 
 ### Install and verify (wheel)
 
@@ -40,7 +40,10 @@ uv pip install --python .venv\Scripts\python.exe .\reproducible_network_pharmaco
 .\.venv\Scripts\rnp.exe --help
 ```
 
-Verify all manually uploaded assets against `SHA256SUMS.txt` before use.
+Verify all manually uploaded assets against `SHA256SUMS.txt` before use. The corrected 2026-11-02
+manifest is 333 bytes (UTF-8, no BOM, LF-only); `sha256sum --strict -c SHA256SUMS.txt` passes all
+three payloads. The three payload bytes/hashes are unchanged; the original 337-byte manifest is
+preserved as local audit evidence.
 
 ## Case data and reproduction
 

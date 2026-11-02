@@ -1,6 +1,6 @@
 # Public case final reproduction — 2026-10-28
 
-Main verification record for the v0.1.0 release candidate. The 2026-10-27 run remains historical.
+Main verification record for the published v0.1.0. The 2026-10-27 run remains historical.
 
 ## Inputs and source
 

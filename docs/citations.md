@@ -5,8 +5,9 @@ licenses; cite both the software and the sources actually used.
 
 ## Software
 
-Zhu Y. *reproducible-network-pharmacology* v0.1.0 (release candidate). MIT-licensed code.
-No DOI is assigned; a DOI/release date must not be invented before an actual release.
+Zhu Y. *reproducible-network-pharmacology* v0.1.0 (published 2026-11-02). MIT-licensed code.
+Release: https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0
+No DOI is assigned.
 
 ## Upstream data citations
 

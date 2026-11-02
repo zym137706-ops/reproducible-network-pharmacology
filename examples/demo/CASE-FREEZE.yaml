@@ -3,12 +3,12 @@ status: published_v0_1_0_2026_11_02
 frozen_at_utc: '2026-10-20T10:45:00Z'
 case_computed_in_linux: true
 public_case_claim: true
-reason: 'The local Linux calculation, independent check and public-candidate reproduction
+reason: 'The local Linux calculation, independent check and candidate reproduction
   are complete. STP tables are CC BY 4.0-confirmed; CTD ticket #8545 confirms public
   non-profit research use including GitHub with citation/date-stamp. PubChem source/field/terms/citation
-  review is complete with a residual third-party-rights caveat. The complete candidate
-  is prepared outside Git but has not been published; the researcher must review and
-  decide data inclusion/visibility/release.'
+  review is complete with a residual third-party-rights caveat. The complete case
+  package is published as the v0.1.0 release asset; real case data is not duplicated
+  in Git. Post-release CTD notification is a follow-up, not a publication gate.'
 recorded_scientific_decisions:
   compound_list:
     file: inputs/compounds.tsv

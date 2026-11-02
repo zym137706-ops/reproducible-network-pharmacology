@@ -18,10 +18,24 @@ snapshot, both universes/foregrounds, expected counts, permissions/citations and
 Private EMLs, screenshots, full headers, school/personal email, IP/session data and unredacted
 private logs are **not** distributed.
 
+Release checksum file:
+
+- SHA256SUMS.txt (333 bytes): 3152101ecd2ef9b87a4c33616ed60ce87af95a3fa5e8da11bc5e61250bc8f1bc
+- <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/download/v0.1.0/SHA256SUMS.txt>
+- The 2026-11-02 correction removed a UTF-8 BOM/extra CR; the three payload hashes are unchanged.
+
 ## Obtain and verify
 
+Release-level checksum (download the three payloads plus `SHA256SUMS.txt` into one directory):
+
 ```bash
-# Download the v0.1.0 release asset from the URL above, then verify.
+sha256sum --strict -c SHA256SUMS.txt
+# expected: OK for wheel, sdist and case ZIP
+```
+
+Case package alone:
+
+```bash
 sha256sum rnp-case-v0.1.0-2026-10-21.zip
 # expected: 55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4
 

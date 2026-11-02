@@ -1,6 +1,6 @@
 # reproducible-network-pharmacology · 完整规划 v3
 
-> 更新：2026-10-28；修订 v2 的范围、结构身份、候选决策及对接验证要求。
+> 更新：2026-11-02；v0.1.0 已发布；历史实施记录保留原日期与事实。
 > 维护入口：仓库内 `docs/project-plan.zh-CN.md`。微信临时目录中的同名规划是本次同步副本，后续以仓库版为准。
 > 本次仅修改设计文档；新增命令、字段、审核门均不代表已经实现。当前行为仍以源码和实际测试为准。
 > 配套设计：[上游与结构契约](upstream.md)、[候选对与对接设计](docking.md)、[ADR-0004](adr/0004-staged-upstream-and-docking.md)。
@@ -27,15 +27,15 @@
 > 有效背景 262、747 terms、2 significant；独立超几何/BH 复核通过。STP 已于 2026-10-23 书面确认
 > 八份原生 XLSX 表适用 CC BY 4.0（署名、原表不修改）；CTD 工单 #8545（2026-10-26）确认本项目请求的
 > 179 基因子集/派生物可用于公开非营利研究（含 GitHub），需引用 CTD 并注明数据日期；商业用途另走官方
-> 渠道。完整候选包已准备并从干净 clone 复现；PubChem 结构来源/条款/引用核查已完成（NCBI 无限制声明 +
-> 第三方权利保留），但发布仍需研究者决定。HGNC
+> 渠道。完整候选包已从干净 clone 复现并作为 v0.1.0 Release 资产发布；PubChem 结构来源/条款/引用核查已完成
+> （NCBI 无限制声明 + 第三方权利保留）。HGNC
 > 2026-10-16 已按 CC0 提交。背景规则/T_r 生成器、待提交/提交日志、查询记录和双阈值配置均已记录。
 > R 恢复入口已修复：PowerShell 每次 R 调用检查 `$LASTEXITCODE`，失败非零退出；默认/显式库均解析
 > 精确绝对路径；`restore_r.sh` 为可执行模式；CI 改为调用项目脚本并验证 Python 启动的 R 使用该库。
 > Skill 已完成一次真实 Agent 会话验收（DeepSeek Harness/`deepseek-flash`，5/5 场景通过，enrichment
 > 因 Windows native exit 跳过，未用 pytest 冒充）；报告见 `docs/skill-agent-acceptance-2026-10-20.md`。
-> 仍未完成：完整公开候选包的最终发布决定/可见性/release、Windows native exit 根因。PubChem
-> 来源/条款/引用审查已完成，保留第三方权利说明。最终版 Codex Skill 真实会话验收已完成（含 Linux
+> 仍未完成：Windows native exit 根因。v0.1.0 软件/数据已发布；PubChem 来源/条款/引用审查已完成，
+> 保留第三方权利说明。最终版 Codex Skill 真实会话验收已完成（含 Linux
 > enrichment/report 的 Docker 调用与 shell 退出码显示限制），报告见
 > `docs/skill-agent-acceptance-2026-10-21.md`。公开案例不得因许可确认或本地计算完成而宣称已发布。
 
@@ -44,16 +44,17 @@
 定位：可独立运行、可追溯、可复算的网络药理学分析工具，以及调用同一 CLI 的薄 Codex Skill 层。
 展示重点：输入身份与分析决策可靠、统计计算可核验、Agent 能识别异常；预测关联和对接结果不构成机制或疗效验证。
 
-截至 2026-10-28：v0.1.0 发布候选的 `validate → ingest → intersect → network → enrich → report → manifest`
-链路已实现；包装层非零退出码、report 父链/产物哈希、富集有效前景/背景集合均有回归测试。
+截至 2026-11-02：v0.1.0 已发布（软件与案例 Release 资产）。`validate → ingest → intersect → network →
+enrich → report → manifest` 链路已实现；包装层非零退出码、report 父链/产物哈希、富集有效前景/背景集合
+均有回归测试。
 Linux CI 从 `renv.lock` 恢复并通过完整合成 quickstart 与正式入口合成双阈值；Windows 因 R native
 exit 0xC0000005 仍有 11 个 R 相关测试失败，不能作为验证环境。真实 RA 案例已在本地 Linux Docker
 完成双阈值计算与独立超几何/BH 核查；STP 表许可和 CTD 公开非营利研究许可均已确认，完整候选包
-已准备并从干净 clone 复现；PubChem 结构来源/条款/引用审查已完成（保留第三方权利说明），
-发布仍需研究者决定，因此不得宣称公开案例已发布。
+已准备并从干净 clone 复现，已作为 v0.1.0 Release 资产发布；PubChem 结构来源/条款/引用审查已完成
+（保留第三方权利说明）。Release: https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0
 Skill 场景测试通过，最终版 Codex 真实会话验收已完成；后续仅增加策略边界说明，不改分析行为，
 其安装版哈希与验收记录同步记录在 `docs/skill-agent-acceptance-2026-10-21.md`。
-v0.1.0 是发布候选版本；v0.0.1 是历史骨架标识。尚未打 `v0.1.0` tag，也不存在已发布的 GitHub release。
+v0.1.0 已于 2026-11-02 正式发布；tag `v0.1.0` 指向 `de7ac95`，GitHub Release 已发布。v0.0.1 是历史骨架标识。
 
 状态统一使用：设计中 → 已实现 → 在指定环境验证 → 已发布。每项状态附 commit、运行记录或 release 链接。
 规划阶段的字段允许按实现验证调整，不能继续声称全部接口已经冻结。

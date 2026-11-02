@@ -1,7 +1,7 @@
 # Public case: candidate data sources and license checklist
 
 Status: **STP tables CC BY 4.0-confirmed; CTD public non-profit research permission confirmed
-(ticket #8545); complete candidate prepared; publication decision/candidate review pending.**
+(ticket #8545); complete candidate published as the v0.1.0 release asset.**
 The disease extract, eight STP XLSX exports, submission log and detailed results are local-only and
 were used for the completed local calculation. HGNC is frozen/committed (CC0). PubChem structure
 terms remain separately pending. No restricted dataset is committed; the case package is published as the v0.1.0 release asset.

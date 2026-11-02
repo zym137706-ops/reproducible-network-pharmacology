@@ -1,7 +1,7 @@
 # Public case: data and license checklist
 
 Status: **local calculation complete; STP tables CC BY 4.0-confirmed; CTD public non-profit research
-permission confirmed (ticket #8545); publication decision/candidate review pending.** The recorded
+permission confirmed (ticket #8545); published as the v0.1.0 release asset.** The recorded
 decisions and evidence are in [`examples/demo/CASE-FREEZE.yaml`](../examples/demo/CASE-FREEZE.yaml).
 The synthetic demo (`scripts/synthetic_demo.py`) is an engineering test, not a public scientific case.
 Do not describe the candidate as a published public case until the researcher approves publication.
@@ -12,7 +12,7 @@ derived outputs may be used for public non-profit research including GitHub, wit
 data date-stamp; commercial use is separate. Disease/STP/backgrounds and detailed results exist
 locally and were used for the completed calculation; they are **not missing local inputs**. HGNC is
 frozen and committed (CC0). PubChem structure source/terms/citation review is complete with a
-residual third-party caveat; publication remains a separate researcher decision.
+residual third-party caveat; the selected package is published as the v0.1.0 release asset.
 
 ## What the case must contain
 

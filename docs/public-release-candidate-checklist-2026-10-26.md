@@ -1,4 +1,4 @@
-﻿# Public release candidate checklist 鈥?2026-10-28
+# Public release candidate checklist 鈥?2026-10-28
 
 This checklist records the **published v0.1.0** state. Software and the case data asset are released;
 real case data is not duplicated in the Git tree. Source-specific data terms are recorded below.
@@ -25,6 +25,9 @@ Release: <https://github.com/zym137706-ops/reproducible-network-pharmacology/rel
 - Data access and reproduction entry: `examples/demo/DATA-ACCESS.md`
 - Versioned release asset: `rnp-case-v0.1.0-2026-10-21.zip` (938,555 bytes)
 - Zip SHA-256: `55b65aefe8ff97c08d12b16945db9313931aa65aea947c96bfdf2aab5fe927e4`
+- Release checksum: `SHA256SUMS.txt` (333 bytes)
+  `3152101ecd2ef9b87a4c33616ed60ce87af95a3fa5e8da11bc5e61250bc8f1bc`
+  (corrected 2026-11-02: no BOM, LF only; three payloads unchanged)
 - Package counts: **35 payload files + `SHA256SUMS.tsv` = 36 total files**; 35/35 hashes and sizes
   verified after extraction.
 - Contents: relative-path `run-0.10.yaml`/`run-0.05.yaml`, STP XLSX, compounds with exact submitted
@@ -75,6 +78,10 @@ Release: <https://github.com/zym137706-ops/reproducible-network-pharmacology/rel
 - Archive check: wheel 36 members; sdist 149 members; `next-steps-dsh`, `HANDOFF`, `STP-PENDING` absent;
   no EML/screenshot/private email/session/key/cache hits. `data/local/README.md` is the tracked public
   guidance page, not local data.
+- Checksum manifest errata (2026-11-02): original public SHA256SUMS.txt was 337 bytes with a UTF-8
+  BOM and an extra CR; it was replaced by a 333-byte UTF-8(no BOM), LF-only manifest
+  3152101ecd2ef9b87a4c33616ed60ce87af95a3fa5e8da11bc5e61250bc8f1bc. Payload bytes/hashes are
+  unchanged; sha256sum --strict -c passes all three after anonymous re-download.
 - Public download verification (2026-11-02): unauthenticated repository/release pages HTTP 200; all four
   manual assets downloaded; `SHA256SUMS.txt` matched all three payloads; case ZIP 35/35 valid;
   downloaded wheel installed `rnp 0.1.0` in a fresh environment.
