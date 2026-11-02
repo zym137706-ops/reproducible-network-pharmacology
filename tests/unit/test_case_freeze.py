@@ -34,11 +34,19 @@ def test_public_case_gate_is_not_confused_with_local_completion() -> None:
         "pubchem_review": "complete_2026-10-27_residual_third_party_caveat",
         "pubchem_inclusion": "selected_in_case_package_release_asset",
         "public_release": "published_2026_11_02",
+        "ctd_notification": "sent_2026-11-02_awaiting_reply",
     }
     assert data["public_release_gaps"] == []
     assert data["public_release_gate"]["status"] == "published"
     assert data["public_release_gate"]["tag"] == "v0.1.0"
     assert data["public_release_gate"]["tag_target"] == "de7ac950fd2da5fde231a36755a7a3af37a5dbe0"
+    assert data["ctd_notification"]["status"] == "sent"
+    assert data["ctd_notification"]["sent_at"] == "2026-11-02T12:21:19+08:00"
+    assert data["ctd_notification"]["evidence_id"] == "EVID-CTD-NOTIFICATION-2026-11-02"
+    assert data["ctd_notification"]["evidence_sha256"] == (
+        "3b234c785b6d439c2d555d1abad370cfe43ea6abbf35026f54a3ac6b46cfaa1f"
+    )
+    assert data["ctd_notification"]["reply_received"] is False
     assert data["disease"]["term"] == "Arthritis, Rheumatoid"
     assert data["disease"]["mesh_id"] == "MESH:D001172"
     assert data["disease"]["row_count"] == 179

@@ -351,8 +351,8 @@ local_calculation:
     status: complete; strict log structure/CID/hash checks; both manifests no drift;
       case_check executed and passed
 public_release_status: 'published_v0_1_0_2026_11_02: software tag/release published;
-  complete case package uploaded as a release asset; real case data not duplicated
-  in Git'
+  complete case package released as asset; CTD public-link notification sent 2026-11-02;
+  no reply yet'
 input_freeze_status:
   disease: local prepared/used; public non-profit research permission confirmed; not
     committed
@@ -373,18 +373,20 @@ status_dimensions:
   pubchem_review: complete_2026-10-27_residual_third_party_caveat
   pubchem_inclusion: selected_in_case_package_release_asset
   public_release: published_2026_11_02
+  ctd_notification: sent_2026-11-02_awaiting_reply
 public_release_gate:
   status: published
   reason: v0.1.0 is published with code and a separate case-data asset. Source-specific
-    terms and attribution are recorded. Post-release CTD notification remains a follow-up,
-    not a publication gate.
+    terms and attribution are recorded. The post-publication CTD notification was
+    sent on 2026-11-02; receipt/reply is pending but is not a publication gate.
   release_url: https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0
   tag: v0.1.0
   tag_target: de7ac950fd2da5fde231a36755a7a3af37a5dbe0
   release_date: '2026-11-02'
 public_release_gaps: []
 public_release_actions:
-- 'post-release: report the public project link and data date-stamp to CTD'
+- post-release CTD notification sent 2026-11-02; await any reply (do not claim receipt
+  without one)
 - keep private EMLs/screenshots/headers outside Git and release assets
 - do not move the published tag or overwrite published asset bytes
 - future changes require a new release/tag per normal process
@@ -444,3 +446,14 @@ input_handoff_evidence:
   result_url: not_saved
   job_id: not_saved
 evidence_identifiers: docs/evidence-identifiers.md
+ctd_notification:
+  status: sent
+  sent_at: '2026-11-02T12:21:19+08:00'
+  to: ctd-rt@ctdbase.org
+  subject: 'Re: [ctdbase.org #8545] [CTD-Feedback] From Yiming Zhu'
+  evidence_id: EVID-CTD-NOTIFICATION-2026-11-02
+  evidence_sha256: 3b234c785b6d439c2d555d1abad370cfe43ea6abbf35026f54a3ac6b46cfaa1f
+  reply_received: false
+  note: 'Post-publication notification under ticket #8545, not a new permission request.
+    The sent copy has no In-Reply-To/References header; do not claim a threaded reply
+    from headers. Do not mark CTD as having confirmed receipt.'

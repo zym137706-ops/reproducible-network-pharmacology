@@ -58,7 +58,7 @@ Release: <https://github.com/zym137706-ops/reproducible-network-pharmacology/rel
 1. v0.1.0 tag and release were created from build commit `de7ac95`.
 2. Repository was made public; four manual release assets were uploaded and published.
 3. The public release was downloaded independently and the asset/checksum checks passed.
-4. Post-release follow-up: notify CTD of the public project link and data date-stamp.
+4. Post-release notification was sent to CTD on 2026-11-02; receipt/reply is pending. Do not claim CTD confirmed receipt.
 5. Do not send a new CTD/STP permission request for the already-confirmed scope.
 
 ## 5. Final verification

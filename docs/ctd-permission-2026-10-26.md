@@ -51,3 +51,8 @@ permission for arbitrary commercial or third-party uses.
 
 The complete candidate package is prepared and reproduced for researcher review; no CTD data has
 been committed or uploaded to CI. The complete candidate is published as the v0.1.0 release asset.
+
+
+## Post-publication notification
+
+The public repository/release link was sent to ctd-rt@ctdbase.org on **2026-11-02 12:21:19 +08:00** (ticket #8545 subject; sent EML archived locally, SHA-256 3b234c785b6d439c2d555d1abad370cfe43ea6abbf35026f54a3ac6b46cfaa1f; 6,019 bytes). No reply has been received. This is a notification, not a new permission request; do not claim CTD confirmed receipt unless a reply arrives. The sent copy has no In-Reply-To/References header, so do not claim a threaded reply from headers alone.
