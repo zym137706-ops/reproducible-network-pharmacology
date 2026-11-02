@@ -1,4 +1,4 @@
-# Public release candidate checklist — 2026-10-28
+﻿# Public release candidate checklist 鈥?2026-10-28
 
 This checklist records the **published v0.1.0** state. Software and the case data asset are released;
 real case data is not duplicated in the Git tree. Source-specific data terms are recorded below.
@@ -68,11 +68,11 @@ Release: <https://github.com/zym137706-ops/reproducible-network-pharmacology/rel
   0 significant; 0.05 T_r 267 / intersection 17 / network 26-74 / effective background 262 / 747
   terms / 2 significant.
 - Image: tag `bioconductor/bioconductor_docker:RELEASE_3_22`; local image/container identity
-  `sha256:e341…`; platform `linux/amd64`; manifest `sha256:67ab…`; config `sha256:7da6…`.
+  `sha256:e341鈥; platform `linux/amd64`; manifest `sha256:67ab鈥; config `sha256:7da6鈥.
   See `docs/public-candidate-reproduction-2026-10-28.md`.
 - `uv run ruff check .`; `uv run pytest` (160 passed, 17 skipped on Windows host); wheel/sdist built from
   clean checkout `de7ac95`; clean-venv wheel install; `rnp --version` = `0.1.0`; schemas/R resources present.
-- Archive check: wheel 36 members; sdist 148 members; `next-steps-dsh`, `HANDOFF`, `STP-PENDING` absent;
+- Archive check: wheel 36 members; sdist 149 members; `next-steps-dsh`, `HANDOFF`, `STP-PENDING` absent;
   no EML/screenshot/private email/session/key/cache hits. `data/local/README.md` is the tracked public
   guidance page, not local data.
 - Public download verification (2026-11-02): unauthenticated repository/release pages HTTP 200; all four
@@ -84,3 +84,4 @@ Tracked-file audit (2026-11-02): no real STP XLSX, CTD gene extract, private sub
 permission screenshot/EML, school/private email or detailed result table is tracked. The tracked
 `STP-SUBMISSION-LOG.tsv` is the blank template; `compounds.tsv` has no structures; HGNC is public CC0;
 test fixtures are synthetic. The complete candidate and private permission evidence remain outside Git.
+
