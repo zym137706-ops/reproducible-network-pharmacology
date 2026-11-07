@@ -14,6 +14,16 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### ADR-0005: structure acquisition boundary — 2026-11-07
+
+- Added ADR-0005 (design only): receptor and sequence facts come from records frozen by one explicit,
+  networked acquisition step (planned `rnp acquire`); discovery tools stay optional, read-only and
+  ID-only; `rnp dock *` stays offline. No command, schema or runtime behaviour was added.
+- Added RCSB PDB and UniProt rows to `docs/data-licenses.md` and `data/SOURCES.yaml` after checking the
+  official terms pages on 2026-11-07; nothing from either source is redistributed by this change.
+- Linked ADR-0005 from the architecture and docking designs, the plan and both READMEs; listed the
+  planned `rnp acquire` as a design-stage command.
+
 ### Public-release hygiene — 2026-10-28
 
 - Removed the internal historical task prompt `docs/next-steps-dsh.md` and the superseded
