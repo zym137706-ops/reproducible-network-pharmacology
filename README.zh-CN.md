@@ -80,6 +80,7 @@ Windows 注意：确认 `python` 指向 Python 3。装了分子模拟工具的�
 | `rnp metabolites import` | 🚧 v0.2 设计 | 已处理代谢组注释导入；同时支持已确认成分清单 |
 | `rnp structures resolve` | 🚧 v0.2 设计 | 结构注册、来源核验与转换历史 |
 | `rnp compounds annotate/select` | 🚧 v0.2 设计 | 性质标注与显式选择；保留全部候选 |
+| `rnp acquire` | 🚧 v0.3 设计（[ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)） | 冻结所选受体 ID 的 RCSB/UniProt 记录（版本、获取时间、哈希）；唯一联网的命令 |
 | `rnp dock prepare/run/qc` | 🚧 v0.3 设计 | 合适共晶体系、普通非共价小分子、对照与姿势质控 |
 
 ## 输入契约
@@ -140,7 +141,7 @@ GeneCards、OMIM、KEGG 等受限数据库**不再分发**，只提供下载说�
 | v1.0 | 稳定契约、兼容性与复现案例 | 按实际证据验收 |
 
 先交付可验证核心，再扩展模块。契约变化需要显式版本迁移；路线图、视频或 DOI 不代替运行证据。
-专项设计：[上游](docs/upstream.md)、[对接](docs/docking.md)、[ADR-0004](docs/adr/0004-staged-upstream-and-docking.md)。
+专项设计：[上游](docs/upstream.md)、[对接](docs/docking.md)、[ADR-0004](docs/adr/0004-staged-upstream-and-docking.md)、[ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)。
 
 ## 许可
 

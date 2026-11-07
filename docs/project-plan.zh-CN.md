@@ -2,7 +2,7 @@
 
 > 更新：2026-11-02。v0.1.0 已正式发布；近期重点为维护、用户试用和反馈迭代。
 > 本文件维护当前状态、后续范围和验收条件；新增设计不代表已经实现。
-> 配套设计：[上游与结构契约](upstream.md)、[候选对与对接设计](docking.md)、[ADR-0004](adr/0004-staged-upstream-and-docking.md)。
+> 配套设计：[上游与结构契约](upstream.md)、[候选对与对接设计](docking.md)、[ADR-0004](adr/0004-staged-upstream-and-docking.md)、[ADR-0005](adr/0005-structure-acquisition-boundary.md)。
 > 历史实施快照保留在文末；实际发布证据优先于历史计划与工期估计。
 
 ## 1. 定位与当前状态

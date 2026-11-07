@@ -159,6 +159,7 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 | `rnp structures resolve` | 🚧 v0.2.0 | Resolve names / InChIKeys to structures (PubChem cache) |
 | `rnp compounds annotate/select` | 🚧 v0.2 design | Properties plus explicit inclusion/exclusion decisions; all original candidates retained |
 | `rnp hubs compute` | 🚧 later extension | Centrality/rank aggregation; not a replacement for MCODE |
+| `rnp acquire` | 🚧 v0.3 design ([ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)) | Freeze RCSB/UniProt records for chosen receptor IDs (versions, retrieval times, hashes); the only command that uses the network |
 | `rnp dock prepare/run/qc` | 🚧 v0.3 design | Suitable co-crystal systems and ordinary noncovalent small molecules, controls and pose QC |
 
 ## Input contracts
@@ -252,7 +253,7 @@ instructions and an adapter; users obtain the data under their own license. See
 
 Ship the verifiable core before extensions. Schema changes require explicit versioned migration;
 a roadmap, video or DOI is not evidence that a capability works. Detailed designs:
-[upstream](docs/upstream.md), [docking](docs/docking.md), [ADR-0004](docs/adr/0004-staged-upstream-and-docking.md).
+[upstream](docs/upstream.md), [docking](docs/docking.md), [ADR-0004](docs/adr/0004-staged-upstream-and-docking.md), [ADR-0005](docs/adr/0005-structure-acquisition-boundary.md).
 
 ## 中文摘要
 

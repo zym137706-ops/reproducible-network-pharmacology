@@ -1,7 +1,7 @@
 # Architecture
 
 > Status: current implementation plus explicitly marked target contracts. Updated 2026-10-19.
-> The accepted scope extension is [ADR-0004](adr/0004-staged-upstream-and-docking.md).
+> The accepted scope extension is [ADR-0004](adr/0004-staged-upstream-and-docking.md); the structure-acquisition boundary is [ADR-0005](adr/0005-structure-acquisition-boundary.md).
 > See the [maintained plan](project-plan.zh-CN.md), [upstream design](upstream.md),
 > and [docking design](docking.md).
 > No new runtime capability is added by these documents.
@@ -14,7 +14,7 @@ record enough metadata to reconstruct what happened.
 
 ## 2. Non-goals
 
-- No online prediction, no scraping of third-party services, no hidden-form replaying.
+- No online prediction, no scraping of third-party services, no hidden-form replaying. The planned `rnp acquire` step ([ADR-0005](adr/0005-structure-acquisition-boundary.md)) only retrieves records from documented public endpoints and freezes them; it is none of these.
 - v0.1 core remains post-prediction. v0.2 adds confirmed-list/processed-metabolomics identity,
   annotation and explicit selection; v0.3 adds limited, controlled noncovalent docking.
 - No raw LC-MS processing, ADMET model training, QSAR or broad receptor/chemistry support in these releases.
@@ -181,6 +181,7 @@ Python 2.7. Use `py -3.12`, `uv run`, or the virtual environment interpreter exp
 - No native reference means redocking is not applicable; predicted structures need separately
   validated protocols. pLDDT is not sufficient docking eligibility evidence.
 - RRA consensus ranks nodes; MCODE identifies modules. Neither substitutes for the other.
+- Structure acquisition ([ADR-0005](adr/0005-structure-acquisition-boundary.md), design only): receptor and sequence facts come from records frozen by one explicit networked command, `rnp acquire`; no other module, in particular `rnp dock *`, uses the network. Discovery tools stay optional, read-only and ID-only.
 
 ## 14. Release checks: closed in the 2026-10-19 slice, and still pending
 
