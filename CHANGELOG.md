@@ -14,6 +14,13 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### Acquisition record schema (design) — 2026-11-07
+
+- Added `schemas/acquisition_record.schema.json` and its tests: the record that the planned
+  `rnp acquire` (ADR-0005) will write for every retrieval from the structure and sequence
+  services, with good and bad examples. No command, network code or runtime behaviour was
+  added; cross-record checks are left to the implementing code.
+
 ### ADR-0005: structure acquisition boundary — 2026-11-07
 
 - Added ADR-0005 (design only): receptor and sequence facts come from records frozen by one explicit,

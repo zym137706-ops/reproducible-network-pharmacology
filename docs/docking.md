@@ -28,6 +28,8 @@ v0.3 首版：有适合该问题的共晶参照、普通非共价小分子、固
 
 受体与序列事实只来自显式获取步骤冻结的记录（计划中的 `rnp acquire`，见 [ADR-0005](adr/0005-structure-acquisition-boundary.md)，尚未实现）；准备与对接不联网。
 
+获取记录的 JSON Schema（设计阶段，将由 `rnp acquire` 写出）：[`schemas/acquisition_record.schema.json`](../schemas/acquisition_record.schema.json)。
+
 receptor 记录来源 ID/版本/下载时间/哈希、目标序列与链映射、突变/缺失、
 构建体/组装状态、口袋局部质量、实验分辨率等适用指标、替代构象、保留/移除成分和理由。
 PDB 共晶来源不自动代表适用；原蛋白与所研究物种/位点必须对应。
