@@ -26,6 +26,34 @@ pubchem:
   review_record: docs/pubchem-structure-review-2026-10-27.md
   note: Local candidate only; not committed. No STP/CTD reply clears PubChem. Publication
     decision remains with researcher.
+rcsb_pdb:
+  name: RCSB Protein Data Bank (wwPDB archive and RCSB PDB programmatic APIs)
+  url: https://www.rcsb.org/
+  license: CC0-1.0 for PDB archive data files; RCSB PDB programmatic API data is CC0-1.0 unless it originates from an integrated external resource, in which case the provider terms apply; attribution of the original structure authors is encouraged
+  redistribute: false
+  redistribution_scope: the terms permit redistribution of PDB archive data files; this repository redistributes nothing from this source yet (planned - frozen structure files stay in git-ignored data/local/structures/, only small trimmed test fixtures with provenance may be committed)
+  release: null
+  retrieved: null
+  sha256: null
+  terms_urls:
+  - https://www.wwpdb.org/about/usage-policies
+  - https://www.rcsb.org/pages/policies
+  - https://www.rcsb.org/pages/usage-policy
+  terms_checked: '2026-11-07'
+  note: Planned source (ADR-0005); nothing is frozen yet. The RCSB policies page adds an exception for API data from integrated external resources that the shorter usage-policy page omits; the stricter statement is recorded. Record the entry ID, retrieval time and hash for every structure used.
+uniprot:
+  name: UniProt Knowledgebase
+  url: https://www.uniprot.org/
+  license: CC-BY-4.0 for all copyrightable parts of the UniProt databases; copies must reproduce the UniProt copyright statement
+  redistribute: false
+  redistribution_scope: the terms permit redistribution with attribution and the copyright statement; this repository redistributes nothing from this source yet (planned - frozen records stay in git-ignored data/local/structures/, only small trimmed test fixtures with provenance, carrying the statement, may be committed)
+  release: null
+  retrieved: null
+  sha256: null
+  terms_urls:
+  - https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/LICENSE
+  terms_checked: '2026-11-07'
+  note: Planned source (ADR-0005); nothing is frozen yet. Record the UniProt release (response header x-uniprot-release) with every record.
 go:
   name: Gene Ontology
   url: https://geneontology.org/docs/download-ontology/
