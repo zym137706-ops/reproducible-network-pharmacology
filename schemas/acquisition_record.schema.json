@@ -1,0 +1,235 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/acquisition_record.schema.json",
+  "title": "rnp acquisition record",
+  "description": "What one structure/sequence acquisition run retrieved from the public services allowed by ADR-0005, and what was frozen. One item per requested (PDB ID, UniProt accession) pair, one request per retrieval. The response-body hash identifies one retrieval, not one query. A frozen file exists exactly when a request's outcome is ok. Cross-record checks (every request_id of an item exists in requests, frozen files exist and match their hashes, item and run status follow from the requests) are done by code, not by this schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "acquisition_id",
+    "tool",
+    "started_at_utc",
+    "finished_at_utc",
+    "status",
+    "items",
+    "requests",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "acquisition_id": { "$ref": "#/$defs/identifier" },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "const": "reproducible-network-pharmacology" },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "started_at_utc": { "$ref": "#/$defs/utc_timestamp" },
+    "finished_at_utc": { "$ref": "#/$defs/utc_timestamp" },
+    "status": {
+      "enum": ["complete", "partial", "failed"],
+      "description": "complete: every item complete and every request ok. partial: at least one complete and at least one failed item. failed: no item complete."
+    },
+    "items": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/item" } },
+    "requests": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/request" } },
+    "warnings": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "complete" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "items": {
+            "items": { "properties": { "status": { "const": "complete" } }, "required": ["status"] }
+          },
+          "requests": {
+            "items": { "properties": { "outcome": { "const": "ok" } }, "required": ["outcome"] }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "failed" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "items": {
+            "items": { "properties": { "status": { "const": "failed" } }, "required": ["status"] }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "status": { "const": "partial" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "items": {
+            "allOf": [
+              {
+                "contains": {
+                  "properties": { "status": { "const": "complete" } },
+                  "required": ["status"]
+                }
+              },
+              {
+                "contains": {
+                  "properties": { "status": { "const": "failed" } },
+                  "required": ["status"]
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "identifier": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$" },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "utc_timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "relative_path": {
+      "type": "string",
+      "description": "POSIX path relative to the acquisition directory: no leading slash, no drive letter, no backslash, no empty, . or .. segments.",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*(/[A-Za-z0-9][A-Za-z0-9._-]*)*$"
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_id", "pdb_id", "uniprot_accession", "status", "request_ids"],
+      "properties": {
+        "item_id": { "$ref": "#/$defs/identifier" },
+        "pdb_id": { "type": "string", "pattern": "^[0-9][A-Z0-9]{3}$" },
+        "uniprot_accession": {
+          "type": "string",
+          "description": "Canonical UniProt accession, without an isoform suffix.",
+          "pattern": "^(?:[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9](?:[A-Z][A-Z0-9]{2}[0-9]){1,2})$"
+        },
+        "status": { "enum": ["complete", "failed"] },
+        "request_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/identifier" }
+        }
+      }
+    },
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "role",
+        "method",
+        "url",
+        "request_body_sha256",
+        "fetched_at_utc",
+        "http_status",
+        "outcome",
+        "bytes",
+        "sha256",
+        "headers",
+        "frozen_file"
+      ],
+      "properties": {
+        "request_id": { "$ref": "#/$defs/identifier" },
+        "role": { "enum": ["structure_mmcif", "rcsb_entry", "rcsb_graphql", "uniprot_entry"] },
+        "method": { "enum": ["GET", "POST"] },
+        "url": {
+          "type": "string",
+          "description": "Only the hosts named in ADR-0005; adding a host means amending the ADR and this schema.",
+          "pattern": "^https://(files\\.rcsb\\.org|data\\.rcsb\\.org|rest\\.uniprot\\.org)/[^\\s]*$"
+        },
+        "request_body_sha256": {
+          "description": "SHA-256 of the request body for POST, null for GET.",
+          "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+        },
+        "fetched_at_utc": { "$ref": "#/$defs/utc_timestamp" },
+        "http_status": {
+          "description": "Null only when no HTTP response was received.",
+          "type": ["integer", "null"],
+          "minimum": 100,
+          "maximum": 599
+        },
+        "outcome": {
+          "enum": [
+            "ok",
+            "http_error",
+            "empty_body",
+            "api_error",
+            "unknown_id",
+            "inactive_accession",
+            "network_error"
+          ]
+        },
+        "message": { "type": "string", "minLength": 1 },
+        "bytes": {
+          "description": "Size of the decoded response body.",
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "sha256": {
+          "description": "SHA-256 of the decoded response body: it identifies this retrieval, not the query.",
+          "oneOf": [{ "$ref": "#/$defs/sha256" }, { "type": "null" }]
+        },
+        "headers": {
+          "description": "Whitelisted response headers that carry version information.",
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "date",
+              "last-modified",
+              "etag",
+              "x-uniprot-release",
+              "x-uniprot-release-date",
+              "x-api-deployment-date"
+            ]
+          },
+          "additionalProperties": { "type": "string" }
+        },
+        "frozen_file": {
+          "oneOf": [{ "$ref": "#/$defs/relative_path" }, { "type": "null" }]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "outcome": { "const": "ok" } }, "required": ["outcome"] },
+          "then": {
+            "properties": {
+              "http_status": { "type": "integer", "minimum": 200, "maximum": 299 },
+              "bytes": { "type": "integer", "minimum": 1 },
+              "sha256": { "$ref": "#/$defs/sha256" },
+              "frozen_file": { "$ref": "#/$defs/relative_path" }
+            }
+          },
+          "else": {
+            "required": ["message"],
+            "properties": { "frozen_file": { "type": "null" } }
+          }
+        },
+        {
+          "if": { "properties": { "method": { "const": "POST" } }, "required": ["method"] },
+          "then": { "properties": { "request_body_sha256": { "$ref": "#/$defs/sha256" } } },
+          "else": { "properties": { "request_body_sha256": { "type": "null" } } }
+        },
+        {
+          "if": { "properties": { "outcome": { "const": "http_error" } }, "required": ["outcome"] },
+          "then": {
+            "properties": {
+              "http_status": { "type": "integer", "not": { "minimum": 200, "maximum": 299 } }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "outcome": { "const": "network_error" } }, "required": ["outcome"] },
+          "then": { "properties": { "http_status": { "type": "null" } } }
+        }
+      ]
+    }
+  }
+}
