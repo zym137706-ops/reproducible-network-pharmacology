@@ -49,10 +49,8 @@ def make_request(
     headers: dict[str, str] | None = None,
     request_body_sha256: str | None = None,
     message: str | None = None,
-    byte_count: int | None = None,
-    sha256_value: str | None = None,
 ) -> dict[str, object]:
-    """Build one request entry; body supplies the byte count and hash of an ok retrieval."""
+    """Build one request entry; body, when given, supplies both the byte count and the hash."""
     entry: dict[str, object] = {
         "request_id": request_id,
         "role": role,
@@ -62,14 +60,14 @@ def make_request(
         "fetched_at_utc": fetched_at,
         "http_status": http_status,
         "outcome": outcome,
-        "bytes": byte_count,
-        "sha256": sha256_value,
+        "bytes": None,
+        "sha256": None,
         "headers": dict(headers or {}),
         "frozen_file": frozen_file,
     }
     if body is not None:
-        entry["bytes"] = byte_count if byte_count is not None else len(body.encode("utf-8"))
-        entry["sha256"] = sha256_value if sha256_value is not None else sha256(body)
+        entry["bytes"] = len(body.encode("utf-8"))
+        entry["sha256"] = sha256(body)
     if message is not None:
         entry["message"] = message
     return entry
@@ -154,7 +152,6 @@ def example_partial() -> dict[str, object]:
             "POST",
             "https://data.rcsb.org/graphql",
             body=EMPTY_GRAPHQL_ANSWER,
-            byte_count=17,
             fetched_at="2026-11-07T02:00:07Z",
             outcome="unknown_id",
             request_body_sha256=sha256(GRAPHQL_BODY),
@@ -169,7 +166,7 @@ def example_failed() -> dict[str, object]:
     """A failed synthetic acquisition: the only retrieval returned HTTP 404."""
     return {
         "schema_version": "1.0",
-        "acquisition_id": "20261107T020100Z_synthetic",
+        "acquisition_id": "20261107T020000Z_synthetic_failed",
         "tool": {"name": "reproducible-network-pharmacology", "version": "0.1.0"},
         "started_at_utc": "2026-11-07T02:00:00Z",
         "finished_at_utc": "2026-11-07T02:00:07Z",
