@@ -65,6 +65,7 @@ The skill may not re-implement it in prose or in a snippet.
 | `rnp.analysis.parents` | parent-stage status/hash checks and refusal semantics |
 | `rnp.output` | staged, atomic output directories; no silent overwrite |
 | `rnp.resources` | packaged resource lookup (schemas/R scripts) in source tree and wheel |
+| `rnp.acquire` | structure/sequence acquisition (ADR-0005): injectable HTTP transport (the only module that imports a networking library), one classified record per retrieval, frozen files plus `acquisition_record.json`, offline verification; library only, no command yet |
 | `rnp.analysis.*` | report CLI (pending); MCODE/topology later, independently validated |
 | `R/ora.R` | over-representation analysis via `clusterProfiler`; writes its own version metadata |
 | `R/venny.R` | two-set Venn figure from `intersect/venn.json` (optional) |
@@ -181,7 +182,7 @@ Python 2.7. Use `py -3.12`, `uv run`, or the virtual environment interpreter exp
 - No native reference means redocking is not applicable; predicted structures need separately
   validated protocols. pLDDT is not sufficient docking eligibility evidence.
 - RRA consensus ranks nodes; MCODE identifies modules. Neither substitutes for the other.
-- Structure acquisition ([ADR-0005](adr/0005-structure-acquisition-boundary.md), design only): receptor and sequence facts come from records frozen by one explicit networked command, `rnp acquire`; no other module, in particular `rnp dock *`, uses the network. Discovery tools stay optional, read-only and ID-only.
+- Structure acquisition ([ADR-0005](adr/0005-structure-acquisition-boundary.md); library in `rnp.acquire`, command pending): receptor and sequence facts come from records frozen by one explicit networked command, `rnp acquire`; no other module, in particular `rnp dock *`, uses the network. Discovery tools stay optional, read-only and ID-only.
 
 ## 14. Release checks: closed in the 2026-10-19 slice, and still pending
 

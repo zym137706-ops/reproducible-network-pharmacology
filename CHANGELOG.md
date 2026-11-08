@@ -14,6 +14,19 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### Acquire library — 2026-11-08
+
+- Added the `rnp.acquire` library (ADR-0005): an injectable HTTP transport that uses only the standard
+  library and does not follow redirects; one classified and recorded retrieval per request, so unknown
+  IDs, inactive or secondary UniProt accessions, non-2xx responses, empty bodies, errors inside HTTP 200
+  responses and network failures are all explicit; freezing of the responses together with an
+  acquisition record that validates against `schemas/acquisition_record.schema.json`; and offline
+  verification of a frozen directory.
+- A guard test keeps networking imports inside `rnp/acquire/transport.py`. There is no `rnp acquire`
+  command yet and no new dependency; the tests use fake fetchers and never touch the network.
+- Fixed the byte count of the partial example in the acquisition-record schema tests so that it matches
+  the body whose hash it carries.
+
 ### Acquisition record schema (design) — 2026-11-07
 
 - Added `schemas/acquisition_record.schema.json` and its tests: the record that the planned
