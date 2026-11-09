@@ -1,0 +1,119 @@
+# 组内试用问题记录（2026-11-09）
+
+这份记录只记录组内 Windows 试用中实际遇到的安装/操作问题，不改变 v0.1.0 的代码、数据和 tag。
+
+## 问题 1：`uv sync` 自动选到 Python 3.15，PyYAML 构建超时
+
+### 现象
+
+同门在 Windows PowerShell 中执行：
+
+```powershell
+uv sync --locked
+```
+
+环境：
+
+- `uv 0.13.7`
+- Windows PowerShell
+- `uv sync` 创建虚拟环境时显示 `Using CPython 3.15.2`
+
+报错关键行：
+
+```text
+error: Failed to download and build `pyyaml==6.0.3`
+  cause: Failed to install requirements from `build-system.requires`
+  cause: Failed to download `setuptools==84.2.1`
+  cause: Failed to download distribution due to network timeout.
+         Try increasing UV_HTTP_TIMEOUT (current value: 30s).
+```
+
+### 原因
+
+1. `uv` 自动选择了最新的 CPython 3.15.2。
+2. `pyyaml==6.0.3` 没有匹配 3.15 的现成预编译包，`uv` 退回到源码构建。
+3. 源码构建需要临时下载 `setuptools==84.2.1`，网络在 30 秒后超时。
+
+这不是项目代码或数据的问题，也不是电脑坏了。
+
+### 处理
+
+固定 Python 3.12，并给下载留出更长时间：
+
+```powershell
+cd D:\rnp
+$env:UV_HTTP_TIMEOUT="120"
+uv python install 3.12
+uv venv --python 3.12 --clear .venv
+uv sync --locked --python 3.12
+uv run rnp --version
+```
+
+预期最后一行显示 `0.1.0`。
+
+如果仍然超时，可把 `UV_HTTP_TIMEOUT` 调到 `300` 后重试；也可以换手机热点重试。不要使用不明镜像。
+
+### 状态
+
+- 指南已更新：`docs/group-quickstart-windows-v0.1.0.docx`，commit `5926877`（`docs: pin the Windows quickstart to Python 3.12`）。
+- 指南新增了“为什么要指定 3.12”说明和对应排查行。
+- 待同门按新命令重试确认。
+
+## 问题 2：`rnp intersect --targets` 被换行成两次执行
+
+### 现象
+
+同门执行时，命令在 `--targets` 后断成两行：
+
+```powershell
+uv run rnp intersect --config examples/quickstart/run.yaml --targets
+```
+
+随后出现：
+
+```text
+rnp intersect: error: argument --targets: expected one argument
+```
+
+下一行 `results/quickstart/targets.tsv` 停在新的 PowerShell 提示符后，并没有作为 `--targets` 的值传给命令。
+
+### 原因
+
+指南/PDF 或聊天窗口里的长命令自动折行，复制时把换行也带进了 PowerShell。PowerShell 先执行了缺少参数的前半句，所以 `--targets` 收到 0 个参数。
+
+不是数据问题，也不是 `ingest stp` 的问题；前一步已经成功。
+
+### 处理
+
+改用短变量写法，一行一行执行，避免长命令在参数中间断开：
+
+```powershell
+cd D:\rnp
+$cfg = "examples/quickstart/run.yaml"
+$targets = "results/quickstart/targets.tsv"
+uv run rnp intersect --config $cfg --targets $targets
+```
+
+之后：
+
+```powershell
+$net = "results/quickstart/intersect"
+uv run rnp network --config $cfg --intersect $net
+```
+
+如果关掉 PowerShell，`$cfg` 等变量会丢失，需要重新执行赋值。
+
+### 状态
+
+- 已将短变量写法发给同门。
+- 指南当前仍使用长命令行；后续应在第 4.3/4.4 节前增加“整行复制、不要在中途回车”的提示，或直接改成短变量版。
+- 待同门重试确认。
+
+## 备注
+
+这两个问题分别属于：
+
+- 环境版本/网络超时；
+- 文档排版/复制方式。
+
+都不需要修改 v0.1.0 的软件逻辑，也不应据此宣称组内试用已经完成；目前仍没有收到完整的试用反馈。
