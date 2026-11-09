@@ -14,6 +14,19 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### Entry A artifact schemas (contract only) — 2026-11-09
+
+- Added four JSON Schemas for the structure-aware compound registration of upstream entry A
+  (`docs/upstream.md`, section 8) and the contract tests that hold good and bad examples for every
+  constraint: `submission_log_row` (one row of the researcher's submission log; a completed log with the
+  12 template columns or the 22 columns of the RA case package stays valid and gains the optional
+  `export_kind` and `result_rows`), `structure_registry_row` (the persistent structure registry),
+  `compound_structures_row` (the planned `compound_structures.tsv`) and `compounds_audit` (the planned
+  stage audit with a fixed vocabulary of issue codes).
+- This is a contract only: no command reads or writes these files yet (`rnp ingest compounds` is planned),
+  `schemas/run.schema.json` is unchanged and the v0.1 name-based behavior is untouched. No new dependency;
+  the later implementation will need RDKit as an optional extra.
+
 ### `rnp acquire` command — 2026-11-08
 
 - Added `rnp acquire` (ADR-0005): `rnp acquire --out DIR PDB_ID:UNIPROT_ACCESSION ...` freezes the RCSB and

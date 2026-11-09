@@ -1,6 +1,6 @@
 # 上游导入、结构注册与显式选择（设计契约）
 
-状态：2026-10-19 设计稿；字段与命令尚未接入运行代码。执行顺序见 [总规划](project-plan.zh-CN.md)。
+状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），字段与命令仍未接入运行代码。执行顺序见 [总规划](project-plan.zh-CN.md)。
 实现时先增加 JSON Schema、跨表约束及正反例，再修改 CLI；不通过文档宣称接口已经可用。
 
 ## 1. 输入边界
@@ -73,3 +73,103 @@ Cytoscape 后续以 compound:<id>、gene:<id>、disease:<id> 连接，Label 与 
 [MSI 标准](https://pmc.ncbi.nlm.nih.gov/articles/PMC3772505/)；
 [RDKit 标准化接口](https://www.rdkit.org/docs/source/rdkit.Chem.MolStandardize.rdMolStandardize.html)；
 [Meeko 配体准备](https://meeko.readthedocs.io/en/develop/lig_prep_basic.html)。
+
+## 8. 入口 A 最小切片的契约（2026-11-09；只有 Schema 和契约测试，命令与代码尚未实现）
+
+本节把第 2、3、6 节落到入口 A 的第一个可实现切片。`rnp ingest compounds` 还不存在，下列产物只有 JSON Schema
+（`schemas/`）和契约测试（`tests/unit/test_entry_a_schemas.py`），没有任何代码读写它们。表格产物是 TSV：
+“行 Schema”描述一行（单元格已去首尾空白，空单元格是空字符串），`properties` 的顺序就是列顺序。
+
+### 8.1 模式与产物
+
+| 产物 | 位置 | 作用 | Schema |
+|---|---|---|---|
+| 提交日志（输入，可选） | `inputs.submission_log` 指向的 TSV | 研究者记录实际提交给 STP 的结构、物种、日期和导出文件 | `submission_log_row` |
+| 结构注册表（持久） | `outputs.dir/registry/structure_registry.tsv`，与 `compound_registry.tsv` 并列 | 每个化合物登记过的结构及其派生标识 | `structure_registry_row` |
+| 化合物—结构表（阶段输出） | `results/<run_id>/compound_structures.tsv` | 每条输入化合物行的结果；后续阶段按它取结构和提交状态 | `compound_structures_row` |
+| 阶段审计 | `results/<run_id>/compounds_audit.json` | 模式、输入哈希、工具与规则版本、计数、逐行问题 | `compounds_audit` |
+
+两种模式：`compounds.tsv` 有 `smiles` 列是结构模式（`identity_mode: structure`）；没有则是名称模式（`name_only`），
+沿用 v0.1 的名称身份，不登记结构，也不能配置提交日志（表级错误）。`compounds.tsv` 不新增列：`smiles` 是研究者确认、
+实际提交的结构；`pubchem_cid`、`source` 等只记录，不联网核对；结构的来源写在提交日志的 `structure_source` 列。
+填好的提交日志——仓库模板 `examples/demo/inputs/STP-SUBMISSION-LOG.tsv` 的 12 列，或 RA 案例包里已完成日志的
+22 列——原样合法，只新增两个可选列 `export_kind`、`result_rows`。
+
+### 8.2 身份规则
+
+- `structure_id`（`STRnnnn`）和 `compound_id` 一样是持久注册 ID，不由行号或排序重建。身份键是（`compound_id`，登记的
+  原始 SMILES 字符串）：同一化合物的字符串变了就新建 `structure_id`，旧的标 `superseded` 并指向新的，旧提交仍指向
+  旧 ID；改回旧字符串则恢复旧 ID 为 `current`。
+- 原始字符串只去首尾空白，不做任何改写：不去盐、不中和、不加或去手性、不合并互变异构体（`standardization` 恒为
+  `not_performed`）。SMILES 内不得含空白。
+- 立体状态由 RDKit 的 `FindPotentialStereo`（四面体与双键立体合并）判定：`none_present`（没有立体元素）、`defined`
+  （全部已指定）、`partially_defined`、`undefined`（全部未指定）；`stereo_elements_specified` 和
+  `stereo_elements_total` 记录两个计数。工具与版本写进每条记录；口径可能随版本变化。
+- 不同化合物登记了相同的完整 InChIKey：不合并、不拒绝，发 `shared_structure` 警告；连接性块（InChIKey 前 14 位）相同
+  而完整键不同：发 `same_connectivity_different_stereo` 警告。绝不凭名称、InChIKey 前缀或质量合并立体异构体。
+- 盐或混合物（`fragment_count` 大于 1）和带电结构只发警告（`multi_fragment`、`charged_structure`），不改写。
+
+### 8.3 提交绑定
+
+- 提交日志的每一行以 `stp_file` 对应一条输入化合物行，逐项核对：名称（日志的 `compound` 非空时须与化合物表一致）；
+  `pubchem_cid`（两边都非空时须一致）；`submitted_structure` 与登记的 SMILES 字符串逐字相等；`species` 与运行配置
+  一致（`Homo_sapiens` 对应 `Homo sapiens`）；导出文件存在；`result_sha256` 非空时等于实算的 SHA-256。任何一项不符
+  都是 error，该行被隔离，提交状态为 `rejected`。
+- 提交状态：`verified`（全部通过，`export_kind` 为 `native_export`）、`verified_kind_unstated`（全部通过，没有声明
+  `export_kind`）、`reconstructed`（全部通过，`export_kind` 为 `reconstructed_from_result_page`，核验状态不高于此）、
+  `not_recorded`（结构已登记但没有提交记录，不得称“可追溯至 STP 实际提交结构”）、`rejected`、`not_checked`（结构没有
+  登记，日志行未评估）、`not_applicable`（名称模式）。
+- 从结果页重建的导出（`reconstructed_from_result_page`）必须在日志里保留不是 `not_saved` 的 `job_id` 和完整行数
+  `result_rows`；原生导出的 `result_rows` 可选。日志没有声明 `result_sha256` 不算错误，记 `submission_hash_not_declared`
+  警告，实算哈希仍写入 `compound_structures.tsv`。日志里对应不到任何化合物行的行，记 `log_row_without_compound` 警告。
+
+### 8.4 行状态、阶段状态和问题代码
+
+`compound_structures.tsv` 的 `row_status`：`accepted`（可进入下游）、`quarantined`（隔离，不进入要求确定结构的下游）、
+`name_only`（名称模式）。隔离只有两个原因：结构没有登记（`structure_status` 为 `not_registered`），或提交被拒绝。
+阶段状态：没有隔离行是 `complete`，有则是 `partial`（退出码 3）。表级问题（缺列、重复键、冲突、需要登记新结构却没有
+安装 RDKit）整体拒绝，退出码 2，什么都不写。
+
+问题代码是稳定的词表；审计的 `issues` 和表里的 `issue_codes`（排序、去重、分号连接）只使用它们：
+
+| 级别 | 代码 | 含义 |
+|---|---|---|
+| error | `missing_structure` | 结构模式下 `smiles` 为空 |
+| error | `invalid_smiles` | RDKit 无法解析 |
+| error | `submission_structure_mismatch` | 日志的 `submitted_structure` 与登记的 SMILES 不相等 |
+| error | `submission_hash_mismatch` | 声明的 `result_sha256` 与导出文件的实算哈希不符 |
+| error | `submission_species_mismatch` | 日志的物种与运行配置不符 |
+| error | `submission_export_missing` | 导出文件不存在 |
+| error | `submission_name_mismatch` | 日志的化合物名与化合物表不符 |
+| error | `submission_cid_mismatch` | 日志与化合物表的 `pubchem_cid` 不符 |
+| warning | `shared_structure` | 另一个化合物登记了相同的完整 InChIKey |
+| warning | `same_connectivity_different_stereo` | 连接性块相同而完整键不同 |
+| warning | `stereo_undefined` | 立体状态为 `partially_defined` 或 `undefined` |
+| warning | `multi_fragment` | 片段数大于 1 |
+| warning | `charged_structure` | 净电荷不为 0 |
+| warning | `smiles_whitespace_trimmed` | 登记时去掉了首尾空白 |
+| warning | `structure_changed` | 化合物的结构字符串变了，已新建 `structure_id` |
+| warning | `structure_reactivated` | 化合物改回了旧字符串，旧 `structure_id` 恢复为 `current` |
+| warning | `submission_record_missing` | 结构已登记，但没有提交记录 |
+| warning | `submission_export_reconstructed` | 导出是从结果页重建的 |
+| warning | `submission_hash_not_declared` | 日志没有声明 `result_sha256` |
+| warning | `log_row_without_compound` | 日志行对应不到任何化合物行（只出现在审计里） |
+
+### 8.5 由库补足的跨表校验
+
+Schema 表达不了的约束由库实现并测试：
+
+- 注册表：`structure_id` 唯一；每个 `compound_id` 至多一个 `current`；`superseded_by` 指向同一化合物的已登记 ID；
+  `connectivity_block` 等于 `inchikey` 的前 14 位；两个立体计数与 `stereo_status` 相符（`defined` 时已指定数等于总数，
+  `partially_defined` 时小于总数）；`first_seen_utc` 不晚于 `last_seen_utc`。
+- 化合物—结构表：行数和顺序与输入一致；`structure_id` 在注册表里并属于该 `compound_id`，`smiles`、`inchikey`、
+  `stereo_status` 与注册表一致；`issue_codes` 排序且不重复。
+- 审计：`summary` 的各项计数与表一致；`compound_structures_sha256` 等于表的实际哈希；每个 error 级问题对应一条隔离行。
+- 输入：提交日志的 `stp_file` 不重复，化合物表的 `stp_file` 不重复（沿用 v0.1 的拒绝规则）。
+
+### 8.6 本切片不做，以及状态
+
+不做：入口 B、性质标注、联网查询、结构标准化、“提交结构与当前结构不同但研究者显式接受”、跨组出现表、配体态、
+选择决定表（`selection_decisions`，下一个切片）。
+状态：设计、Schema 和契约测试已完成（2026-11-09）；库、命令，以及 `run.schema.json` 的新键（`inputs.submission_log`、
+`inputs.structure_registry`）尚未实现。
