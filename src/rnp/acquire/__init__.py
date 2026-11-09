@@ -1,6 +1,6 @@
 """Structure and sequence acquisition for ADR-0005.
 
-A library only: there is no `rnp acquire` command yet.
+The library behind the `rnp acquire` command (see `rnp.cli`).
 """
 
 from .freeze import (

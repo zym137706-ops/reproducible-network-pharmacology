@@ -5,17 +5,22 @@ The CLI is the single source of truth for every analysis step. The agent skill i
 
 Exit codes: 0 success, 2 validation/input error (nothing written), 3 partial run
 (outputs written and marked partial), 1 unexpected internal error.
+
+``rnp acquire`` is the only command whose Python code uses the network (ADR-0005).
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 from typing import Any
 
 from . import __version__
+from .acquire import DEFAULT_TIMEOUT, RECORD_FILENAME, urllib_fetcher, verify_acquisition
+from .acquire import acquire as run_acquire
 from .analysis.enrich import run_enrich
 from .analysis.ingest import run_ingest
 from .analysis.intersect import run_intersect
@@ -23,11 +28,20 @@ from .analysis.network import run_network
 from .analysis.report import run_report
 from .config import RunConfig, load_config, validate_document
 from .errors import InputError, RnpError, exit_code_for
-from .provenance import sha256_file
+from .provenance import sha256_file, utc_now_iso
 
 
 def _emit(payload: Any) -> None:
     print(json.dumps(payload, indent=2, ensure_ascii=False))
+
+
+def _emit_ascii(payload: Any) -> None:
+    """Print a summary that survives an old terminal code page.
+
+    The summary quotes text from remote responses, so the record must not become unreadable when
+    a non-ASCII character cannot be encoded after the record was already written.
+    """
+    print(json.dumps(payload, indent=2, ensure_ascii=True))
 
 
 def _require_inputs(config: RunConfig) -> dict[str, str]:
@@ -195,6 +209,115 @@ def cmd_manifest(args: argparse.Namespace) -> int:
     return 0 if not drift else 3
 
 
+def _upper_ascii(text: str) -> str:
+    """Upper-case ASCII identifiers only.
+
+    A non-ASCII character must reach the library unchanged: str.upper() maps some of them
+    (for example the German sharp s) onto other valid-looking letters, silently turning one
+    identifier into a different one.
+    """
+    return text.upper() if text.isascii() else text
+
+
+def _acquire_pairs(raw_items: list[str]) -> tuple[list[tuple[str, str]], list[str]]:
+    pairs: list[tuple[str, str]] = []
+    problems: list[str] = []
+    for number, raw in enumerate(raw_items, 1):
+        parts = [part.strip() for part in raw.split(":")]
+        if len(parts) != 2 or not all(parts):
+            problems.append(f"item {number}: {raw!r} is not PDB_ID:UNIPROT_ACCESSION")
+            continue
+        pairs.append((_upper_ascii(parts[0]), _upper_ascii(parts[1])))
+    return pairs, problems
+
+
+def _record_status(path: Path) -> str | None:
+    """Return the record status, or None when the file is not a JSON object with one."""
+    try:
+        record = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, ValueError):
+        return None
+    if not isinstance(record, dict):
+        return None
+    status = record.get("status")
+    return status if isinstance(status, str) else None
+
+
+def _acquire_verify(args: argparse.Namespace) -> int:
+    if args.out is not None or args.timeout is not None or args.items:
+        raise InputError("--verify cannot be combined with --out, --timeout or items")
+    directory = Path(args.verify).resolve()
+    if not directory.is_dir():
+        raise InputError(f"not a directory: {directory}")
+    record_path = directory / RECORD_FILENAME
+    if not record_path.is_file():
+        raise InputError(
+            f"not an acquisition directory (missing {RECORD_FILENAME}): {directory}",
+            details=["a directory without the record is an interrupted run and cannot be used"],
+        )
+    problems = verify_acquisition(directory)
+    _emit_ascii(
+        {
+            "status": "problems" if problems else "verified",
+            "directory": str(directory),
+            "record": str(record_path),
+            "record_sha256": sha256_file(record_path),
+            "acquisition_status": _record_status(record_path),
+            "problems": problems,
+        }
+    )
+    return 3 if problems else 0
+
+
+def cmd_acquire(args: argparse.Namespace) -> int:
+    if args.verify is not None:
+        return _acquire_verify(args)
+    timeout = DEFAULT_TIMEOUT if args.timeout is None else args.timeout
+    problems: list[str] = []
+    if not args.out:
+        problems.append("--out is required unless --verify is given")
+    if not args.items:
+        problems.append("no items given; pass one or more PDB_ID:UNIPROT_ACCESSION pairs")
+    if not math.isfinite(timeout) or timeout <= 0:
+        problems.append("--timeout must be a positive, finite number of seconds")
+    pairs, item_problems = _acquire_pairs(args.items)
+    problems.extend(item_problems)
+    if problems:
+        raise InputError("invalid arguments for 'rnp acquire'", details=problems)
+    result = run_acquire(
+        pairs,
+        Path(args.out).resolve(),
+        fetcher=urllib_fetcher,
+        now=utc_now_iso,
+        timeout=timeout,
+    )
+    record = result.record
+    outcomes: dict[str, int] = {}
+    for entry in record["requests"]:
+        outcomes[entry["outcome"]] = outcomes.get(entry["outcome"], 0) + 1
+    _emit_ascii(
+        {
+            "status": result.status,
+            "acquisition_id": record["acquisition_id"],
+            "out_dir": str(result.out_dir),
+            "record": str(result.record_path),
+            "record_sha256": sha256_file(result.record_path),
+            "items": [
+                {
+                    "item_id": entry["item_id"],
+                    "pdb_id": entry["pdb_id"],
+                    "uniprot_accession": entry["uniprot_accession"],
+                    "status": entry["status"],
+                }
+                for entry in record["items"]
+            ],
+            "outcomes": {name: outcomes[name] for name in sorted(outcomes)},
+            "warnings": record["warnings"],
+        }
+    )
+    return 0 if result.status == "complete" else 3
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="rnp",
@@ -283,6 +406,44 @@ def build_parser() -> argparse.ArgumentParser:
         help="render a report that includes explicitly partial stages",
     )
     report.add_argument("--force", action="store_true", help="replace an existing output dir")
+    acquire = sub.add_parser(
+        "acquire",
+        help="freeze RCSB and UniProt records for chosen receptor IDs (uses the network)",
+        description=(
+            "Retrieve the RCSB PDB and UniProt records of each PDB_ID:UNIPROT_ACCESSION "
+            "pair, freeze them in a new directory and write acquisition_record.json there. "
+            "This is the only rnp command whose Python code uses the network: it contacts "
+            "files.rcsb.org, data.rcsb.org and rest.uniprot.org and nothing else, and --verify "
+            "contacts nothing. Identifiers are case-insensitive and recorded in upper case."
+        ),
+        epilog=(
+            "Exit codes: 0 every item complete; 2 invalid arguments, nothing written; 3 at "
+            "least one item failed (the record is written and lists every failure), or --verify "
+            "found a problem; 1 internal error. An output directory without "
+            "acquisition_record.json is an interrupted run: delete it and run again."
+        ),
+    )
+    acquire.add_argument(
+        "items",
+        nargs="*",
+        metavar="PDB_ID:UNIPROT_ACCESSION",
+        help="a receptor structure and its target sequence, for example 1M17:P00533",
+    )
+    acquire.add_argument(
+        "--out", default=None, help="new or empty directory for the frozen files and the record"
+    )
+    acquire.add_argument(
+        "--timeout",
+        type=float,
+        default=None,
+        help=f"seconds to wait for each response (default {DEFAULT_TIMEOUT:g})",
+    )
+    acquire.add_argument(
+        "--verify",
+        default=None,
+        metavar="DIR",
+        help="check a frozen directory against its record; offline, writes nothing",
+    )
     return parser
 
 
@@ -294,6 +455,7 @@ _DISPATCH = {
     ("enrich", None): cmd_enrich,
     ("report", None): cmd_report,
     ("manifest", None): cmd_manifest,
+    ("acquire", None): cmd_acquire,
 }
 
 
