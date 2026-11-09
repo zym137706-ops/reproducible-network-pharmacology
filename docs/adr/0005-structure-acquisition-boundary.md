@@ -1,6 +1,6 @@
 # ADR 0005 — Structure acquisition boundary
 
-- Status: accepted design; implementation pending
+- Status: accepted; the acquire library and the `rnp acquire` command are implemented and unreleased; the construct check and the candidate-pair tables are pending
 - Date: 2026-11-07
 - Relates to: [ADR-0004](0004-staged-upstream-and-docking.md) (items 4, 5 and 7), [docking design](../docking.md) §3, [upstream design](../upstream.md) §3
 

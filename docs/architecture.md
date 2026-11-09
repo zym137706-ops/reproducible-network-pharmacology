@@ -14,7 +14,7 @@ record enough metadata to reconstruct what happened.
 
 ## 2. Non-goals
 
-- No online prediction, no scraping of third-party services, no hidden-form replaying. The planned `rnp acquire` step ([ADR-0005](adr/0005-structure-acquisition-boundary.md)) only retrieves records from documented public endpoints and freezes them; it is none of these.
+- No online prediction, no scraping of third-party services, no hidden-form replaying. The `rnp acquire` step ([ADR-0005](adr/0005-structure-acquisition-boundary.md)) only retrieves records from documented public endpoints and freezes them; it is none of these.
 - v0.1 core remains post-prediction. v0.2 adds confirmed-list/processed-metabolomics identity,
   annotation and explicit selection; v0.3 adds limited, controlled noncovalent docking.
 - No raw LC-MS processing, ADMET model training, QSAR or broad receptor/chemistry support in these releases.
@@ -65,7 +65,7 @@ The skill may not re-implement it in prose or in a snippet.
 | `rnp.analysis.parents` | parent-stage status/hash checks and refusal semantics |
 | `rnp.output` | staged, atomic output directories; no silent overwrite |
 | `rnp.resources` | packaged resource lookup (schemas/R scripts) in source tree and wheel |
-| `rnp.acquire` | structure/sequence acquisition (ADR-0005): injectable HTTP transport (the only module that imports a networking library), one classified record per retrieval, frozen files plus `acquisition_record.json`, offline verification; library only, no command yet |
+| `rnp.acquire` | structure/sequence acquisition (ADR-0005): injectable HTTP transport (the only module that imports a networking library), one classified record per retrieval, frozen files plus `acquisition_record.json`, offline verification; exposed as the `rnp acquire` command in `rnp.cli` |
 | `rnp.analysis.*` | report CLI (pending); MCODE/topology later, independently validated |
 | `R/ora.R` | over-representation analysis via `clusterProfiler`; writes its own version metadata |
 | `R/venny.R` | two-set Venn figure from `intersect/venn.json` (optional) |
@@ -130,6 +130,12 @@ Implemented: a failed ingest writes no run directory; a partial ingest writes ou
 `--allow-partial` is passed, and record the override (`status_override`, `stage_status:
 partial_override`). File existence alone is not treated as success evidence.
 
+`rnp acquire` follows the same contract: 0 when every item is complete; 2 for invalid arguments or an
+output directory that is not new or empty (nothing is requested or written); 3 when at least one item
+failed or none completed (the record is still written and lists every failure), and when `--verify`
+finds a problem; 1 for an internal error. Its `acquisition_record.json`, not a `run_manifest.json`, is
+the provenance of the run, because there is no run config for a manifest to bind.
+
 ## 8. Determinism rules
 
 - Tables are sorted by explicit keys before writing.
@@ -182,7 +188,7 @@ Python 2.7. Use `py -3.12`, `uv run`, or the virtual environment interpreter exp
 - No native reference means redocking is not applicable; predicted structures need separately
   validated protocols. pLDDT is not sufficient docking eligibility evidence.
 - RRA consensus ranks nodes; MCODE identifies modules. Neither substitutes for the other.
-- Structure acquisition ([ADR-0005](adr/0005-structure-acquisition-boundary.md); library in `rnp.acquire`, command pending): receptor and sequence facts come from records frozen by one explicit networked command, `rnp acquire`; no other module, in particular `rnp dock *`, uses the network. Discovery tools stay optional, read-only and ID-only.
+- Structure acquisition ([ADR-0005](adr/0005-structure-acquisition-boundary.md)) is implemented and unreleased (library in `rnp.acquire`, command `rnp acquire`). What stays a contract is the rule that receptor and sequence facts come only from records that command froze, so no other module, in particular `rnp dock *`, uses the network. Discovery tools stay optional, read-only and ID-only.
 
 ## 14. Release checks: closed in the 2026-10-19 slice, and still pending
 

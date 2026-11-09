@@ -14,6 +14,21 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### `rnp acquire` command — 2026-11-08
+
+- Added `rnp acquire` (ADR-0005): `rnp acquire --out DIR PDB_ID:UNIPROT_ACCESSION ...` freezes the RCSB and
+  UniProt records of each pair into a new directory, writes `acquisition_record.json` and prints a JSON
+  summary; `rnp acquire --verify DIR` re-checks a frozen directory against its record offline. Identifiers
+  are case-insensitive; characters outside ASCII are refused, never mapped to another identifier.
+- Exit codes follow the existing contract: 0 when every item is complete; 2 for invalid arguments or an
+  output directory that is not new or empty; 3 when at least one item failed or `--verify` finds a
+  problem; 1 for an internal error. The record, not a `run_manifest.json`, is the provenance of the run.
+- It is the only command whose Python code uses the network (the opt-in KEGG enrichment of `rnp enrich`
+  reaches its service from inside R); the import guard test covers `rnp/cli.py`. No new dependency; the
+  tests replace the fetcher and the clock and never touch the network.
+- Added the RCSB PDB / wwPDB and UniProt entries to `docs/citations.md` and marked the command as
+  implemented (unreleased) in both READMEs, the architecture and docking designs and ADR-0005.
+
 ### Acquire library — 2026-11-08
 
 - Added the `rnp.acquire` library (ADR-0005): an injectable HTTP transport that uses only the standard

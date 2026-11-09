@@ -159,8 +159,29 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 | `rnp structures resolve` | 🚧 v0.2.0 | Resolve names / InChIKeys to structures (PubChem cache) |
 | `rnp compounds annotate/select` | 🚧 v0.2 design | Properties plus explicit inclusion/exclusion decisions; all original candidates retained |
 | `rnp hubs compute` | 🚧 later extension | Centrality/rank aggregation; not a replacement for MCODE |
-| `rnp acquire` | 🚧 v0.3 design ([ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)) | Freeze RCSB/UniProt records for chosen receptor IDs (versions, retrieval times, hashes); the only command that uses the network |
+| `rnp acquire` | ✅ implemented, unreleased ([ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)) | Freeze the RCSB/UniProt records of chosen receptor IDs (`PDB_ID:UNIPROT_ACCESSION`) into a new directory together with an `acquisition_record.json` (retrieval times, HTTP status, sizes, SHA-256 hashes, version headers); `--verify DIR` re-checks a frozen directory offline; the only command whose Python code uses the network |
 | `rnp dock prepare/run/qc` | 🚧 v0.3 design | Suitable co-crystal systems and ordinary noncovalent small molecules, controls and pose QC |
+
+In `rnp`'s own Python code only `rnp acquire` uses the network: it contacts `files.rcsb.org`,
+`data.rcsb.org` and `rest.uniprot.org` and nothing else, and `--verify` contacts nothing. The optional KEGG
+enrichment of `rnp enrich` also reaches its service, from inside R; GO enrichment and every other command
+are offline.
+
+```bash
+# freeze two receptor structures and their UniProt records (identifiers are case-insensitive)
+uv run rnp acquire --out data/local/structures/demo-1 1M17:P00533 3ERT:P03372
+
+# later, offline: do the frozen files still match their record?
+uv run rnp acquire --verify data/local/structures/demo-1
+```
+
+The output directory must be new or empty. It receives one folder per PDB ID, `uniprot/<accession>.json`
+and `acquisition_record.json`, which is written last: a directory without it is an interrupted run. Exit
+code 0 means every item is complete, 3 means at least one item failed (the record lists every failure and
+nothing is substituted for a failed request), 2 means invalid arguments. `--verify` checks integrity only;
+read `status` in the record to see whether every item is complete. Frozen files stay in the git-ignored
+`data/local/`; RCSB and UniProt keep their own terms (see [data licenses](docs/data-licenses.md) and
+[citations](docs/citations.md)).
 
 ## Input contracts
 

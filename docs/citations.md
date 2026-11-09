@@ -55,3 +55,41 @@ No DOI is assigned.
 - NCBI policy: <https://www.ncbi.nlm.nih.gov/home/about/policies/>. NCBI places no restrictions on
   use/distribution of molecular data, but third-party submitters may retain rights and NCBI cannot
   grant unrestricted permission. This is not asserted as MIT/CC0/CC BY.
+
+### RCSB Protein Data Bank (RCSB PDB / wwPDB)
+
+- Website: <https://www.rcsb.org/>; worldwide PDB: <https://www.wwpdb.org/>
+- Used only by `rnp acquire` (implemented, unreleased), not by the published v0.1.0 case. Each retrieval
+  records the entry ID, retrieval time and SHA-256; the frozen files stay in the git-ignored `data/local/`
+  and are not redistributed here.
+- Berman HM, Westbrook J, Feng Z, Gilliland G, Bhat TN, Weissig H, Shindyalov IN, Bourne PE. The Protein
+  Data Bank. *Nucleic Acids Research* **28**(1), 235–242 (2000). <https://doi.org/10.1093/nar/28.1.235>
+- Burley SK, Bhatt R, Bhikadiya C, et al. Updated resources for exploring experimentally-determined PDB
+  structures and Computed Structure Models at the RCSB Protein Data Bank. *Nucleic Acids Research*
+  **53**(D1), D564–D574 (2025). <https://doi.org/10.1093/nar/gkae1091>
+- wwPDB: Berman H, Henrick K, Nakamura H. Announcing the worldwide Protein Data Bank. *Nature Structural
+  Biology* **10**(12), 980 (2003). <https://doi.org/10.1038/nsb1203-980>; wwPDB consortium. Protein Data
+  Bank: the single global archive for 3D macromolecular structure data. *Nucleic Acids Research*
+  **47**(D1), D520–D528 (2019). <https://doi.org/10.1093/nar/gky949>
+- Terms checked 2026-11-07 and re-read on 2026-11-08 (<https://www.rcsb.org/pages/policies>): the data of
+  the PDB archive are CC0 1.0; data from the RCSB programmatic APIs have the same license unless they
+  originate from an integrated external resource, whose restrictions then apply. RCSB asks that RCSB PDB
+  be cited as above and that every PDB entry used be cited by its PDB ID together with the publication of
+  its structure authors (an entry without a publication: PDB ID, deposition year, authors, title and
+  entry DOI). See `docs/data-licenses.md`.
+
+### UniProt
+
+- Website: <https://www.uniprot.org/>
+- Used only by `rnp acquire` (implemented, unreleased), not by the published v0.1.0 case. The UniProt
+  release is recorded with each retrieval when the response carries `x-uniprot-release`; the frozen
+  records stay in the git-ignored `data/local/` and are not redistributed here.
+- The UniProt Consortium. UniProt: the Universal Protein Knowledgebase in 2025. *Nucleic Acids Research*
+  **53**(D1), D609–D617 (2025). <https://doi.org/10.1093/nar/gkae1010>
+- Ahmad S, et al.; UniProt Consortium. The UniProt website API: facilitating programmatic access to
+  protein knowledge. *Nucleic Acids Research* **53**(W1), W547–W553 (2025).
+  <https://doi.org/10.1093/nar/gkaf394> (covers the REST API that `rnp acquire` uses).
+- License: CC BY 4.0 (terms checked 2026-11-07, see `docs/data-licenses.md`): attribution is required and
+  the UniProt copyright statement must be reproduced with any redistributed copy. UniProt's citation page
+  (<https://www.uniprot.org/help/publications>, read 2026-11-08) asks users to cite the publication that
+  best covers the components they used.
