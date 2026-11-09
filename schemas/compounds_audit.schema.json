@@ -1,0 +1,708 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/compounds_audit.schema.json",
+  "title": "Compound structure registration audit",
+  "description": "Stage audit of `rnp ingest compounds`: identity mode, inputs, tool and rule versions, counts, every row-level issue with a stable code, the registries used and the hash of compound_structures.tsv. Totals must agree with the tables (checked by the library, not by this schema).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_by",
+    "stage_status",
+    "identity_mode",
+    "config",
+    "inputs",
+    "toolkit",
+    "rule_versions",
+    "summary",
+    "issues",
+    "registries",
+    "notes",
+    "compound_structures_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "generated_by": {
+      "const": "rnp ingest compounds"
+    },
+    "stage_status": {
+      "enum": [
+        "complete",
+        "partial"
+      ]
+    },
+    "identity_mode": {
+      "enum": [
+        "structure",
+        "name_only"
+      ]
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compounds",
+        "submission_log",
+        "stp_dir"
+      ],
+      "properties": {
+        "compounds": {
+          "$ref": "#/$defs/compounds_ref"
+        },
+        "submission_log": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/file_ref"
+            }
+          ]
+        },
+        "stp_dir": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/dir_ref"
+            }
+          ]
+        }
+      }
+    },
+    "toolkit": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name",
+            "version"
+          ],
+          "properties": {
+            "name": {
+              "const": "rdkit"
+            },
+            "version": {
+              "type": "string",
+              "pattern": "^[0-9]{4}\\.[0-9]{1,2}\\.[0-9]+$"
+            }
+          }
+        }
+      ]
+    },
+    "rule_versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compound_identity",
+        "structure_identity",
+        "submission_binding"
+      ],
+      "properties": {
+        "compound_identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "structure_identity": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+-structure-registry$"
+            }
+          ]
+        },
+        "submission_binding": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+-submission-binding$"
+            }
+          ]
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows",
+        "rows_accepted",
+        "rows_quarantined",
+        "rows_name_only",
+        "structures_new",
+        "structures_reused",
+        "structures_superseded",
+        "submissions_verified",
+        "submissions_reconstructed",
+        "submissions_not_recorded",
+        "submissions_rejected",
+        "errors",
+        "warnings"
+      ],
+      "properties": {
+        "rows": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rows_accepted": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows_quarantined": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rows_name_only": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "structures_new": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "structures_reused": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "structures_superseded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "submissions_verified": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "submissions_reconstructed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "submissions_not_recorded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "submissions_rejected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "errors": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/issue_error"
+          },
+          {
+            "$ref": "#/$defs/issue_warning"
+          }
+        ]
+      }
+    },
+    "registries": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compound_registry",
+        "structure_registry"
+      ],
+      "properties": {
+        "compound_registry": {
+          "$ref": "#/$defs/registry_ref"
+        },
+        "structure_registry": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/registry_ref"
+            }
+          ]
+        }
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "compound_structures_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "file_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "rows"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "compounds_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "rows"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "dir_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "files_hashed"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "files_hashed": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "registry_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "rule_version",
+        "entries"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rule_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entries": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "issue_error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "code",
+        "source",
+        "row",
+        "compound_id",
+        "message"
+      ],
+      "properties": {
+        "level": {
+          "const": "error"
+        },
+        "code": {
+          "enum": [
+            "missing_structure",
+            "invalid_smiles",
+            "submission_structure_mismatch",
+            "submission_hash_mismatch",
+            "submission_species_mismatch",
+            "submission_export_missing",
+            "submission_name_mismatch",
+            "submission_cid_mismatch"
+          ]
+        },
+        "source": {
+          "enum": [
+            "compounds",
+            "submission_log"
+          ]
+        },
+        "row": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "compound_id": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "issue_warning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "code",
+        "source",
+        "row",
+        "compound_id",
+        "message"
+      ],
+      "properties": {
+        "level": {
+          "const": "warning"
+        },
+        "code": {
+          "enum": [
+            "shared_structure",
+            "same_connectivity_different_stereo",
+            "stereo_undefined",
+            "multi_fragment",
+            "charged_structure",
+            "smiles_whitespace_trimmed",
+            "structure_changed",
+            "structure_reactivated",
+            "submission_record_missing",
+            "submission_export_reconstructed",
+            "submission_hash_not_declared",
+            "log_row_without_compound"
+          ]
+        },
+        "source": {
+          "enum": [
+            "compounds",
+            "submission_log"
+          ]
+        },
+        "row": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "compound_id": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "identity_mode": {
+            "const": "name_only"
+          }
+        },
+        "required": [
+          "identity_mode"
+        ]
+      },
+      "then": {
+        "properties": {
+          "stage_status": {
+            "const": "complete"
+          },
+          "toolkit": {
+            "type": "null"
+          },
+          "inputs": {
+            "properties": {
+              "submission_log": {
+                "type": "null"
+              },
+              "stp_dir": {
+                "type": "null"
+              }
+            }
+          },
+          "rule_versions": {
+            "properties": {
+              "structure_identity": {
+                "type": "null"
+              },
+              "submission_binding": {
+                "type": "null"
+              }
+            }
+          },
+          "registries": {
+            "properties": {
+              "structure_registry": {
+                "type": "null"
+              }
+            }
+          },
+          "summary": {
+            "properties": {
+              "rows_accepted": {
+                "const": 0
+              },
+              "rows_quarantined": {
+                "const": 0
+              },
+              "structures_new": {
+                "const": 0
+              },
+              "structures_reused": {
+                "const": 0
+              },
+              "structures_superseded": {
+                "const": 0
+              },
+              "submissions_verified": {
+                "const": 0
+              },
+              "submissions_reconstructed": {
+                "const": 0
+              },
+              "submissions_not_recorded": {
+                "const": 0
+              },
+              "submissions_rejected": {
+                "const": 0
+              },
+              "errors": {
+                "const": 0
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "toolkit": {
+            "type": "object"
+          },
+          "rule_versions": {
+            "properties": {
+              "structure_identity": {
+                "type": "string"
+              }
+            }
+          },
+          "registries": {
+            "properties": {
+              "structure_registry": {
+                "type": "object"
+              }
+            }
+          },
+          "summary": {
+            "properties": {
+              "rows_name_only": {
+                "const": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "inputs": {
+            "properties": {
+              "submission_log": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "submission_log"
+            ]
+          }
+        },
+        "required": [
+          "inputs"
+        ]
+      },
+      "then": {
+        "properties": {
+          "rule_versions": {
+            "properties": {
+              "submission_binding": {
+                "type": "null"
+              }
+            }
+          },
+          "summary": {
+            "properties": {
+              "submissions_verified": {
+                "const": 0
+              },
+              "submissions_reconstructed": {
+                "const": 0
+              },
+              "submissions_rejected": {
+                "const": 0
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "rule_versions": {
+            "properties": {
+              "submission_binding": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "stage_status": {
+            "const": "complete"
+          }
+        },
+        "required": [
+          "stage_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "summary": {
+            "properties": {
+              "rows_quarantined": {
+                "const": 0
+              },
+              "errors": {
+                "const": 0
+              }
+            }
+          },
+          "issues": {
+            "not": {
+              "contains": {
+                "properties": {
+                  "level": {
+                    "const": "error"
+                  }
+                },
+                "required": [
+                  "level"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "summary": {
+            "properties": {
+              "rows_quarantined": {
+                "minimum": 1
+              },
+              "errors": {
+                "minimum": 1
+              }
+            }
+          },
+          "issues": {
+            "contains": {
+              "properties": {
+                "level": {
+                  "const": "error"
+                }
+              },
+              "required": [
+                "level"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

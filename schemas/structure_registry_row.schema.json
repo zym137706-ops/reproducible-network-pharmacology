@@ -1,0 +1,245 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/structure_registry_row.schema.json",
+  "title": "Structure registry row",
+  "description": "One row of the persistent structure registry (a TSV): the structure string registered for one compound and the identifiers derived from it. No standardization is performed. The order of `properties` is the column order of the TSV.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "structure_id",
+    "compound_id",
+    "smiles",
+    "inchikey",
+    "connectivity_block",
+    "formula",
+    "net_charge",
+    "fragment_count",
+    "stereo_status",
+    "stereo_elements_specified",
+    "stereo_elements_total",
+    "standardization",
+    "toolkit",
+    "toolkit_version",
+    "rule_version",
+    "status",
+    "superseded_by",
+    "first_seen_utc",
+    "last_seen_utc"
+  ],
+  "properties": {
+    "structure_id": {
+      "type": "string",
+      "pattern": "^STR[0-9]{4,}$"
+    },
+    "compound_id": {
+      "type": "string",
+      "pattern": "^[^\\s]+$"
+    },
+    "smiles": {
+      "type": "string",
+      "pattern": "^[^\\s]+$"
+    },
+    "inchikey": {
+      "type": "string",
+      "pattern": "^[A-Z]{14}-[A-Z]{10}-[A-Z]$"
+    },
+    "connectivity_block": {
+      "type": "string",
+      "pattern": "^[A-Z]{14}$"
+    },
+    "formula": {
+      "type": "string",
+      "pattern": "^[A-Z][^\\s]*$"
+    },
+    "net_charge": {
+      "type": "string",
+      "pattern": "^(?:0|-?[1-9][0-9]*)$"
+    },
+    "fragment_count": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]*$"
+    },
+    "stereo_status": {
+      "enum": [
+        "none_present",
+        "defined",
+        "partially_defined",
+        "undefined"
+      ]
+    },
+    "stereo_elements_specified": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]*)$"
+    },
+    "stereo_elements_total": {
+      "type": "string",
+      "pattern": "^(?:0|[1-9][0-9]*)$"
+    },
+    "standardization": {
+      "const": "not_performed"
+    },
+    "toolkit": {
+      "const": "rdkit"
+    },
+    "toolkit_version": {
+      "type": "string",
+      "pattern": "^[0-9]{4}\\.[0-9]{1,2}\\.[0-9]+$"
+    },
+    "rule_version": {
+      "type": "string",
+      "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+-structure-registry$"
+    },
+    "status": {
+      "enum": [
+        "current",
+        "superseded"
+      ]
+    },
+    "superseded_by": {
+      "type": "string",
+      "pattern": "^(?:STR[0-9]{4,})?$"
+    },
+    "first_seen_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    },
+    "last_seen_utc": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])T(?:[01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]Z$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "current"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "superseded_by": {
+            "const": ""
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "superseded"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "superseded_by": {
+            "type": "string",
+            "pattern": "^STR[0-9]{4,}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "stereo_status": {
+            "const": "none_present"
+          }
+        },
+        "required": [
+          "stereo_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "stereo_elements_specified": {
+            "const": "0"
+          },
+          "stereo_elements_total": {
+            "const": "0"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "stereo_status": {
+            "const": "defined"
+          }
+        },
+        "required": [
+          "stereo_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "stereo_elements_specified": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "stereo_elements_total": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "stereo_status": {
+            "const": "partially_defined"
+          }
+        },
+        "required": [
+          "stereo_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "stereo_elements_specified": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          },
+          "stereo_elements_total": {
+            "type": "string",
+            "pattern": "^(?:[2-9]|[1-9][0-9]+)$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "stereo_status": {
+            "const": "undefined"
+          }
+        },
+        "required": [
+          "stereo_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "stereo_elements_specified": {
+            "const": "0"
+          },
+          "stereo_elements_total": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          }
+        }
+      }
+    }
+  ]
+}

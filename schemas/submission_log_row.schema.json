@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/submission_log_row.schema.json",
+  "title": "STP submission log row",
+  "description": "One row of the researcher's submission log (a TSV): what was actually submitted to SwissTargetPrediction for one compound and which export file came back. Values are validated after leading and trailing whitespace has been stripped from every cell; an empty cell is the empty string. Extra columns are allowed and must be single-line strings.",
+  "type": "object",
+  "required": [
+    "stp_file",
+    "submitted_structure",
+    "species",
+    "submitted_date"
+  ],
+  "properties": {
+    "compound": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "pubchem_cid": {
+      "type": "string",
+      "pattern": "^(?:[0-9]+)?$"
+    },
+    "stp_file": {
+      "type": "string",
+      "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+    },
+    "submitted_structure": {
+      "type": "string",
+      "pattern": "^[^\\s]+$"
+    },
+    "structure_source": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "species": {
+      "enum": [
+        "Homo sapiens",
+        "Mus musculus"
+      ]
+    },
+    "submitted_date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$"
+    },
+    "result_file": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "retrieved_date": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "operator": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "result_sha256": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{64})?$"
+    },
+    "notes": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "submitted_date_precision": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "retrieved_date_basis": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "retrieved_date_precision": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "time_zone_windows_id": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "utc_offset": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "result_url": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "job_id": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "operator_identity": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "submission_method": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "submission_evidence": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "export_kind": {
+      "enum": [
+        "",
+        "native_export",
+        "reconstructed_from_result_page"
+      ]
+    },
+    "result_rows": {
+      "type": "string",
+      "pattern": "^(?:[1-9][0-9]*)?$"
+    }
+  },
+  "additionalProperties": {
+    "type": "string",
+    "pattern": "^[^\\t\\r\\n]*$"
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "export_kind": {
+            "const": "reconstructed_from_result_page"
+          }
+        },
+        "required": [
+          "export_kind"
+        ]
+      },
+      "then": {
+        "required": [
+          "job_id",
+          "result_rows"
+        ],
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "pattern": "^(?!not_saved$)[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+          },
+          "result_rows": {
+            "type": "string",
+            "pattern": "^[1-9][0-9]*$"
+          }
+        }
+      }
+    }
+  ]
+}

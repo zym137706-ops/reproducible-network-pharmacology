@@ -1,0 +1,469 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/compound_structures_row.schema.json",
+  "title": "Compound structure table row",
+  "description": "One row of compound_structures.tsv, written by `rnp ingest compounds`: the outcome for one input compound row, in input order. `issue_codes` is a sorted, unique, semicolon-joined list. The order of `properties` is the column order of the TSV.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "compound_id",
+    "group",
+    "name",
+    "stp_file",
+    "row_status",
+    "structure_status",
+    "structure_id",
+    "smiles",
+    "inchikey",
+    "stereo_status",
+    "submission_status",
+    "export_kind",
+    "export_sha256",
+    "issue_codes"
+  ],
+  "properties": {
+    "compound_id": {
+      "type": "string",
+      "pattern": "^[^\\s]+$"
+    },
+    "group": {
+      "type": "string",
+      "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+    },
+    "stp_file": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "row_status": {
+      "enum": [
+        "accepted",
+        "quarantined",
+        "name_only"
+      ]
+    },
+    "structure_status": {
+      "enum": [
+        "registered",
+        "not_registered",
+        "name_only"
+      ]
+    },
+    "structure_id": {
+      "type": "string",
+      "pattern": "^(?:STR[0-9]{4,})?$"
+    },
+    "smiles": {
+      "type": "string",
+      "pattern": "^[^\\s]*$"
+    },
+    "inchikey": {
+      "type": "string",
+      "pattern": "^(?:[A-Z]{14}-[A-Z]{10}-[A-Z])?$"
+    },
+    "stereo_status": {
+      "enum": [
+        "",
+        "none_present",
+        "defined",
+        "partially_defined",
+        "undefined"
+      ]
+    },
+    "submission_status": {
+      "enum": [
+        "verified",
+        "verified_kind_unstated",
+        "reconstructed",
+        "not_recorded",
+        "rejected",
+        "not_checked",
+        "not_applicable"
+      ]
+    },
+    "export_kind": {
+      "enum": [
+        "",
+        "native_export",
+        "reconstructed_from_result_page"
+      ]
+    },
+    "export_sha256": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{64})?$"
+    },
+    "issue_codes": {
+      "type": "string",
+      "pattern": "^(?:(?:missing_structure|invalid_smiles|submission_structure_mismatch|submission_hash_mismatch|submission_species_mismatch|submission_export_missing|submission_name_mismatch|submission_cid_mismatch|shared_structure|same_connectivity_different_stereo|stereo_undefined|multi_fragment|charged_structure|smiles_whitespace_trimmed|structure_changed|structure_reactivated|submission_record_missing|submission_export_reconstructed|submission_hash_not_declared)(?:;(?:missing_structure|invalid_smiles|submission_structure_mismatch|submission_hash_mismatch|submission_species_mismatch|submission_export_missing|submission_name_mismatch|submission_cid_mismatch|shared_structure|same_connectivity_different_stereo|stereo_undefined|multi_fragment|charged_structure|smiles_whitespace_trimmed|structure_changed|structure_reactivated|submission_record_missing|submission_export_reconstructed|submission_hash_not_declared))*)?$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "row_status": {
+            "const": "accepted"
+          }
+        },
+        "required": [
+          "row_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "structure_status": {
+            "const": "registered"
+          },
+          "submission_status": {
+            "enum": [
+              "verified",
+              "verified_kind_unstated",
+              "reconstructed",
+              "not_recorded"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "row_status": {
+            "const": "quarantined"
+          }
+        },
+        "required": [
+          "row_status"
+        ]
+      },
+      "then": {
+        "anyOf": [
+          {
+            "properties": {
+              "structure_status": {
+                "const": "not_registered"
+              },
+              "submission_status": {
+                "const": "not_checked"
+              }
+            }
+          },
+          {
+            "properties": {
+              "structure_status": {
+                "const": "registered"
+              },
+              "submission_status": {
+                "const": "rejected"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "row_status": {
+            "const": "name_only"
+          }
+        },
+        "required": [
+          "row_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "structure_status": {
+            "const": "name_only"
+          },
+          "submission_status": {
+            "const": "not_applicable"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "structure_status": {
+            "const": "registered"
+          }
+        },
+        "required": [
+          "structure_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "structure_id": {
+            "type": "string",
+            "pattern": "^STR[0-9]{4,}$"
+          },
+          "smiles": {
+            "type": "string",
+            "pattern": "^[^\\s]+$"
+          },
+          "inchikey": {
+            "type": "string",
+            "pattern": "^[A-Z]{14}-[A-Z]{10}-[A-Z]$"
+          },
+          "stereo_status": {
+            "enum": [
+              "none_present",
+              "defined",
+              "partially_defined",
+              "undefined"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "structure_id": {
+            "const": ""
+          },
+          "smiles": {
+            "const": ""
+          },
+          "inchikey": {
+            "const": ""
+          },
+          "stereo_status": {
+            "const": ""
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "submission_status": {
+            "const": "verified"
+          }
+        },
+        "required": [
+          "submission_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "export_kind": {
+            "const": "native_export"
+          },
+          "export_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "submission_status": {
+            "const": "verified_kind_unstated"
+          }
+        },
+        "required": [
+          "submission_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "export_kind": {
+            "const": ""
+          },
+          "export_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "submission_status": {
+            "const": "reconstructed"
+          }
+        },
+        "required": [
+          "submission_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "export_kind": {
+            "const": "reconstructed_from_result_page"
+          },
+          "export_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "submission_status": {
+            "enum": [
+              "not_recorded",
+              "rejected",
+              "not_checked",
+              "not_applicable"
+            ]
+          }
+        },
+        "required": [
+          "submission_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "export_kind": {
+            "const": ""
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "submission_status": {
+            "enum": [
+              "not_checked",
+              "not_applicable"
+            ]
+          }
+        },
+        "required": [
+          "submission_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "export_sha256": {
+            "const": ""
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "structure_status": {
+            "const": "not_registered"
+          }
+        },
+        "required": [
+          "structure_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "issue_codes": {
+            "pattern": "(?:^|;)(?:missing_structure|invalid_smiles)(?:;|$)"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "issue_codes": {
+            "not": {
+              "pattern": "(?:^|;)(?:missing_structure|invalid_smiles)(?:;|$)"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "submission_status": {
+            "const": "rejected"
+          }
+        },
+        "required": [
+          "submission_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "issue_codes": {
+            "pattern": "(?:^|;)(?:submission_structure_mismatch|submission_hash_mismatch|submission_species_mismatch|submission_export_missing|submission_name_mismatch|submission_cid_mismatch)(?:;|$)"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "issue_codes": {
+            "not": {
+              "pattern": "(?:^|;)(?:submission_structure_mismatch|submission_hash_mismatch|submission_species_mismatch|submission_export_missing|submission_name_mismatch|submission_cid_mismatch)(?:;|$)"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "submission_status": {
+            "const": "not_recorded"
+          }
+        },
+        "required": [
+          "submission_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "issue_codes": {
+            "pattern": "(?:^|;)(?:submission_record_missing)(?:;|$)"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "issue_codes": {
+            "not": {
+              "pattern": "(?:^|;)(?:submission_record_missing)(?:;|$)"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "submission_status": {
+            "const": "reconstructed"
+          }
+        },
+        "required": [
+          "submission_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "issue_codes": {
+            "pattern": "(?:^|;)(?:submission_export_reconstructed)(?:;|$)"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "issue_codes": {
+            "not": {
+              "pattern": "(?:^|;)(?:submission_export_reconstructed)(?:;|$)"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
