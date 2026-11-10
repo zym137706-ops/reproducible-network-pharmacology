@@ -28,10 +28,12 @@ jobs:
       - name: Install from lock file
         run: |
           uv venv --python ${{ matrix.python-version }}
-          uv sync --locked --extra dev
+          uv sync --locked --extra dev --extra chem
       - name: Lint
         run: uv run ruff check .
       - name: Test
+        env:
+          RNP_REQUIRE_CHEM: "1"
         run: uv run pytest -q
       - name: CLI quickstart (enrichment is covered by the R job)
         run: |

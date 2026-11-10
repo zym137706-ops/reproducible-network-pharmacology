@@ -9,6 +9,15 @@ Zhu Y. *reproducible-network-pharmacology* v0.1.0 (published 2026-11-02). MIT-li
 Release: https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0
 No DOI is assigned.
 
+Optional software (extra `chem`, used by the structure library `rnp.structures`; implemented, unreleased):
+
+- RDKit: open-source cheminformatics, <https://www.rdkit.org/>; source <https://github.com/rdkit/rdkit>.
+  License BSD-3-Clause (PyPI metadata of rdkit 2026.9.1, read 2026-11-10). The installed version is
+  recorded in every structure-registry row (`toolkit_version`).
+- InChI and InChIKey come from the InChI support of RDKit. Heller SR, McNaught A, Pletnev I, Stein S,
+  Tchekhovskoi D. InChI, the IUPAC International Chemical Identifier. *Journal of Cheminformatics* **7**, 23
+  (2015). <https://doi.org/10.1186/s13321-015-0068-4>
+
 ## Upstream data citations
 
 ### SwissTargetPrediction (STP)

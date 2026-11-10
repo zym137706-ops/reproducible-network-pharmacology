@@ -14,6 +14,14 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### Optional `chem` extra (RDKit) — 2026-11-10
+
+- Added the optional extra `chem` (`rdkit>=2026.3.1,<2027`) and locked it in `uv.lock`; the core
+  dependencies are unchanged and `import rnp` never imports RDKit. The extra is needed only to register a
+  structure that is not yet in the structure registry (the library of the next entry-A step).
+- CI installs the extra for the test job and sets `RNP_REQUIRE_CHEM=1`, so the RDKit tests cannot be
+  skipped there; without the variable they are skipped when RDKit is missing.
+
 ### Entry A artifact schemas (contract only) — 2026-11-09
 
 - Added four JSON Schemas for the structure-aware compound registration of upstream entry A
