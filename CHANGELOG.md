@@ -14,6 +14,18 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### Structure registration library — 2026-11-10
+
+- Added the library `rnp.structures` for upstream entry A (`docs/upstream.md`, section 8): an RDKit
+  adapter that is imported lazily; the persistent structure registry with supersession and the
+  `structure_*`, `shared_structure` and stereo/salt/charge warnings; binding of the submission log to the
+  registered structures with statuses and stable issue codes; the rows of `compound_structures.tsv` and
+  the audit counts; and the cross-table checks that the schemas cannot express (registry, table rows,
+  issues against row statuses, summary counts).
+- It is a library only: no command calls it yet and `schemas/run.schema.json` is unchanged. RDKit is
+  needed only to describe a structure that is not yet in the registry; reading registries and binding
+  submissions work without it. The tests replace the RDKit adapter by a fake, except for the adapter's own.
+
 ### Optional `chem` extra (RDKit) — 2026-11-10
 
 - Added the optional extra `chem` (`rdkit>=2026.3.1,<2027`) and locked it in `uv.lock`; the core
