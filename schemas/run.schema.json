@@ -22,6 +22,16 @@
         "disease_retrieval_date": { "type": "string", "format": "date" },
         "hgnc_map": { "type": "string", "minLength": 1 },
         "compound_registry": { "type": "string", "minLength": 1 },
+        "submission_log": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Optional STP submission log (TSV) that 'rnp ingest compounds' checks against the registered structures and the export files; structure mode only."
+        },
+        "structure_registry": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Persistent structure registry (TSV); default <outputs.dir>/registry/structure_registry.tsv; structure mode only."
+        },
         "allow_filename_match": {
           "type": "boolean",
           "description": "Compatibility mode: bind exports by filename when no explicit stp_file is given. Recorded in the audit."

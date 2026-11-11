@@ -52,6 +52,8 @@ def _require_inputs(config: RunConfig) -> dict[str, str]:
     }
     if "hgnc_map" in config.data["inputs"]:
         checks["hgnc_map"] = config.input_path("hgnc_map")
+    if "submission_log" in config.data["inputs"]:
+        checks["submission_log"] = config.input_path("submission_log")
     problems = []
     for name, path in checks.items():
         expected = "dir" if name == "stp_dir" else "file"
