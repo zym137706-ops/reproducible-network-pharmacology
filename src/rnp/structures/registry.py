@@ -10,7 +10,7 @@ from ..errors import InputError, SchemaViolation
 from ..io.tables import write_table
 from ..output import write_table_atomic
 from .checks import check_registry, structure_number
-from .chem import StructureError
+from .chem import TOOLKIT, StructureError, StructureInfo
 from .model import CompoundRow, Issue, schema_problems, sorted_issues
 from .tables import read_rows
 
@@ -108,7 +108,7 @@ def _warning_codes(row: dict[str, str], compound: CompoundRow) -> list[Issue]:
 def _new_row(
     compound: CompoundRow,
     smiles: str,
-    info: object,
+    info: StructureInfo,
     *,
     toolkit_version: str,
     now: str,
@@ -127,7 +127,7 @@ def _new_row(
         "stereo_elements_specified": str(info.stereo_elements_specified),
         "stereo_elements_total": str(info.stereo_elements_total),
         "standardization": "not_performed",
-        "toolkit": "rdkit",
+        "toolkit": TOOLKIT,
         "toolkit_version": toolkit_version,
         "rule_version": RULE_VERSION,
         "status": "current",
@@ -173,7 +173,7 @@ def register_structures(
     *,
     toolkit_version: str,
     now: str,
-    describe: Callable[[str], object] | None = None,
+    describe: Callable[[str], StructureInfo] | None = None,
 ) -> RegistrationResult:
     """Register every input row, returning the new registry and per-row outcomes."""
     compound_ids = [row.compound_id for row in rows]
@@ -252,11 +252,8 @@ def register_structures(
             describe = chem.describe_smiles
         try:
             info = describe(text)
-        except Exception as exc:
-            if isinstance(exc, StructureError):
-                message = f"{text!r} cannot be registered: {exc}"
-            else:
-                raise
+        except StructureError as exc:
+            message = f"{text!r} cannot be registered: {exc}"
             issues.append(_issue("error", "invalid_smiles", "compounds", compound, message))
             outcomes.append(
                 StructureOutcome(
@@ -324,18 +321,12 @@ def register_structures(
         )
         if same_key:
             outcome.issues.append(
-                _issue(
+                Issue(
                     "warning",
                     "shared_structure",
                     "compounds",
-                    CompoundRow(
-                        outcome.row,
-                        outcome.compound_id,
-                        "",
-                        "",
-                        "",
-                        "",
-                    ),
+                    outcome.row,
+                    outcome.compound_id,
                     f"the same InChIKey is registered for {', '.join(same_key)}",
                 )
             )
@@ -350,18 +341,12 @@ def register_structures(
         )
         if same_connectivity:
             outcome.issues.append(
-                _issue(
+                Issue(
                     "warning",
                     "same_connectivity_different_stereo",
                     "compounds",
-                    CompoundRow(
-                        outcome.row,
-                        outcome.compound_id,
-                        "",
-                        "",
-                        "",
-                        "",
-                    ),
+                    outcome.row,
+                    outcome.compound_id,
                     "same connectivity, different stereochemistry: " + ", ".join(same_connectivity),
                 )
             )

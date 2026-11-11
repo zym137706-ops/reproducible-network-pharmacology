@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import sys
 from pathlib import Path
 
 import pytest
@@ -30,6 +31,7 @@ from rnp.structures import (
     REGISTRY_COLUMNS as PACKAGE_COLUMNS,
 )
 from rnp.structures import (
+    ChemUnavailable,
     CompoundRow,
     Issue,
     check_registry,
@@ -810,3 +812,83 @@ def test_the_registry_is_a_path_friendly_function(tmp_path: Path):
     path = tmp_path / "a" / "b" / "r.tsv"
     write_registry(path, sample_registry())
     assert path.is_file()
+
+
+# --- gaps that mutation testing of the first implementation showed (2026-11-11) -------------------
+STEREO_ROWS = [
+    ("none_present", 0, 0),
+    ("defined", 1, 1),
+    ("defined", 3, 3),
+    ("undefined", 0, 1),
+    ("undefined", 0, 4),
+    ("partially_defined", 1, 2),
+    ("partially_defined", 2, 3),
+]
+
+
+@pytest.mark.parametrize("status, specified, total", STEREO_ROWS)
+def test_a_valid_row_of_every_stereo_status_has_no_problems(status, specified, total):
+    row = registry_row("CMP0001", 1, "CCO", stereo_status=status, specified=specified, total=total)
+    assert check_registry([row]) == []
+
+
+def test_a_registry_with_every_stereo_status_survives_a_round_trip(tmp_path):
+    rows = [
+        registry_row(
+            f"CMP{number:04d}",
+            number,
+            "C" * number,
+            stereo_status=status,
+            specified=specified,
+            total=total,
+        )
+        for number, (status, specified, total) in enumerate(STEREO_ROWS, start=1)
+    ]
+    write_registry(tmp_path / "r.tsv", rows)
+    assert read_registry(tmp_path / "r.tsv") == rows
+
+
+class Unexpected(Exception):
+    """An error that is not a StructureError."""
+
+
+@pytest.mark.parametrize(
+    "error",
+    [ChemUnavailable(), RuntimeError("boom"), Unexpected("unexpected")],
+    ids=["chem_unavailable", "runtime_error", "unexpected"],
+)
+def test_a_describer_error_that_is_not_a_structure_error_is_not_swallowed(error):
+    def describer(smiles):
+        raise error
+
+    with pytest.raises(type(error)):
+        run([compound(1, "CCO"), compound(2, "CCN")], describer=describer)
+
+
+@pytest.fixture
+def no_rdkit(monkeypatch):
+    """Make `import rdkit` fail, whether or not RDKit is installed."""
+    monkeypatch.setitem(sys.modules, "rdkit", None)
+
+
+def test_a_new_structure_without_rdkit_is_a_run_error_not_a_row_problem(no_rdkit):
+    with pytest.raises(ChemUnavailable) as caught:
+        register_structures([compound(1, "CCO")], [], toolkit_version=TOOLKIT_VERSION, now=NOW)
+    assert caught.value.exit_code == 2
+
+
+def test_without_rdkit_a_string_with_whitespace_is_still_a_row_problem(no_rdkit):
+    result = register_structures(
+        [compound(1, "CC O")], [], toolkit_version=TOOLKIT_VERSION, now=NOW
+    )
+    (outcome,) = result.outcomes
+    assert outcome.status == "not_registered"
+    assert codes(outcome) == ["invalid_smiles"]
+
+
+def test_without_rdkit_a_registered_structure_is_still_reused(no_rdkit):
+    registry = [registry_row("CMP0001", 1, "CCO")]
+    result = register_structures(
+        [compound(1, "CCO")], registry, toolkit_version=TOOLKIT_VERSION, now=LATER
+    )
+    assert result.reused == 1 and result.new == 0

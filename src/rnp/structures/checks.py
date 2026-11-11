@@ -61,7 +61,7 @@ def check_registry(rows: list[dict[str, str]]) -> list[str]:
         if row["connectivity_block"] != expected_block:
             problems.append(f"{where}: connectivity_block is not the first block of the inchikey")
         if row["stereo_status"] == "defined" and (
-            row["stereo_elements_specified"] != row["stereo_elements_total"]
+            int(row["stereo_elements_specified"]) != int(row["stereo_elements_total"])
         ):
             problems.append(
                 f"{where}: stereo_status is defined but only "

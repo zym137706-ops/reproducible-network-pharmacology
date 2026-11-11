@@ -238,8 +238,7 @@ def bind_submissions(
                 "the export was reconstructed from the result page",
             )
         else:
-            status = "rejected"
-            export_kind = ""
+            raise ValueError(f"unknown export_kind: {export_kind!r}")
         outcomes.append(
             SubmissionOutcome(
                 compound.row,

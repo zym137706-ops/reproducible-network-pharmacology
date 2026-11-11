@@ -579,3 +579,43 @@ def test_a_log_row_can_be_read_from_a_file_and_bound(tmp_path):
         rows, registered(rows).outcomes, log, stp_dir=stp, species="Homo_sapiens"
     )
     assert result.outcomes[0].status == "verified"
+
+
+# --- gaps that mutation testing of the first implementation showed (2026-11-11) -------------------
+def test_a_log_row_with_only_the_required_columns_can_be_bound(tmp_path):
+    stp = tmp_path / "stp"
+    digest = write_export(stp, "c1.xlsx")
+    rows = [compound(1, "CCO", pubchem_cid="702")]
+    minimal = LogRow(
+        1,
+        {
+            "stp_file": "c1.xlsx",
+            "submitted_structure": "CCO",
+            "species": "Homo sapiens",
+            "submitted_date": "2026-10-21",
+        },
+    )
+    result = bind_submissions(
+        rows, registered(rows).outcomes, [minimal], stp_dir=stp, species="Homo_sapiens"
+    )
+    (outcome,) = result.outcomes
+    assert (outcome.status, outcome.export_kind, outcome.export_sha256) == (
+        "verified_kind_unstated",
+        "",
+        digest,
+    )
+    assert issue_view(outcome) == [
+        ("warning", "submission_hash_not_declared", "submission_log", 1, "CMP0001")
+    ]
+    assert result.orphan_issues == []
+
+
+def test_an_export_kind_that_the_schema_does_not_allow_is_refused(tmp_path):
+    stp = tmp_path / "stp"
+    digest = write_export(stp, "c1.xlsx")
+    rows = [compound(1, "CCO")]
+    odd = LogRow(1, log_row(1, digest, export_kind="weird_kind"))
+    with pytest.raises(ValueError):
+        bind_submissions(
+            rows, registered(rows).outcomes, [odd], stp_dir=stp, species="Homo_sapiens"
+        )

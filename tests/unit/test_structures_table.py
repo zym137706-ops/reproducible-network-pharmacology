@@ -566,3 +566,14 @@ def test_the_library_flow_through_files(tmp_path):
     again = read_registry(registry_path)
     assert [r["last_seen_utc"] for r in again] == [LATER, LATER]
     assert [r["first_seen_utc"] for r in again] == [NOW, NOW]
+
+
+# --- gaps that mutation testing of the first implementation showed (2026-11-11) -------------------
+def test_the_problems_of_a_table_to_write_name_their_rows(tmp_path):
+    _, _, _, table, _, _ = pipeline(tmp_path)
+    table[1]["row_status"] = "perhaps"
+    with pytest.raises(SchemaViolation) as caught:
+        write_structures_table(tmp_path / "t.tsv", table)
+    assert any(d.startswith("row 2:") and "row_status" in d for d in caught.value.details)
+    assert not any(d.startswith("row 1:") for d in caught.value.details)
+    assert not (tmp_path / "t.tsv").exists()
