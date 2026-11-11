@@ -14,6 +14,21 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### `rnp ingest compounds` command — 2026-11-11
+
+- Added the command `rnp ingest compounds` (stage module `rnp.analysis.compounds`). It registers the
+  compound identities and, when the compound table has a `smiles` column, the structures and the STP
+  submission log, and writes `compound_structures.tsv`, `compounds_audit.json` and `run_manifest.json`
+  into `<outputs.dir>/<run id>_compounds/`. Rows without a registered structure or with a refused
+  submission are quarantined (exit code 3). Without a `smiles` column the stage runs in name-only mode
+  and needs no RDKit.
+- The run config accepts the optional inputs `inputs.submission_log` and `inputs.structure_registry`;
+  `rnp validate` checks that a named submission log is a file.
+- `rnp.structures`: `bind_submissions` raises `ValueError` for an `export_kind` the submission log schema
+  does not allow, instead of rejecting the row without a reason; the registry code was tidied (no change
+  in behaviour).
+- `rnp ingest stp` is unchanged: it does not read the compounds stage yet.
+
 ### Structure registration library — 2026-11-10
 
 - Added the library `rnp.structures` for upstream entry A (`docs/upstream.md`, section 8): an RDKit

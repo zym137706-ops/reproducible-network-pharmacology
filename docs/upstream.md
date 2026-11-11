@@ -1,6 +1,6 @@
 # 上游导入、结构注册与显式选择（设计契约）
 
-状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`（未发布）；命令仍未实现，字段尚未接入任何命令。执行顺序见 [总规划](project-plan.zh-CN.md)。
+状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`（均未发布）；`ingest stp` 对它的接入（`--compounds`）尚未实现。执行顺序见 [总规划](project-plan.zh-CN.md)。
 实现时先增加 JSON Schema、跨表约束及正反例，再修改 CLI；不通过文档宣称接口已经可用。
 
 ## 1. 输入边界
@@ -74,12 +74,12 @@ Cytoscape 后续以 compound:<id>、gene:<id>、disease:<id> 连接，Label 与 
 [RDKit 标准化接口](https://www.rdkit.org/docs/source/rdkit.Chem.MolStandardize.rdMolStandardize.html)；
 [Meeko 配体准备](https://meeko.readthedocs.io/en/develop/lig_prep_basic.html)。
 
-## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；命令尚未实现）
+## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`）
 
-本节把第 2、3、6 节落到入口 A 的第一个可实现切片。`rnp ingest compounds` 还不存在；下列产物有 JSON Schema
-（`schemas/`）和契约测试（`tests/unit/test_entry_a_schemas.py`），库 `rnp.structures`（`src/rnp/structures/`）
-已能读写和校验它们，但没有任何命令调用这个库。表格产物是 TSV：“行 Schema”描述一行（单元格已去首尾空白，
-空单元格是空字符串），`properties` 的顺序就是列顺序。
+本节把第 2、3、6 节落到入口 A 的第一个可实现切片。命令 `rnp ingest compounds`（2026-11-11 起，未发布）读写下列产物，
+并用库 `rnp.structures`（`src/rnp/structures/`）完成登记、绑定和校验；这些产物有 JSON Schema（`schemas/`）和契约测试
+（`tests/unit/test_entry_a_schemas.py`）。表格产物是 TSV：“行 Schema”描述一行（单元格已去首尾空白，空单元格是空字符串），
+`properties` 的顺序就是列顺序。
 
 ### 8.1 模式与产物
 
@@ -172,8 +172,22 @@ Schema 表达不了的约束由库实现并测试：
 
 不做：入口 B、性质标注、联网查询、结构标准化、“提交结构与当前结构不同但研究者显式接受”、跨组出现表、配体态、
 选择决定表（`selection_decisions`，下一个切片）。
-状态：设计、Schema 和契约测试已完成（2026-11-09）；库 `rnp.structures` 已实现、未发布（2026-11-10）：RDKit 适配
-（可选依赖 `chem`，只在登记新结构时才需要）、结构注册表、提交绑定、`compound_structures.tsv` 与审计计数，以及上面
-8.5 的跨表校验（注册表、化合物—结构表、问题与行状态的对应、`summary` 计数；审计里 `compound_structures_sha256`
-的核对留给写出审计的命令）。命令 `rnp ingest compounds`，以及 `run.schema.json` 的新键（`inputs.submission_log`、
-`inputs.structure_registry`）尚未实现。
+状态：设计、Schema 和契约测试已完成（2026-11-09）；库 `rnp.structures` 和命令 `rnp ingest compounds` 已实现、未发布
+（2026-11-10、2026-11-11）。命令把阶段输出写进 `<outputs.dir>/<run_id>_compounds/`，`run.schema.json` 有了新键
+`inputs.submission_log` 和 `inputs.structure_registry`；结构模式下运行命令需要可选依赖 `chem`（见 8.7）。
+`ingest stp --compounds`（下游接入）尚未实现。
+
+### 8.7 命令 `rnp ingest compounds`（2026-11-11；未发布）
+
+`rnp ingest compounds --config run.yaml [--force]`：对 `inputs.compounds` 的每一行登记化合物身份（沿用 v0.1 的名称注册表）；
+表里有 `smiles` 列时进入结构模式，登记结构并核对 `inputs.submission_log`。
+
+- **输入：**`inputs.compounds`、`inputs.stp_dir`（给了日志才用来核对导出）、`species`、可选的 `inputs.compound_registry` 和
+  `inputs.allow_filename_match`；新增可选的 `inputs.submission_log`（TSV）和 `inputs.structure_registry`（默认
+  `<outputs.dir>/registry/structure_registry.tsv`）。名称模式（表里没有 `smiles` 列）下配置这两个新键是表级错误。
+- **输出：**阶段目录 `<outputs.dir>/<run_id>_compounds/`（默认 run_id 是 UTC 时间戳加配置哈希前 8 位，再加 `_compounds`）里有
+  `compound_structures.tsv`、`compounds_audit.json`、`run_manifest.json`；两个注册表在阶段目录就位之后才写。表和审计里没有时间戳。
+- **退出码：**0 完成；3 部分（有隔离行，输出已写）；2 表级或输入错误（什么都不写，注册表也不动），包括结构模式下没有安装 RDKit；
+  1 内部错误。
+- **RDKit：**结构模式需要可选依赖 `chem`（审计要写 RDKit 版本）；名称模式不需要。
+- `ingest stp` 目前不读这个阶段的输出；接入（`--compounds`）是下一步。

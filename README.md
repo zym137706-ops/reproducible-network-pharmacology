@@ -147,6 +147,7 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 |---|---|---|
 | `rnp validate` | ✅ | Validate a run config and every declared input path |
 | `rnp ingest stp` | ✅ | Bind compounds to exports, parse xlsx/csv (merged title rows, multi-symbol targets, complexes) into `targets.tsv`; quarantine unbound exports; classify file status; stage status |
+| `rnp ingest compounds` | ✅ implemented, unreleased | Register compound identities and, when the compound table has a `smiles` column, structures (RDKit, optional extra `chem`) and the STP submission log; writes `compound_structures.tsv`, `compounds_audit.json` and a manifest into `<outputs.dir>/<run id>_compounds/`; rows without a registered structure or with a refused submission are quarantined (exit code 3); without a `smiles` column it runs in name-only mode and needs no RDKit; `ingest stp` does not read it yet ([docs/upstream.md](docs/upstream.md), section 8) |
 | `rnp manifest` | ✅ | Validate a run manifest and detect drift in recorded input hashes |
 | `rnp intersect` | ✅ | HGNC-normalized intersection; refuses partial upstream by default; exclusions and conflicts in audit tables |
 | `rnp network` | ✅ | Cytoscape node/edge/MOLlist tables + Venny data; optional R Venn plot (`--venn-plot`); valid empty network for zero hits |

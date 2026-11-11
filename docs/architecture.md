@@ -58,6 +58,7 @@ The skill may not re-implement it in prose or in a snippet.
 | `rnp.normalize.hgnc` | HGNC symbol/alias/UniProt normalization with conflict reporting |
 | `rnp.normalize.identities` | persistent `compound_id` registry and explicit export binding |
 | `rnp.analysis.ingest` | binding, quarantine, stage status, `targets.tsv` + audit |
+| `rnp.analysis.compounds` | the compounds stage (upstream entry A): identity registry, structure registry and submission log in one audited stage; `compound_structures.tsv` + audit + manifest |
 | `rnp.analysis.intersect` | compound–target edges, disease intersection, exclusion audit, Venn data |
 | `rnp.analysis.network` | Cytoscape node/edge/MOLlist tables and their invariants |
 | `rnp.analysis.enrich` | explicit-background ORA via the R bridge; complete table + significant view |
@@ -86,6 +87,10 @@ The skill may not re-implement it in prose or in a snippet.
 6. `rnp report --config run.yaml --run-dir results/<id>` — verifies stage audits/hashes and renders
    Markdown; missing stages are "not run", partial stages need an explicit override.
 7. `rnp manifest --run-dir results/<id> --check-inputs` — verify nothing drifted.
+
+Optional, before step 2, for compound lists with structures (upstream entry A, `docs/upstream.md` section 8): `rnp ingest compounds --config run.yaml` registers the compound
+identities and, when the compound table has a `smiles` column, the structures and the STP submission log. It writes `compound_structures.tsv`, `compounds_audit.json` and a manifest into its
+own directory `results/<id>_compounds/`; `rnp ingest stp` does not read it yet.
 
 `run_id` = UTC timestamp + first 8 hex of the config SHA-256, e.g. `20261018T051500Z_6f037817`.
 It is overridable (`--run-id`) so tests and re-runs are reproducible.
