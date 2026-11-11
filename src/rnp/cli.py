@@ -21,6 +21,7 @@ from typing import Any
 from . import __version__
 from .acquire import DEFAULT_TIMEOUT, RECORD_FILENAME, urllib_fetcher, verify_acquisition
 from .acquire import acquire as run_acquire
+from .analysis.compounds import run_compounds
 from .analysis.enrich import run_enrich
 from .analysis.ingest import run_ingest
 from .analysis.intersect import run_intersect
@@ -95,6 +96,13 @@ def cmd_validate(args: argparse.Namespace) -> int:
 def cmd_ingest_stp(args: argparse.Namespace) -> int:
     config = load_config(args.config)
     summary = run_ingest(config, run_id=args.run_id, force=args.force)
+    _emit(summary)
+    return 0 if summary["stage_status"] == "complete" else 3
+
+
+def cmd_ingest_compounds(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    summary = run_compounds(config, run_id=args.run_id, force=args.force)
     _emit(summary)
     return 0 if summary["stage_status"] == "complete" else 3
 
@@ -333,6 +341,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     ingest = sub.add_parser("ingest", help="parse raw exports into audited tables")
     ingest_sub = ingest.add_subparsers(dest="ingest_command", required=True)
+    ingest_compounds = ingest_sub.add_parser(
+        "compounds",
+        help="register compound identities, structures and STP submissions (upstream entry A)",
+    )
+    ingest_compounds.add_argument("--config", required=True, help="path to run.yaml")
+    ingest_compounds.add_argument("--run-id", default=None, help=argparse.SUPPRESS)
+    ingest_compounds.add_argument(
+        "--force", action="store_true", help="replace an existing run directory"
+    )
     ingest_stp = ingest_sub.add_parser("stp", help="parse SwissTargetPrediction exports")
     ingest_stp.add_argument("--config", required=True, help="path to run.yaml")
     ingest_stp.add_argument("--run-id", default=None, help=argparse.SUPPRESS)
@@ -452,6 +469,7 @@ def build_parser() -> argparse.ArgumentParser:
 _DISPATCH = {
     ("validate", None): cmd_validate,
     ("ingest", "stp"): cmd_ingest_stp,
+    ("ingest", "compounds"): cmd_ingest_compounds,
     ("intersect", None): cmd_intersect,
     ("network", None): cmd_network,
     ("enrich", None): cmd_enrich,
