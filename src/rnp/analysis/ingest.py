@@ -23,6 +23,8 @@ from ..normalize.identities import (
 )
 from ..output import staged_output, write_table_atomic
 from ..provenance import build_manifest, sha256_file, utc_now_iso, write_json
+from .compounds_link import check_exports, check_identities, load_compounds_stage
+from .parents import parent_record
 
 EXPORT_SUFFIXES = {".csv", ".tsv", ".txt", ".xlsx"}
 COMPOUND_COLUMNS = [
@@ -33,6 +35,7 @@ COMPOUND_COLUMNS = [
     "submission_id",
     "identity_basis",
 ]
+STRUCTURE_COLUMNS = ["structure_id", "structure_status"]
 
 
 def registry_path(config: RunConfig) -> Path:
@@ -63,12 +66,22 @@ def run_ingest(
     *,
     run_id: str | None = None,
     force: bool = False,
+    compounds: str | Path | None = None,
 ) -> dict[str, Any]:
-    """Parse the bound STP exports and write a staged, auditable target table."""
+    """Parse the bound STP exports and write a staged, auditable target table.
+
+    When ``compounds`` names a compounds stage directory, its decisions are applied after the
+    stage is verified to still describe the compound table and the exports.
+    """
     compounds_path = config.input_path("compounds")
     stp_dir = config.input_path("stp_dir")
     if not stp_dir.is_dir():
         raise InputError(f"inputs.stp_dir is not a directory: {stp_dir}")
+    stage = (
+        load_compounds_stage(compounds, config, compounds_path)
+        if compounds is not None
+        else None
+    )
     threshold = float(config.data["thresholds"]["stp_probability"])
     allow_filename_match = bool(config.data["inputs"].get("allow_filename_match", False))
     registry = registry_path(config)
@@ -76,6 +89,9 @@ def run_ingest(
     records, registry_rows, notes = register_compounds(
         compounds_path, registry, allow_filename_match=allow_filename_match
     )
+    if stage is not None:
+        check_identities(stage, records)
+    quarantined = stage.quarantined if stage is not None else set()
     files = sorted(
         path
         for path in stp_dir.iterdir()
@@ -106,6 +122,26 @@ def run_ingest(
     unbound_reasons = {item["path"]: item["reason"] for item in unbound}
     for path in files:
         compound = bindings.get(path.name)
+        if compound is not None and compound.compound_id in quarantined:
+            file_entries.append(
+                {
+                    "path": path.name,
+                    "format": "xlsx" if path.suffix.lower() == ".xlsx" else "csv",
+                    "sha256": sha256_file(path),
+                    "status": "quarantined",
+                    "compound_id": compound.compound_id,
+                    "group": compound.group,
+                    "reason": "compound_quarantined",
+                    "warnings": [],
+                    "errors": [],
+                    "rows_total": 0,
+                    "rows_valid": 0,
+                    "rows_invalid": 0,
+                    "rows_below_threshold": 0,
+                    "rows_used": 0,
+                }
+            )
+            continue
         if compound is None:
             file_entries.append(
                 {
@@ -159,7 +195,13 @@ def run_ingest(
                 }
             )
 
+    if stage is not None:
+        check_exports(
+            stage, records, {entry["path"]: entry["sha256"] for entry in file_entries}
+        )
     stage_status = _stage_status(file_entries, missing)
+    if stage_status == "complete" and quarantined:
+        stage_status = "partial"
     if stage_status == "failed":
         problems = [
             f"{entry['path']}: {entry['status']}"
@@ -175,21 +217,29 @@ def run_ingest(
     run_dir = config.output_dir / run
     started_at = utc_now_iso()
     with staged_output(run_dir, force=force) as work:
-        write_table(
-            work / "compounds_registered.tsv",
-            [
+        registered_columns = list(COMPOUND_COLUMNS)
+        registered_rows = [
+            {
+                "compound_id": record.compound_id,
+                "group": record.group,
+                "name": record.name,
+                "stp_file": record.stp_file,
+                "submission_id": record.submission_id,
+                "identity_basis": record.identity_basis,
+            }
+            for record in records
+        ]
+        if stage is not None and stage.identity_mode == "structure":
+            registered_columns.extend(STRUCTURE_COLUMNS)
+            registered_rows = [
                 {
-                    "compound_id": record.compound_id,
-                    "group": record.group,
-                    "name": record.name,
-                    "stp_file": record.stp_file,
-                    "submission_id": record.submission_id,
-                    "identity_basis": record.identity_basis,
+                    **row,
+                    "structure_id": structure["structure_id"],
+                    "structure_status": structure["structure_status"],
                 }
-                for record in records
-            ],
-            COMPOUND_COLUMNS,
-        )
+                for row, structure in zip(registered_rows, stage.rows, strict=True)
+            ]
+        write_table(work / "compounds_registered.tsv", registered_rows, registered_columns)
         stp_io.write_targets_tsv(targets, work / "targets.tsv")
         compounds_sha = sha256_file(work / "compounds_registered.tsv")
         targets_sha = sha256_file(work / "targets.tsv")
@@ -216,6 +266,14 @@ def run_ingest(
             "warnings": sum(len(entry["warnings"]) for entry in file_entries),
             "errors": sum(len(entry["errors"]) for entry in file_entries) + len(missing),
         }
+        if stage is not None:
+            notes.append(
+                {
+                    "code": "compounds_stage_applied",
+                    "message": "structure ids and quarantine decisions come from the compounds "
+                    f"stage {stage.directory}",
+                }
+            )
         audit = {
             "schema_version": "1.1",
             "generated_by": "rnp ingest stp",
@@ -239,18 +297,33 @@ def run_ingest(
         write_json(work / "stp_audit.json", audit)
 
         exit_code = 0 if stage_status == "complete" else 3
+        args = {
+            "config": str(config.path),
+            "stp_dir": str(stp_dir),
+            "stp_probability": threshold,
+            "allow_filename_match": allow_filename_match,
+        }
+        inputs = [config.path, compounds_path, *files]
+        parents: list[dict[str, Any]] = []
+        if stage is not None:
+            args["compounds"] = str(stage.directory)
+            inputs.extend([stage.audit_path, stage.table_path])
+            parents.append(
+                parent_record(
+                    stage="ingest compounds",
+                    directory=stage.directory,
+                    audit_path=stage.audit_path,
+                    stage_status=stage.stage_status,
+                    override=False,
+                )
+            )
         manifest = build_manifest(
             run_id=run,
             command="ingest stp",
-            args={
-                "config": str(config.path),
-                "stp_dir": str(stp_dir),
-                "stp_probability": threshold,
-                "allow_filename_match": allow_filename_match,
-            },
+            args=args,
             config=config,
-            inputs=[config.path, compounds_path, *files],
-            parents=[],
+            inputs=inputs,
+            parents=parents,
             started_at=started_at,
             finished_at=utc_now_iso(),
             exit_code=exit_code,
