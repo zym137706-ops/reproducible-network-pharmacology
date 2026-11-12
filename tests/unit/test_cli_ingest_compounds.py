@@ -119,6 +119,21 @@ def test_a_string_that_is_not_a_structure_makes_the_run_partial(tmp_path, capsys
     assert (manifest["stage_status"], manifest["exit_code"]) == ("partial", 3)
 
 
+def test_a_smiles_column_without_any_structure_is_quarantined_with_the_real_toolkit(
+    tmp_path, capsys, chem
+):
+    import rdkit
+
+    write_exports(tmp_path)
+    config = write_config(tmp_path, [compound_row(1), compound_row(2)])
+    assert invoke(config) == 3
+    printed = json.loads(capsys.readouterr().out)
+    assert printed["status"] == "partial"
+    assert [item["issue_codes"] for item in printed["quarantine"]] == [["missing_structure"]] * 2
+    audit = read_json(tmp_path / "results" / "r1_compounds" / "compounds_audit.json")
+    assert audit["toolkit"] == {"name": "rdkit", "version": rdkit.rdBase.rdkitVersion}
+
+
 # --- exit codes that need no RDKit ----------------------------------------------------------------
 def test_name_only_run_prints_its_summary_and_exits_0(tmp_path, capsys):
     config = write_config(tmp_path, [compound_row(1), compound_row(2)], columns=NAME_COLUMNS)

@@ -501,6 +501,7 @@ def test_two_rows_that_resolve_to_one_identity_write_nothing(tmp_path):
     with pytest.raises(InputError) as caught:
         run(config, run_id="r2")
     assert caught.value.exit_code == 2
+    assert caught.value.message == "the identity registry gave one compound_id to more than one row"
     assert caught.value.details == ["CMP0001: rows 1, 2"]
     assert registry.read_bytes() == before
     assert not (tmp_path / "results" / "r2_compounds").exists()
@@ -595,6 +596,33 @@ def test_registered_structures_need_no_adapter(tmp_path, no_rdkit):
     assert summary["summary"]["structures_reused"] == 2
 
 
+def test_structure_mode_needs_the_toolkit_even_when_every_structure_is_registered(
+    tmp_path, no_rdkit
+):
+    config, _, _ = two(tmp_path)
+    run(config)
+    with pytest.raises(ChemUnavailable) as caught:
+        run_compounds(load_config(config), run_id="r2", now=lambda: LATER)
+    assert caught.value.exit_code == 2
+    assert not (tmp_path / "results" / "r2_compounds").exists()
+
+
+def test_the_manifest_lists_the_exports_in_the_order_of_the_rows(tmp_path):
+    digests = write_exports(tmp_path, (1, 2, 3))
+    rows = [
+        compound_row(1, "CCO", stp_file="c3.xlsx"),
+        compound_row(2, "CCN", stp_file="c1.xlsx"),
+    ]
+    log = [
+        log_row(1, digests[3], stp_file="c3.xlsx", submitted_structure="CCO"),
+        log_row(2, digests[1], stp_file="c1.xlsx", submitted_structure="CCN"),
+    ]
+    config = write_config(tmp_path, rows, log_rows=log)
+    run(config)
+    manifest = read_json(tmp_path / "results" / "r1_compounds" / "run_manifest.json")
+    assert [Path(item["path"]).name for item in manifest["inputs"]][-2:] == ["c3.xlsx", "c1.xlsx"]
+
+
 def test_a_table_without_a_pubchem_cid_column_works(tmp_path):
     digests = write_exports(tmp_path)
     config = write_config(
@@ -615,5 +643,6 @@ def test_an_inconsistency_found_by_the_self_check_is_an_internal_error(tmp_path,
     with pytest.raises(SchemaViolation) as caught:
         run(config)
     assert caught.value.exit_code == 1
+    assert caught.value.message == "the compounds stage is internally inconsistent"
     assert caught.value.details == ["the parts disagree"]
     assert not (tmp_path / "results").exists()

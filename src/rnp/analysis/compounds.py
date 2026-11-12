@@ -1,9 +1,8 @@
 """The compounds stage: name-only identity or structure registration plus submission binding.
 
-Structure mode is selected by the presence of a ``smiles`` column in the compound table.
-The stage never trusts an unregistered structure: the persistent structure registry is the
-source of identity, and the submission log is checked against both the registry and the
-export bytes.
+Structure mode is selected by the presence of a smiles column in the compound table. The stage
+never trusts an unregistered structure: the persistent structure registry is the source of
+identity, and the submission log is checked against both the registry and the export bytes.
 """
 
 from __future__ import annotations
@@ -15,12 +14,19 @@ from typing import Any
 from ..config import RunConfig, validate_document
 from ..errors import InputError, SchemaViolation
 from ..io.tables import clean_text, read_table, write_table
-from ..normalize.identities import RULE_VERSION as COMPOUND_RULE_VERSION
+from ..normalize.identities import (
+    REGISTRY_COLUMNS,
+    register_compounds,
+)
+from ..normalize.identities import (
+    RULE_VERSION as COMPOUND_RULE_VERSION,
+)
 from ..output import staged_output, write_table_atomic
 from ..provenance import build_manifest, sha256_file, utc_now_iso, write_json
 from ..structures import (
     CompoundRow,
     Issue,
+    StructureInfo,
     bind_submissions,
     build_name_only_rows,
     build_structure_rows,
@@ -36,8 +42,14 @@ from ..structures import (
     write_structures_table,
 )
 from ..structures import toolkit_version as rdkit_version
+from ..structures.chem import TOOLKIT
 from ..structures.registry import RULE_VERSION as STRUCTURE_RULE_VERSION
 from ..structures.submissions import RULE_VERSION as BINDING_RULE_VERSION
+from .ingest import registry_path
+
+TABLE_NAME = "compound_structures.tsv"
+AUDIT_NAME = "compounds_audit.json"
+MANIFEST_NAME = "run_manifest.json"
 
 Summary = dict[str, int]
 
@@ -51,25 +63,24 @@ def _run_id(config: RunConfig, override: str | None, now: str) -> str:
     return f"{base}_compounds"
 
 
-def _compound_registry_path(config: RunConfig) -> Path:
-    if "compound_registry" in config.data["inputs"]:
-        return config.input_path("compound_registry")
-    return config.output_dir / "registry" / "compound_registry.tsv"
-
-
-def _structure_registry_path(config: RunConfig) -> Path:
+def structure_registry_path(config: RunConfig) -> Path:
+    """Return the path of the persistent structure registry of this run."""
     if "structure_registry" in config.data["inputs"]:
         return config.input_path("structure_registry")
     return config.output_dir / "registry" / "structure_registry.tsv"
 
 
 def _reject_structure_inputs(config: RunConfig) -> None:
-    for key in ("submission_log", "structure_registry"):
-        if key in config.data["inputs"]:
-            raise InputError(
-                f"inputs.{key} needs structure mode, but the compound table has no smiles column",
-                details=[f"remove inputs.{key}, or add a smiles column to the compound table"],
-            )
+    details = [
+        f"inputs.{key} is only used in structure mode: remove it or add a smiles column"
+        for key in ("submission_log", "structure_registry")
+        if key in config.data["inputs"]
+    ]
+    if details:
+        raise InputError(
+            "the compound table has no smiles column, so the stage runs in name-only mode",
+            details=details,
+        )
 
 
 def _check_duplicate_ids(records: list[Any]) -> None:
@@ -82,7 +93,10 @@ def _check_duplicate_ids(records: list[Any]) -> None:
         if len(rows) > 1
     ]
     if problems:
-        raise InputError("two input rows resolve to one compound identity", details=problems)
+        raise InputError(
+            "the identity registry gave one compound_id to more than one row",
+            details=problems,
+        )
 
 
 def _compound_rows(raw_rows: list[dict[str, str]], records: list[Any]) -> list[CompoundRow]:
@@ -98,15 +112,6 @@ def _compound_rows(raw_rows: list[dict[str, str]], records: list[Any]) -> list[C
         )
         for number, (raw, record) in enumerate(zip(raw_rows, records, strict=True), start=1)
     ]
-
-
-def _needs_descriptor(compounds: list[CompoundRow], registry: list[dict[str, str]]) -> bool:
-    known = {(row["compound_id"], row["smiles"]) for row in registry}
-    for compound in compounds:
-        text = compound.smiles.strip()
-        if text and (compound.compound_id, text) not in known:
-            return True
-    return False
 
 
 def _stage_status(table: list[dict[str, str]]) -> str:
@@ -132,14 +137,15 @@ def _self_check(
     issues: list[Issue],
     summary: Summary,
 ) -> None:
+    errors = sum(1 for issue in issues if issue.level == "error")
+    warnings = len(issues) - errors
     problems = [
         *check_table(table, registry, compounds),
         *check_issues(table, issues),
-        *check_summary(summary, table, summary["errors"], summary["warnings"]),
+        *check_summary(summary, table, errors, warnings),
     ]
     if problems:
-        raise SchemaViolation("the compounds stage self-check failed", details=problems)
-
+        raise SchemaViolation("the compounds stage is internally inconsistent", details=problems)
 
 def _audit(
     config: RunConfig,
@@ -220,13 +226,10 @@ def _audit(
 
 
 def _write_compound_registry(path: Path, rows: list[dict[str, str]]) -> None:
-    from ..normalize.identities import REGISTRY_COLUMNS
-
     write_table_atomic(
         path,
         lambda temporary: write_table(temporary, rows, REGISTRY_COLUMNS),
     )
-
 
 def run_compounds(
     config: RunConfig,
@@ -234,7 +237,7 @@ def run_compounds(
     run_id: str | None = None,
     force: bool = False,
     now: Callable[[], str] = utc_now_iso,
-    describe: Callable[[str], Any] | None = None,
+    describe: Callable[[str], StructureInfo] | None = None,
     toolkit_version: Callable[[], str] = rdkit_version,
 ) -> dict[str, Any]:
     """Run the compounds stage and return its summary."""
@@ -247,7 +250,9 @@ def run_compounds(
     if not structure_mode:
         _reject_structure_inputs(config)
 
-    compound_registry = _compound_registry_path(config)
+    compound_registry = registry_path(config)
+    registry_file: Path | None = None
+    registration = None
     if structure_mode:
         submission_log = (
             config.input_path("submission_log")
@@ -264,20 +269,17 @@ def run_compounds(
         else:
             stp_dir = None
             log_rows = None
-        structure_registry_path = _structure_registry_path(config)
-        structure_registry = read_registry(structure_registry_path)
+        registry_file = structure_registry_path(config)
+        structure_registry = read_registry(registry_file)
     else:
         submission_log = None
         stp_dir = None
         log_rows = None
-        structure_registry_path = None
         structure_registry = []
 
     # Identity registration reads the table again but performs no writes; its notes are part of
     # the audit, and a duplicate identity is a table-level error before anything is staged.
-    from ..normalize.identities import register_compounds as _register_compounds
-
-    records, compound_registry_rows, notes = _register_compounds(
+    records, compound_registry_rows, notes = register_compounds(
         compounds_path,
         compound_registry,
         allow_filename_match=bool(config.data["inputs"].get("allow_filename_match", False)),
@@ -287,6 +289,7 @@ def run_compounds(
     started_at = now()
     run = _run_id(config, run_id, started_at)
     run_dir = config.output_dir / run
+    hashed: list[Path] = []
 
     if not structure_mode:
         table = build_name_only_rows(compounds)
@@ -297,21 +300,14 @@ def run_compounds(
         structure_rule = None
         binding_rule = None
         structure_entries = 0
-        files_hashed = 0
     else:
-        assert structure_registry_path is not None
-        hashed: list[Path] = []
-
         def counting_hasher(path: Path) -> str:
             hashed.append(path)
             return sha256_file(path)
 
-        if _needs_descriptor(compounds, structure_registry) or describe is not None:
-            version = toolkit_version()
-        elif structure_registry:
-            version = structure_registry[0]["toolkit_version"]
-        else:
-            version = ""
+        # Structure mode needs the toolkit even when every structure is already registered: the
+        # audit records the version of this run, not whatever the registry was written with.
+        version = toolkit_version()
         registration = register_structures(
             compounds,
             structure_registry,
@@ -337,17 +333,16 @@ def run_compounds(
             issues=issues,
             summary=summary,
         )
-        toolkit = {"name": "rdkit", "version": version}
+        toolkit = {"name": TOOLKIT, "version": version}
         structure_rule = STRUCTURE_RULE_VERSION
         binding_rule = BINDING_RULE_VERSION if log_rows is not None else None
         structure_entries = len(registration.registry)
-        files_hashed = len(set(hashed))
 
     stage_status = _stage_status(table)
 
     with staged_output(run_dir, force=force) as work:
-        write_structures_table(work / "compound_structures.tsv", table)
-        table_sha = sha256_file(work / "compound_structures.tsv")
+        write_structures_table(work / TABLE_NAME, table)
+        table_sha = sha256_file(work / TABLE_NAME)
         audit = _audit(
             config,
             identity_mode="structure" if structure_mode else "name_only",
@@ -356,7 +351,7 @@ def run_compounds(
             submission_log=submission_log,
             log_rows=len(log_rows or []),
             stp_dir=stp_dir,
-            files_hashed=files_hashed,
+            files_hashed=len(hashed),
             toolkit=toolkit,
             structure_rule_version=structure_rule,
             binding_rule_version=binding_rule,
@@ -364,13 +359,13 @@ def run_compounds(
             issues=issues,
             compound_registry=compound_registry,
             compound_registry_entries=len(compound_registry_rows),
-            structure_registry=structure_registry_path,
+            structure_registry=registry_file,
             structure_registry_entries=structure_entries,
             notes=notes,
             table_sha256=table_sha,
         )
         validate_document(audit, "compounds_audit", "compounds audit")
-        write_json(work / "compounds_audit.json", audit)
+        write_json(work / AUDIT_NAME, audit)
 
         manifest = build_manifest(
             run_id=run,
@@ -389,7 +384,7 @@ def run_compounds(
                 config.path,
                 compounds_path,
                 *([submission_log] if submission_log is not None else []),
-                *(sorted(set(hashed)) if structure_mode else []),
+                *hashed,
             ],
             parents=[],
             started_at=started_at,
@@ -399,14 +394,13 @@ def run_compounds(
             overwritten=force,
         )
         validate_document(manifest, "run_manifest", "run manifest")
-        write_json(work / "run_manifest.json", manifest)
+        write_json(work / MANIFEST_NAME, manifest)
 
     _write_compound_registry(compound_registry, compound_registry_rows)
-    if structure_mode and structure_registry_path is not None:
+    if registration is not None and registry_file is not None:
         # Registration itself has already produced the complete registry (including rows that
         # were reused); write it only after the staged output is in place.
-        registration_rows = registration.registry  # type: ignore[possibly-undefined]
-        write_registry(structure_registry_path, registration_rows)
+        write_registry(registry_file, registration.registry)
 
     return {
         "status": "ok" if stage_status == "complete" else "partial",

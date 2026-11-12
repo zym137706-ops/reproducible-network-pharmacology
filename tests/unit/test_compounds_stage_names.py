@@ -262,6 +262,26 @@ def test_name_only_mode_refuses_inputs_that_need_structures(tmp_path, key):
     assert not (tmp_path / "results").exists()
 
 
+def test_name_only_mode_names_every_input_that_needs_structures(tmp_path):
+    config, _ = set_up(
+        tmp_path,
+        inputs={
+            "submission_log": str(tmp_path / "x.tsv"),
+            "structure_registry": str(tmp_path / "y.tsv"),
+        },
+    )
+    with pytest.raises(InputError) as caught:
+        run(config)
+    assert caught.value.message == (
+        "the compound table has no smiles column, so the stage runs in name-only mode"
+    )
+    tail = "is only used in structure mode: remove it or add a smiles column"
+    assert caught.value.details == [
+        f"inputs.submission_log {tail}",
+        f"inputs.structure_registry {tail}",
+    ]
+
+
 @pytest.mark.parametrize(
     "rows",
     [
@@ -359,6 +379,7 @@ def test_two_rows_that_resolve_to_one_identity_write_nothing(tmp_path):
     with pytest.raises(InputError) as caught:
         run(config, run_id="r2")
     assert caught.value.exit_code == 2
+    assert caught.value.message == "the identity registry gave one compound_id to more than one row"
     assert caught.value.details == ["CMP0001: rows 1, 2"]
     assert registry.read_bytes() == before
     assert sorted(path.name for path in (tmp_path / "results").iterdir()) == [
@@ -382,4 +403,5 @@ def test_an_inconsistency_found_by_the_self_check_is_an_internal_error(tmp_path,
     with pytest.raises(SchemaViolation) as caught:
         run(config)
     assert caught.value.exit_code == 1
+    assert caught.value.message == "the compounds stage is internally inconsistent"
     assert not (tmp_path / "results").exists()
