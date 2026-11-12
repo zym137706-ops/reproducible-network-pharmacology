@@ -1,6 +1,6 @@
 # 上游导入、结构注册与显式选择（设计契约）
 
-状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`（均未发布）；`ingest stp` 对它的接入（`--compounds`）尚未实现。执行顺序见 [总规划](project-plan.zh-CN.md)。
+状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`，2026-11-12 起 `rnp ingest stp --compounds` 接入它（均未发布）。执行顺序见 [总规划](project-plan.zh-CN.md)。
 实现时先增加 JSON Schema、跨表约束及正反例，再修改 CLI；不通过文档宣称接口已经可用。
 
 ## 1. 输入边界
@@ -74,7 +74,7 @@ Cytoscape 后续以 compound:<id>、gene:<id>、disease:<id> 连接，Label 与 
 [RDKit 标准化接口](https://www.rdkit.org/docs/source/rdkit.Chem.MolStandardize.rdMolStandardize.html)；
 [Meeko 配体准备](https://meeko.readthedocs.io/en/develop/lig_prep_basic.html)。
 
-## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`）
+## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`；2026-11-12 `ingest stp --compounds`）
 
 本节把第 2、3、6 节落到入口 A 的第一个可实现切片。命令 `rnp ingest compounds`（2026-11-11 起，未发布）读写下列产物，
 并用库 `rnp.structures`（`src/rnp/structures/`）完成登记、绑定和校验；这些产物有 JSON Schema（`schemas/`）和契约测试
@@ -128,8 +128,8 @@ Cytoscape 后续以 compound:<id>、gene:<id>、disease:<id> 连接，Label 与 
 
 `compound_structures.tsv` 的 `row_status`：`accepted`（可进入下游）、`quarantined`（隔离，不进入要求确定结构的下游）、
 `name_only`（名称模式）。隔离只有两个原因：结构没有登记（`structure_status` 为 `not_registered`），或提交被拒绝。
-阶段状态：没有隔离行是 `complete`，有则是 `partial`（退出码 3）。表级问题（缺列、重复键、冲突、需要登记新结构却没有
-安装 RDKit）整体拒绝，退出码 2，什么都不写。
+阶段状态：没有隔离行是 `complete`，有则是 `partial`（退出码 3）。表级问题（缺列、重复键、冲突、结构模式下没有安装
+RDKit）整体拒绝，退出码 2，什么都不写。
 
 问题代码是稳定的词表；审计的 `issues` 和表里的 `issue_codes`（排序、去重、分号连接）只使用它们：
 
@@ -175,7 +175,7 @@ Schema 表达不了的约束由库实现并测试：
 状态：设计、Schema 和契约测试已完成（2026-11-09）；库 `rnp.structures` 和命令 `rnp ingest compounds` 已实现、未发布
 （2026-11-10、2026-11-11）。命令把阶段输出写进 `<outputs.dir>/<run_id>_compounds/`，`run.schema.json` 有了新键
 `inputs.submission_log` 和 `inputs.structure_registry`；结构模式下运行命令需要可选依赖 `chem`（见 8.7）。
-`ingest stp --compounds`（下游接入）尚未实现。
+`rnp ingest stp --compounds`（下游接入）已实现、未发布（2026-11-12，见 8.8）。
 
 ### 8.7 命令 `rnp ingest compounds`（2026-11-11；未发布）
 
@@ -190,4 +190,22 @@ Schema 表达不了的约束由库实现并测试：
 - **退出码：**0 完成；3 部分（有隔离行，输出已写）；2 表级或输入错误（什么都不写，注册表也不动），包括结构模式下没有安装 RDKit；
   1 内部错误。
 - **RDKit：**结构模式需要可选依赖 `chem`（审计要写 RDKit 版本）；名称模式不需要。
-- `ingest stp` 目前不读这个阶段的输出；接入（`--compounds`）是下一步。
+- `rnp ingest stp --compounds DIR` 读这个阶段的输出（见 8.8）；不带 `--compounds` 的 `ingest stp` 与以前完全一样。
+
+### 8.8 命令 `rnp ingest stp --compounds DIR`（2026-11-12；未发布）
+
+`rnp ingest stp --config run.yaml --compounds DIR [--force]`：`DIR` 是 `rnp ingest compounds` 的阶段目录。给了它，
+`ingest stp` 在 v0.1 的基础上多做三件事；不给它，`ingest stp` 的产物与以前逐字节相同（名称模式的回归测试锁着这一点）。
+
+- **隔离：**阶段表里 `row_status` 为 `quarantined` 的化合物，它的导出不解析、不进 `targets.tsv`，在 `stp_audit.json`
+  里记为 `status: quarantined`、`reason: compound_quarantined`（带 `compound_id` 和 `group`），也出现在审计的 `quarantine`
+  里；只要有这样的化合物，阶段就是 `partial`（退出码 3）。所有化合物都被隔离时没有可用的导出，是表级错误（退出码 2）。
+- **结构列：**阶段是结构模式时，`compounds_registered.tsv` 末尾多两列 `structure_id`、`structure_status`；名称模式的阶段不加列。
+- **记录：**`run_manifest.json` 的 `parents` 多一项 `ingest compounds`（`dir`、`audit`、`audit_sha256`、`stage_status`，
+  `status_override` 为 `false`），`args` 多 `compounds`，`inputs` 末尾多阶段的审计和表。`stp_audit.json` 的 Schema 不变
+  （仍是 1.1，没有 `parents`，`rnp report` 因此照旧），`notes` 多一条 `compounds_stage_applied`。
+- **阶段必须是当前的**，否则表级错误（退出码 2，什么都不写）：目录和审计存在且合 `compounds_audit` Schema；审计记录的
+  运行配置哈希等于现在的；表的哈希等于审计里的 `compound_structures_sha256`，且每行合 `compound_structures_row` Schema；
+  审计记录的化合物表哈希等于现在 `inputs.compounds` 的；阶段里每行的 `compound_id`、`group`、`name`、`stp_file` 等于现在
+  登记出来的；提交已被核对过（`verified`、`verified_kind_unstated`、`reconstructed`）的导出，现在文件的 SHA-256 仍等于阶段
+  记录的 `export_sha256`（被隔离的化合物不查）。任何一条不成立，都要重新运行 `rnp ingest compounds`。

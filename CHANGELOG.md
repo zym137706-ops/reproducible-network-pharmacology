@@ -14,6 +14,20 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### `rnp ingest stp --compounds` — 2026-11-12
+
+- `rnp ingest stp` accepts `--compounds DIR`, the output directory of `rnp ingest compounds`. The export
+  of a compound that the compounds stage quarantined is quarantined too (reason `compound_quarantined`,
+  not in `targets.tsv`, stage `partial`); when the compounds stage ran in structure mode,
+  `compounds_registered.tsv` gets the columns `structure_id` and `structure_status`; the manifest names
+  the compounds stage as a parent. A compounds stage that is not current (changed audit, table,
+  compound table, run config, compound identities or export files) is refused with exit code 2.
+- Without `--compounds`, `rnp ingest stp` is unchanged; a regression test fixes its artifacts.
+- `rnp ingest compounds`: a table whose `smiles` column is empty quarantines every row (exit code 3)
+  instead of failing the audit check; structure mode always asks RDKit for its version (exit code 2
+  when RDKit is missing) and records it; the manifest lists the verified exports in the order of the
+  rows; the table-level error messages were made consistent.
+
 ### `rnp ingest compounds` command — 2026-11-11
 
 - Added the command `rnp ingest compounds` (stage module `rnp.analysis.compounds`). It registers the
