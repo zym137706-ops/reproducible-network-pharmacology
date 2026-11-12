@@ -95,7 +95,9 @@ def cmd_validate(args: argparse.Namespace) -> int:
 
 def cmd_ingest_stp(args: argparse.Namespace) -> int:
     config = load_config(args.config)
-    summary = run_ingest(config, run_id=args.run_id, force=args.force)
+    summary = run_ingest(
+        config, run_id=args.run_id, force=args.force, compounds=args.compounds
+    )
     _emit(summary)
     return 0 if summary["stage_status"] == "complete" else 3
 
@@ -355,6 +357,13 @@ def build_parser() -> argparse.ArgumentParser:
     ingest_stp.add_argument("--run-id", default=None, help=argparse.SUPPRESS)
     ingest_stp.add_argument(
         "--force", action="store_true", help="replace an existing run directory"
+    )
+    ingest_stp.add_argument(
+        "--compounds",
+        default=None,
+        metavar="DIR",
+        help="apply the decisions of a compounds stage directory "
+        "(output of 'rnp ingest compounds')",
     )
 
     intersect = sub.add_parser(
