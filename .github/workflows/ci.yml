@@ -105,7 +105,7 @@ jobs:
       - name: Install from lock file
         run: |
           uv venv --python 3.12
-          uv sync --locked --extra dev
+          uv sync --locked --extra dev --extra chem
       - name: Record restored R environment
         run: |
           Rscript -e 'cat(R.version.string, "\n"); cat(.libPaths(), sep = "\n"); suppressMessages(library(clusterProfiler)); cat("clusterProfiler", as.character(packageVersion("clusterProfiler")), "\n")'
@@ -189,6 +189,111 @@ jobs:
               assert run["network_nodes"] == nodes, (label, run)
               assert run["network_edges"] == edges, (label, run)
           print("portable case entry e2e ok")
+          PY
+      - name: Portable case entry end-to-end with a submission log on synthetic inputs
+        env:
+          RNP_RSCRIPT: Rscript
+        run: |
+          uv run python - <<'PY'
+          import csv
+          import hashlib
+          import json
+          import os
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          root = Path.cwd()
+          source = root / "tests/fixtures/run/inputs"
+          base = Path(os.environ["RUNNER_TEMP"]) / "case-log-e2e"
+          base.mkdir()
+          compounds = list(
+              csv.DictReader((source / "compounds.tsv").open(encoding="utf-8"), delimiter="\t")
+          )
+          for row, smiles in zip(compounds, ["CCO", "CCC"], strict=True):
+              row["smiles"] = smiles
+          with (base / "compounds.tsv").open("w", encoding="utf-8", newline="") as handle:
+              writer = csv.DictWriter(
+                  handle, fieldnames=list(compounds[0]), delimiter="\t", lineterminator="\n"
+              )
+              writer.writeheader()
+              writer.writerows(compounds)
+          with (base / "log.tsv").open("w", encoding="utf-8", newline="") as handle:
+              writer = csv.writer(handle, delimiter="\t", lineterminator="\n")
+              writer.writerow(
+                  [
+                      "stp_file",
+                      "compound",
+                      "pubchem_cid",
+                      "submitted_structure",
+                      "species",
+                      "submitted_date",
+                      "result_sha256",
+                  ]
+              )
+              for row in compounds:
+                  digest = hashlib.sha256((source / "stp" / row["stp_file"]).read_bytes())
+                  writer.writerow(
+                      [
+                          row["stp_file"],
+                          row["name"],
+                          row["pubchem_cid"],
+                          row["smiles"],
+                          "Homo sapiens",
+                          "2026-10-21",
+                          digest.hexdigest(),
+                      ]
+                  )
+          subprocess.run(
+              [
+                  sys.executable,
+                  "scripts/case_run.py",
+                  "--compounds",
+                  str(base / "compounds.tsv"),
+                  "--stp-dir",
+                  str(source / "stp"),
+                  "--disease-genes",
+                  str(source / "disease_genes.txt"),
+                  "--hgnc-map",
+                  str(root / "tests/fixtures/hgnc/hgnc_map.tsv"),
+                  "--log",
+                  str(base / "log.tsv"),
+                  "--config-template",
+                  "examples/quickstart/run.yaml",
+                  "--out",
+                  str(base / "out"),
+              ],
+              cwd=root,
+              check=True,
+          )
+          out = base / "out"
+          provenance = json.loads((out / "case_provenance.json").read_text(encoding="utf-8"))
+          assert provenance["status"] == "complete", provenance
+          assert provenance["inputs"]["log"]["policy"] == "case-log-policy-v2"
+          structures = provenance["inputs"]["structures"]
+          assert structures["mode"] == "structure", structures
+          assert structures["submission_status_counts"] == {"verified_kind_unstated": 2}, structures
+          assert sorted(provenance["inputs"]["compounds_stage"]) == ["0.05", "0.10"]
+          for label in ("0.05", "0.10"):
+              stage = out / label / "run_compounds"
+              for name in ("compound_structures.tsv", "compounds_audit.json", "run_manifest.json"):
+                  assert (stage / name).is_file(), (label, name)
+              header = (out / label / "run" / "compounds_registered.tsv").read_text(
+                  encoding="utf-8"
+              ).splitlines()[0]
+              assert header.endswith("structure_id\tstructure_status"), header
+          check = json.loads((out / "independent-check.json").read_text(encoding="utf-8"))
+          expected = {
+              "0.10": (4, 2, 4, 4),
+              "0.05": (5, 3, 5, 6),
+          }
+          for label, (targets, intersection, nodes, edges) in expected.items():
+              run = check["runs"][label]
+              assert run["T_r"] == targets, (label, run)
+              assert run["intersection"] == intersection, (label, run)
+              assert run["network_nodes"] == nodes, (label, run)
+              assert run["network_edges"] == edges, (label, run)
+          print("case entry with a submission log e2e ok")
           PY
       - name: Portable case entry rejects wrong submitted structure
         run: |
