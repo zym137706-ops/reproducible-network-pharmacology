@@ -510,6 +510,8 @@ def _stage_name(command: list[str]) -> str:
         return "independent_check"
     if any(str(part).endswith("build_case_background.py") for part in command):
         return "backgrounds"
+    if "ingest" in command and "compounds" in command:
+        return "ingest_compounds"
     for part in command:
         if part in {"validate", "ingest", "intersect", "network", "enrich", "report", "manifest"}:
             return part
@@ -614,20 +616,40 @@ def main(argv: list[str] | None = None) -> int:
                 ROOT,
                 provenance["commands"],
             )
+        if args.log is not None:
+            provenance["inputs"]["compounds_stage"] = {}
+            for label in labels:
+                run_command(
+                    base
+                    + [
+                        "ingest",
+                        "compounds",
+                        "--config",
+                        str(configs[label]),
+                        "--run-id",
+                        STAGE_RUN_ID,
+                    ],
+                    ROOT,
+                    provenance["commands"],
+                )
+                stage = out / label / STAGE_DIR_NAME
+                provenance["inputs"]["compounds_stage"][label] = {
+                    "dir": str(stage),
+                    "audit_sha256": sha256(stage / STAGE_AUDIT_NAME),
+                    "table_sha256": sha256(stage / STAGE_TABLE_NAME),
+                }
         for label in labels:
-            run_command(
-                base
-                + [
-                    "ingest",
-                    "stp",
-                    "--config",
-                    str(configs[label]),
-                    "--run-id",
-                    "run",
-                ],
-                ROOT,
-                provenance["commands"],
-            )
+            ingest_command = [
+                "ingest",
+                "stp",
+                "--config",
+                str(configs[label]),
+                "--run-id",
+                "run",
+            ]
+            if args.log is not None:
+                ingest_command += ["--compounds", str(out / label / STAGE_DIR_NAME)]
+            run_command(base + ingest_command, ROOT, provenance["commands"])
         background_args = [sys.executable, str(BUILD_BACKGROUND)]
         for label in labels:
             background_args += [
@@ -669,6 +691,18 @@ def main(argv: list[str] | None = None) -> int:
                 ROOT,
                 provenance["commands"],
             )
+            if args.log is not None:
+                run_command(
+                    base
+                    + [
+                        "manifest",
+                        "--run-dir",
+                        str(out / label / STAGE_DIR_NAME),
+                        "--check-inputs",
+                    ],
+                    ROOT,
+                    provenance["commands"],
+                )
         check_command = [sys.executable, str(CASE_CHECK)]
         for label in labels:
             check_command += ["--run", f"{label}={out / label / 'run'}"]
