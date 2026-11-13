@@ -147,6 +147,7 @@ def _self_check(
     if problems:
         raise SchemaViolation("the compounds stage is internally inconsistent", details=problems)
 
+
 def _audit(
     config: RunConfig,
     *,
@@ -230,6 +231,7 @@ def _write_compound_registry(path: Path, rows: list[dict[str, str]]) -> None:
         path,
         lambda temporary: write_table(temporary, rows, REGISTRY_COLUMNS),
     )
+
 
 def run_compounds(
     config: RunConfig,
