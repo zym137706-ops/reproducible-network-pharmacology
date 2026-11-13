@@ -81,6 +81,9 @@ refused. `case_provenance.json` records `inputs.log.policy`, `inputs.structures`
 status and issue counts) and `inputs.compounds_stage` (per threshold: the directory and the SHA-256 of
 the audit and of the table).
 
+A recorded run of this chain on the v0.1.0 case package is in
+[`case-entry-compounds-stage-run-2026-11-13.md`](case-entry-compounds-stage-run-2026-11-13.md).
+
 ## Independent check
 
 ```bash
