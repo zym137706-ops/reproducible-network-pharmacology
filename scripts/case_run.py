@@ -60,6 +60,7 @@ STAGE_RUN_ID = "run"
 STAGE_DIR_NAME = f"{STAGE_RUN_ID}_compounds"
 STAGE_AUDIT_NAME = "compounds_audit.json"
 STAGE_TABLE_NAME = "compound_structures.tsv"
+RECHECK_RULE = "case-binding-recheck-v1"
 # What the case entry does with each problem code and each submission status of a compounds stage.
 # "fatal" stops the run before anything is written; "recorded" only goes into the provenance counts.
 ISSUE_POLICY = {
@@ -716,7 +717,27 @@ def main(argv: list[str] | None = None) -> int:
             "--out",
             str(out / "independent-check.json"),
         ]
+        if args.log is not None:
+            species = yaml.safe_load(configs[labels[0]].read_text(encoding="utf-8"))["species"]
+            check_command += [
+                "--compound-table",
+                str(args.compounds.resolve()),
+                "--stp-dir",
+                str(args.stp_dir.resolve()),
+                "--log",
+                str(args.log.resolve()),
+                "--species",
+                species,
+            ]
+            for label in labels:
+                check_command += ["--stage", f"{label}={out / label / STAGE_DIR_NAME}"]
         run_command(check_command, ROOT, provenance["commands"])
+        if args.log is not None:
+            provenance["inputs"]["log"]["binding_recheck"] = {
+                "tool": "scripts/case_check.py",
+                "rule": RECHECK_RULE,
+                "result": "passed",
+            }
     except CommandFailure as exc:
         provenance["status"] = "failed"
         provenance["failed_stage"] = _stage_name(exc.command)
