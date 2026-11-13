@@ -1,10 +1,16 @@
-"""Portable case entry preflight, provenance hash scope and independent-check wiring."""
+"""Portable case entry preflight, provenance hash scope and independent-check wiring.
+
+The tests that give a submission log let the real `rnp ingest compounds` judge the structures, so
+they need RDKit (optional extra `chem`): without it they are skipped, unless the environment
+variable RNP_REQUIRE_CHEM is 1 (CI sets it), in which case a missing RDKit is a failure.
+"""
 
 from __future__ import annotations
 
 import csv
 import importlib.util
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -13,6 +19,16 @@ from rnp.config import load_config
 
 ROOT = Path(__file__).parents[2]
 QUICKSTART = ROOT / "tests" / "fixtures" / "run" / "inputs"
+
+
+@pytest.fixture
+def chem():
+    try:
+        import rdkit  # noqa: F401
+    except ImportError:
+        if os.environ.get("RNP_REQUIRE_CHEM") == "1":
+            pytest.fail("RDKit is required (RNP_REQUIRE_CHEM=1) but is not installed")
+        pytest.skip("RDKit is not installed (optional extra 'chem')")
 
 
 def _module(name: str, relative: str):
@@ -146,7 +162,7 @@ def test_case_run_preflight_and_configs_are_portable(tmp_path: Path) -> None:
     assert set(provenance["configs"]) == {"0.10", "0.05"}
 
 
-def test_case_run_accepts_matching_log(tmp_path: Path) -> None:
+def test_case_run_accepts_matching_log(tmp_path: Path, chem) -> None:
     run, args = _args(tmp_path)
     args.compounds = _compounds_with_structures(tmp_path, ["CCO", "CCC"])
     log = tmp_path / "log.tsv"
@@ -157,7 +173,7 @@ def test_case_run_accepts_matching_log(tmp_path: Path) -> None:
     assert inputs["log"]["structures_verified"] is True
 
 
-def test_case_run_rejects_wrong_submitted_structure(tmp_path: Path) -> None:
+def test_case_run_rejects_wrong_submitted_structure(tmp_path: Path, chem) -> None:
     run, args = _args(tmp_path)
     args.compounds = _compounds_with_structures(tmp_path, ["CCO", "CCC"])
     log = tmp_path / "log.tsv"
@@ -167,7 +183,7 @@ def test_case_run_rejects_wrong_submitted_structure(tmp_path: Path) -> None:
         run.verify_inputs(args)
 
 
-def test_case_run_rejects_binding_and_cid_conflicts(tmp_path: Path) -> None:
+def test_case_run_rejects_binding_and_cid_conflicts(tmp_path: Path, chem) -> None:
     run, args = _args(tmp_path)
     args.compounds = _compounds_with_structures(tmp_path, ["CCO", "CCC"])
     log = tmp_path / "log.tsv"
@@ -189,7 +205,7 @@ def test_case_run_rejects_binding_and_cid_conflicts(tmp_path: Path) -> None:
         run.verify_inputs(args)
 
 
-def test_case_run_rejects_bad_submission_hash(tmp_path: Path) -> None:
+def test_case_run_rejects_bad_submission_hash(tmp_path: Path, chem) -> None:
     run, args = _args(tmp_path)
     args.compounds = _compounds_with_structures(tmp_path, ["CCO", "CCC"])
     log = tmp_path / "log.tsv"

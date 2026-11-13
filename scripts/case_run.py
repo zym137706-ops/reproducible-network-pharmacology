@@ -16,6 +16,8 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -51,6 +53,60 @@ SOURCE_HASH_FILES = (
     "scripts/build_case_background.py",
 )
 LOCK_FILES = ("uv.lock", "renv.lock")
+
+POLICY_VERSION = "case-log-policy-v2"
+VERIFIED_BY = "rnp ingest compounds"
+STAGE_RUN_ID = "run"
+STAGE_DIR_NAME = f"{STAGE_RUN_ID}_compounds"
+STAGE_AUDIT_NAME = "compounds_audit.json"
+STAGE_TABLE_NAME = "compound_structures.tsv"
+# What the case entry does with each problem code and each submission status of a compounds stage.
+# "fatal" stops the run before anything is written; "recorded" only goes into the provenance counts.
+ISSUE_POLICY = {
+    "missing_structure": "fatal",
+    "invalid_smiles": "fatal",
+    "submission_structure_mismatch": "fatal",
+    "submission_hash_mismatch": "fatal",
+    "submission_species_mismatch": "fatal",
+    "submission_export_missing": "fatal",
+    "submission_name_mismatch": "fatal",
+    "submission_cid_mismatch": "fatal",
+    "submission_record_missing": "fatal",
+    "submission_hash_not_declared": "fatal",
+    "log_row_without_compound": "fatal",
+    "shared_structure": "recorded",
+    "same_connectivity_different_stereo": "recorded",
+    "stereo_undefined": "recorded",
+    "multi_fragment": "recorded",
+    "charged_structure": "recorded",
+    "smiles_whitespace_trimmed": "recorded",
+    "structure_changed": "recorded",
+    "structure_reactivated": "recorded",
+    "submission_export_reconstructed": "recorded",
+}
+# The column of the compound table or of the submission log that a fatal code is about.
+ISSUE_FIELD = {
+    "missing_structure": "smiles",
+    "invalid_smiles": "smiles",
+    "submission_structure_mismatch": "submitted_structure",
+    "submission_hash_mismatch": "result_sha256",
+    "submission_species_mismatch": "species",
+    "submission_export_missing": "stp_file",
+    "submission_name_mismatch": "compound",
+    "submission_cid_mismatch": "pubchem_cid",
+    "submission_record_missing": "stp_file",
+    "submission_hash_not_declared": "result_sha256",
+    "log_row_without_compound": "stp_file",
+}
+SUBMISSION_POLICY = {
+    "verified": "accepted",
+    "verified_kind_unstated": "accepted",
+    "reconstructed": "accepted",
+    "not_recorded": "rejected",
+    "rejected": "rejected",
+    "not_checked": "rejected",
+    "not_applicable": "rejected",
+}
 
 
 class CommandFailure(RuntimeError):
@@ -269,33 +325,12 @@ def verify_inputs(args: argparse.Namespace) -> dict[str, Any]:
             entry = (compound.get("name") or stp).strip()
             row = by_file[stp]
             log_entry = (row.get("compound") or stp).strip()
-            if (row.get("compound") or "").strip() and row["compound"].strip() != entry:
-                raise ValueError(
-                    f"{args.log}: entry {log_entry!r} stp_file {stp!r} names "
-                    f"{row['compound']!r}, but {args.compounds} names {entry!r}"
-                )
-
-            compound_cid = _required(compound, "pubchem_cid", args.compounds, entry)
-            log_cid = _required(row, "pubchem_cid", args.log, log_entry)
-            if compound_cid != log_cid:
-                raise ValueError(
-                    f"{args.log}: entry {log_entry!r} pubchem_cid {log_cid!r} != "
-                    f"{compound_cid!r} in {args.compounds}"
-                )
-
-            compound_smiles = (compound.get("smiles") or "").strip()
-            if not compound_smiles:
+            _required(row, "pubchem_cid", args.log, log_entry)
+            if not (compound.get("smiles") or "").strip():
                 raise ValueError(
                     f"{args.compounds}: entry {entry!r} has empty smiles; cannot verify "
                     f"submitted_structure in {args.log}"
                 )
-            submitted = _required(row, "submitted_structure", args.log, log_entry)
-            if submitted != compound_smiles:
-                raise ValueError(
-                    f"{args.log}: entry {log_entry!r} submitted_structure does not match "
-                    f"the exact stripped smiles for {entry!r} in {args.compounds}"
-                )
-
             if "submission_id" in row and row.get("submission_id", "").strip():
                 compound_submission = (compound.get("submission_id") or "").strip()
                 if compound_submission and row["submission_id"].strip() != compound_submission:
@@ -303,18 +338,7 @@ def verify_inputs(args: argparse.Namespace) -> dict[str, Any]:
                         f"{args.log}: entry {log_entry!r} submission_id "
                         f"{row['submission_id']!r} != {compound_submission!r} in {args.compounds}"
                     )
-
-            species = _required(row, "species", args.log, log_entry)
-            if species != "Homo sapiens":
-                raise ValueError(
-                    f"{args.log}: entry {log_entry!r} species is {species!r}, "
-                    "expected 'Homo sapiens'"
-                )
-            actual_hash = sha256(files[stp])
-            if row.get("result_sha256", "").strip() != actual_hash:
-                raise ValueError(
-                    f"{args.log}: entry {log_entry!r} result_sha256 does not match {files[stp]}"
-                )
+        structures = structure_preflight(args)
         log_check = {
             "provided": True,
             "path": str(args.log.resolve()),
@@ -324,9 +348,11 @@ def verify_inputs(args: argparse.Namespace) -> dict[str, Any]:
             "structures_verified": True,
             "time_precision": "submitted_date is date-only; retrieved_date uses the user-approved "
             "file LastWriteTime proxy; result_url/job_id may be not_saved",
+            "verified_by": VERIFIED_BY,
+            "policy": POLICY_VERSION,
         }
 
-    return {
+    record = {
         "compounds": str(args.compounds.resolve()),
         "compounds_sha256": sha256(args.compounds),
         "compound_rows": len(compounds),
@@ -342,6 +368,9 @@ def verify_inputs(args: argparse.Namespace) -> dict[str, Any]:
         "hgnc_sha256": sha256(args.hgnc_map),
         "log": log_check,
     }
+    if args.log is not None:
+        record["structures"] = structures
+    return record
 
 
 def write_configs(args: argparse.Namespace, out: Path) -> dict[str, Path]:
@@ -361,6 +390,8 @@ def write_configs(args: argparse.Namespace, out: Path) -> dict[str, Path]:
             ),
             "hgnc_map": str(args.hgnc_map.resolve()),
         }
+        if args.log is not None:
+            data["inputs"]["submission_log"] = str(args.log.resolve())
         data["thresholds"]["stp_probability"] = float(label)
         data["thresholds"]["note"] = f"case threshold {label}; sensitivity run independent"
         data["enrichment"]["universe_file"] = str(out / "backgrounds" / f"universe-{label}.txt")
@@ -370,6 +401,99 @@ def write_configs(args: argparse.Namespace, out: Path) -> dict[str, Path]:
         path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
         configs[label] = path
     return configs
+
+
+def _stage_problem(args: argparse.Namespace, names: dict[str, str], issue: dict[str, Any]) -> str:
+    """Write one issue of the compounds audit as a problem of the case inputs."""
+    where = args.log if issue["source"] == "submission_log" else args.compounds
+    compound_id = issue.get("compound_id", "")
+    entry = f"entry {names[compound_id]!r} " if compound_id in names else ""
+    return f"{where}: {entry}{ISSUE_FIELD[issue['code']]}: {issue['message']} [{issue['code']}]"
+
+
+def judge_stage(
+    args: argparse.Namespace, returncode: int, stderr: str, stage_dir: Path
+) -> dict[str, Any]:
+    """Judge a finished compounds stage with the case policy and return its provenance record."""
+    if returncode == 2:
+        raise ValueError(f"rnp ingest compounds rejected the inputs (exit 2): {stderr.strip()}")
+    if returncode not in (0, 3):
+        raise ValueError(f"rnp ingest compounds failed (exit {returncode}): {stderr.strip()}")
+    audit_path = stage_dir / STAGE_AUDIT_NAME
+    table_path = stage_dir / STAGE_TABLE_NAME
+    if not audit_path.is_file() or not table_path.is_file():
+        raise ValueError(f"rnp ingest compounds wrote no compounds stage in {stage_dir}")
+
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    table = _read(table_path)
+    issues = audit.get("issues", [])
+    names = {row.get("compound_id", ""): row.get("name", "") for row in table}
+    problems: list[str] = []
+    mode = audit["identity_mode"]
+    if mode != "structure":
+        problems.append(
+            f"{args.compounds}: smiles: the compounds stage ran in {mode} mode, "
+            "not in structure mode"
+        )
+    fatal: set[str] = set()
+    for issue in issues:
+        code = issue["code"]
+        if code not in ISSUE_POLICY:
+            raise ValueError(
+                f"rnp ingest compounds reported {code!r}, which the case policy does not classify"
+            )
+        if ISSUE_POLICY[code] == "fatal":
+            problems.append(_stage_problem(args, names, issue))
+            fatal.add(issue.get("compound_id", ""))
+    for row in table:
+        status = row["submission_status"]
+        if SUBMISSION_POLICY.get(status) != "accepted" and row.get("compound_id", "") not in fatal:
+            problems.append(
+                f"{args.log}: entry {row.get('name', '')!r} submission_status: {status}, "
+                "not a checked submission"
+            )
+    if problems:
+        raise ValueError("\n".join(problems))
+    return {
+        "mode": mode,
+        "toolkit": audit["toolkit"],
+        "rows": len(table),
+        "submission_status_counts": dict(
+            sorted(Counter(row["submission_status"] for row in table).items())
+        ),
+        "issue_code_counts": dict(sorted(Counter(issue["code"] for issue in issues).items())),
+    }
+
+
+def structure_preflight(args: argparse.Namespace) -> dict[str, Any]:
+    """Run the compounds command on a copy of the inputs and judge what it wrote."""
+    with tempfile.TemporaryDirectory(prefix="rnp-case-preflight-") as temporary:
+        directory = Path(temporary)
+        configs = write_configs(args, directory)
+        label = sorted(configs, key=float)[0]
+        command = [
+            sys.executable,
+            "-m",
+            "rnp.cli",
+            "ingest",
+            "compounds",
+            "--config",
+            str(configs[label]),
+            "--run-id",
+            STAGE_RUN_ID,
+        ]
+        result = subprocess.run(
+            command,
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env=dict(os.environ, PYTHONUTF8="1"),
+        )
+        return judge_stage(
+            args, result.returncode, result.stderr, directory / label / STAGE_DIR_NAME
+        )
 
 
 def run_command(command: list[str], cwd: Path, recorded: list[str] | None = None) -> None:
