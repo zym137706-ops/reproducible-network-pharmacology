@@ -110,6 +110,9 @@ def test_a_fatal_code_stops_the_run_and_names_the_field(tmp_path: Path, code: st
         assert "entry" not in message  # no compound is named when the code is about no compound
     where = args.compounds if stage_issue(code)["source"] == "compounds" else args.log
     assert str(where) in message
+    entry = "entry 'Compound 2' " if number else ""
+    text = stage_issue(code, number)["message"]
+    assert message == f"{where}: {entry}{FATAL_FIELDS[code]}: {text} [{code}]"
 
 
 def test_every_problem_is_reported_not_only_the_first(tmp_path: Path) -> None:
