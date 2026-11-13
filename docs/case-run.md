@@ -10,11 +10,13 @@ Every analysis step remains the `rnp` CLI.
 - `--stp-dir`: the native STP exports named exactly by `stp_file`; no fuzzy matching
 - `--disease-genes`: one HGNC symbol per line
 - `--hgnc-map`: frozen HGNC table with the columns expected by `rnp`
-- `--log`: optional completed submission log; if provided, each row is bound by `stp_file`,
-  `submitted_structure` is compared byte-for-byte (after trimming whitespace) with the compound's
-  actual `smiles`, and CID/submission_id/species/result SHA-256 are checked before anything runs.
-  Missing columns, duplicate/missing/unbound rows, or mismatched structures fail. If no log is
-  provided, `log.provided=false`; the run is **not** labelled as a verified submission log.
+- `--log`: optional completed submission log; if provided, each row is bound by `stp_file`, and
+  `rnp ingest compounds` registers the structures and checks every row (the submitted structure
+  against the compound's `smiles`, the compound name, CID, species and result SHA-256) before anything
+  runs. This needs RDKit (the optional extra `chem`: `uv sync --extra chem`). Missing columns,
+  duplicate/missing/unbound rows, a `smiles` that RDKit cannot parse, or mismatched structures fail.
+  If no log is provided, `log.provided=false`; the run is **not** labelled as a verified submission
+  log, needs no RDKit and runs no compounds stage.
 - `--out`: a **new or empty** output directory; the runner refuses to overwrite it
 - `--config-template`: defaults to `examples/demo/run.yaml`; case-specific decisions are reused
 
@@ -32,7 +34,10 @@ uv run python scripts/case_run.py \
 ```
 
 This verifies explicit bindings, every file hash, disease/HGNC presence, writes fixed configs for
-0.10/0.05 and records `case_provenance.json`. It does not call the network or submit STP data.
+0.10/0.05 and records `case_provenance.json`. With `--log` it also runs `rnp ingest compounds` on a
+copy of the inputs in a temporary directory (removed afterwards) and refuses the case unless every
+submission is checked; nothing of that run is kept in the output directory. It does not call the
+network or submit STP data.
 
 ## Full chain
 
@@ -53,12 +58,28 @@ The exact release-asset paths and environment setup are documented in
 [`examples/demo/DATA-ACCESS.md`](../examples/demo/DATA-ACCESS.md). The command is the same as
 preflight without `--preflight-only`; it is not a shorthand for omitted arguments.
 
-Order: `validate → ingest → build_case_background.py → intersect → network → enrich → report →
-manifest --check-inputs` for each threshold, then **`case_check.py` once across both runs**. The
+Order: `validate → ingest compounds` (with `--log` only) `→ ingest stp → build_case_background.py →
+intersect → network → enrich → report → manifest --check-inputs` for each threshold (with `--log`,
+`ingest stp` gets `--compounds <stage>` and the stage directory is checked with a second
+`manifest --check-inputs`), then **`case_check.py` once across both runs**. The
 overall `case_provenance.json` becomes `complete` only after the analysis, both manifest checks and
 the independent checker succeed. A child/checker failure exits non-zero and persists `status=failed`,
 `failed_stage`, `failed_command` and the real `child_exit_code`, with the earlier commands retained.
 Configs are written before ingest and are not modified afterwards.
+
+## Structures and the submission log
+
+With `--log`, each threshold gets a compounds stage next to its run: `<out>/<threshold>/run_compounds/`
+holds `compound_structures.tsv` (structure id, InChIKey and submission status of every compound),
+`compounds_audit.json` and `run_manifest.json`, and `ingest stp --compounds` ties every STP export to
+the structure that was submitted for it. The case policy `case-log-policy-v2` is stricter than the
+command: every compound needs a registered structure and a checked submission (`verified`,
+`verified_kind_unstated` or `reconstructed`), and a missing log row, a log row without a compound or a
+log without `result_sha256` is an error, although the command only warns. Warnings about the structure
+itself (`stereo_undefined`, `multi_fragment`, `charged_structure`, `shared_structure`) are recorded, not
+refused. `case_provenance.json` records `inputs.log.policy`, `inputs.structures` (mode, RDKit version,
+status and issue counts) and `inputs.compounds_stage` (per threshold: the directory and the SHA-256 of
+the audit and of the table).
 
 ## Independent check
 

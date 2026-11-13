@@ -1,6 +1,6 @@
 # 上游导入、结构注册与显式选择（设计契约）
 
-状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`，2026-11-12 起 `rnp ingest stp --compounds` 接入它（均未发布）。执行顺序见 [总规划](project-plan.zh-CN.md)。
+状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`，2026-11-12 起 `rnp ingest stp --compounds` 接入它，2026-11-13 起案例入口 `scripts/case_run.py` 在给了提交日志时经由它们登记和核对结构（均未发布）。执行顺序见 [总规划](project-plan.zh-CN.md)。
 实现时先增加 JSON Schema、跨表约束及正反例，再修改 CLI；不通过文档宣称接口已经可用。
 
 ## 1. 输入边界
@@ -74,7 +74,7 @@ Cytoscape 后续以 compound:<id>、gene:<id>、disease:<id> 连接，Label 与 
 [RDKit 标准化接口](https://www.rdkit.org/docs/source/rdkit.Chem.MolStandardize.rdMolStandardize.html)；
 [Meeko 配体准备](https://meeko.readthedocs.io/en/develop/lig_prep_basic.html)。
 
-## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`；2026-11-12 `ingest stp --compounds`）
+## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`；2026-11-12 `ingest stp --compounds`；2026-11-13 案例入口）
 
 本节把第 2、3、6 节落到入口 A 的第一个可实现切片。命令 `rnp ingest compounds`（2026-11-11 起，未发布）读写下列产物，
 并用库 `rnp.structures`（`src/rnp/structures/`）完成登记、绑定和校验；这些产物有 JSON Schema（`schemas/`）和契约测试
@@ -175,7 +175,7 @@ Schema 表达不了的约束由库实现并测试：
 状态：设计、Schema 和契约测试已完成（2026-11-09）；库 `rnp.structures` 和命令 `rnp ingest compounds` 已实现、未发布
 （2026-11-10、2026-11-11）。命令把阶段输出写进 `<outputs.dir>/<run_id>_compounds/`，`run.schema.json` 有了新键
 `inputs.submission_log` 和 `inputs.structure_registry`；结构模式下运行命令需要可选依赖 `chem`（见 8.7）。
-`rnp ingest stp --compounds`（下游接入）已实现、未发布（2026-11-12，见 8.8）。
+`rnp ingest stp --compounds`（下游接入）已实现、未发布（2026-11-12，见 8.8）；案例入口 `scripts/case_run.py` 给了提交日志时经由它们核对结构，已实现、未发布（2026-11-13，见 8.9）。
 
 ### 8.7 命令 `rnp ingest compounds`（2026-11-11；未发布）
 
@@ -209,3 +209,24 @@ Schema 表达不了的约束由库实现并测试：
   审计记录的化合物表哈希等于现在 `inputs.compounds` 的；阶段里每行的 `compound_id`、`group`、`name`、`stp_file` 等于现在
   登记出来的；提交已被核对过（`verified`、`verified_kind_unstated`、`reconstructed`）的导出，现在文件的 SHA-256 仍等于阶段
   记录的 `export_sha256`（被隔离的化合物不查）。任何一条不成立，都要重新运行 `rnp ingest compounds`。
+
+### 8.9 案例入口 `scripts/case_run.py`（2026-11-13；未发布）
+
+给了 `--log` 时，案例入口把结构核对交给入口 A 的命令，不再自己逐项比对；不给 `--log` 的行为与以前相同，不运行化合物阶段，
+也不需要 RDKit。
+
+- **预检分两层。**文件层（不需要 RDKit，沿用旧消息）：化合物表的必需列、名称和 `stp_file` 不重复、STP 目录的文件集合等于绑定集合、
+  日志的必需列、日志行数和 `stp_file` 集合与化合物表一致、两边的 `pubchem_cid` 非空、化合物的 `smiles` 非空、`submission_id` 一致。
+  结构层：在系统临时目录里，用与正式运行相同的输入和配置（多一个 `inputs.submission_log`）真跑一遍 `rnp ingest compounds`，再按案例
+  策略判定；临时目录用完即删，输出目录不受影响，预检不过时输出目录不创建。
+- **案例策略 `case-log-policy-v2` 比命令严格。**命令的 8 个错误代码都致命；3 个警告（`submission_record_missing`、
+  `submission_hash_not_declared`、`log_row_without_compound`）在案例里也致命；每个化合物的提交状态必须是 `verified`、
+  `verified_kind_unstated`、`reconstructed` 之一；其余警告（`stereo_undefined`、`multi_fragment`、`charged_structure`、
+  `shared_structure` 等）只记录。策略给 `compounds_audit` Schema 里的每个问题代码和 `compound_structures_row` Schema 里的每个提交状态
+  归类；核心新增代码而策略没有归类时，契约测试失败。
+- **链。**每个阈值：`ingest compounds --run-id run`（阶段目录 `<out>/<阈值>/run_compounds`）→ `ingest stp --compounds <阶段目录>` → ……；
+  每个阈值最后对阶段目录多做一次 `manifest --check-inputs`。阶段失败记为 `failed_stage: ingest_compounds`。
+- **记录。**`case_provenance.json` 的 `inputs.log` 多 `verified_by`、`policy`；`inputs.structures` 记模式、RDKit 版本、提交状态计数和问题代码
+  计数；链跑完阶段后 `inputs.compounds_stage` 记每个阈值的目录和审计、表的 SHA-256。`case_provenance` 的 Schema 不变（`inputs` 是自由对象）。
+- **比旧版更严：**RDKit 解析不了的 SMILES、含空白的 SMILES、缺 `submitted_date` 列的日志，现在被拒绝。
+- **需要 RDKit。**给了 `--log` 的案例需要可选依赖 `chem`；没有时预检以退出码非 0 失败，并原样带出命令的安装提示。

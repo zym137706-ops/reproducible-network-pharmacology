@@ -130,8 +130,10 @@ file inclusion, visibility and release. Its data access/reproduction guide is
 The synthetic demo is an engineering test, not a scientific result.
 
 For a user-supplied real case, [`scripts/case_run.py`](scripts/case_run.py) verifies explicit
-bindings/hashes and exact submitted structures when a log is supplied, fixes both threshold configs,
-runs the full CLI chain, invokes [`scripts/case_check.py`](scripts/case_check.py) and records
+bindings/hashes when a log is supplied and has `rnp ingest compounds` register and check the exact
+submitted structures (needs RDKit, extra `chem`), fixes both threshold configs, runs the full CLI
+chain (`ingest compounds` and `ingest stp --compounds` when a log is supplied), invokes
+[`scripts/case_check.py`](scripts/case_check.py) and records
 `case_provenance.json`; the overall status is `complete` only after the analysis, both manifest checks
 and the independent set/p-value/BH check succeed. Source hashes use the versioned
 `case-source-hash-v2` scope (case-relevant source + entrypoints + locks, not the whole package).
@@ -154,7 +156,7 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 | `rnp enrich` | ✅ | ORA via R `clusterProfiler` per group with an **explicit background**; complete tested-term table + significant view; distinct statuses for no-hit vs failure |
 | `rnp mcode` | 🚧 later extension | Module enrichment from Cytoscape MCODE exports; independent of hub ranking |
 | `rnp report` | ✅ | Markdown report from verified stage audits + tables; hash-checked; no claims beyond the evidence |
-| `scripts/case_run.py` | ✅ local case entry | Portable preflight + full CLI chain for user-supplied inputs; records source/config/container provenance |
+| `scripts/case_run.py` | ✅ local case entry | Portable preflight + full CLI chain for user-supplied inputs; records source/config/container provenance; with `--log` it registers and checks the structures through `rnp ingest compounds` (needs RDKit, extra `chem`) |
 | `scripts/case_check.py` | ✅ independent check | Re-derives T_r/foreground and recomputes hypergeometric/BH from result tables |
 | `rnp metabolites import` | 🚧 v0.2 | Import processed metabolomics annotations; confirmed compound lists also supported |
 | `rnp structures resolve` | 🚧 v0.2.0 | Resolve names / InChIKeys to structures (PubChem cache) |

@@ -65,7 +65,7 @@ export CASE_DIR=/path/to/rnp-case-v0.1.0-2026-10-21
 export OUT=/path/to/new-case-output
 
 cd "$REPO"
-uv sync --locked --extra dev
+uv sync --locked --extra dev --extra chem
 bash scripts/restore_r.sh "$REPO/../case-rlib"
 export R_LIBS="$REPO/../case-rlib"
 export RNP_RSCRIPT=Rscript
@@ -80,7 +80,9 @@ uv run python scripts/case_run.py \
   --out "$OUT"
 ```
 
-`case_run.py` runs both thresholds, checks both manifests and invokes `scripts/case_check.py`.
+`case_run.py` registers the structures of the log with `rnp ingest compounds` (this needs RDKit:
+the `--extra chem` above), runs both thresholds, checks both manifests and invokes
+`scripts/case_check.py`.
 Expected counts are frozen in `expected/EXPECTED.json`; see `VERIFICATION.md`.
 
 ## Licenses and attribution

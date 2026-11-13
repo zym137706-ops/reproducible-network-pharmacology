@@ -14,6 +14,21 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### `scripts/case_run.py` checks the submission log with `rnp ingest compounds` — 2026-11-13
+
+- With `--log`, the case entry no longer compares structures, names, species and hashes itself. The
+  preflight runs `rnp ingest compounds` on a copy of the inputs in a temporary directory and judges its
+  audit with the case policy `case-log-policy-v2` (every submission must be checked; a missing log row,
+  a log row without a compound and an undeclared hash are errors here, although the command only
+  warns); the chain runs `rnp ingest compounds` and `rnp ingest stp --compounds` for each threshold and
+  checks the compounds stage with `rnp manifest --check-inputs`. `case_provenance.json` records
+  `inputs.structures` and `inputs.compounds_stage`; a failure of the stage is `failed_stage`
+  `ingest_compounds`.
+- **A case with `--log` needs RDKit** (extra `chem`); the CI job `r-contract` installs it. Without `--log`
+  the case entry is unchanged and needs no RDKit.
+- Stricter than before: a SMILES that RDKit cannot parse, a SMILES with a space inside and a log without
+  the column `submitted_date` are refused.
+
 ### `rnp ingest stp --compounds` — 2026-11-12
 
 - `rnp ingest stp` accepts `--compounds DIR`, the output directory of `rnp ingest compounds`. The export
