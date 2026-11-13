@@ -100,6 +100,16 @@ It re-derives `T_r`/foreground from targets + HGNC + disease, checks intersectio
 and independently recomputes every hypergeometric p-value and BH correction; it does not call the
 functions that produced the result and does not accept copied summary counts as expected values.
 
+With a submission log (`case_run.py` does this whenever `--log` is given) the check also rechecks the
+bindings of the compounds stage. Add `--compound-table` (the compound table), `--stp-dir`, `--log`,
+`--species` (the species of the run config, for example `Homo_sapiens`) and one
+`--stage 0.10=/path/to/out/0.10/run_compounds` for every `--run`; all of them or none. From these raw
+inputs alone, with the standard library and without RDKit, it derives each compound's submission status,
+export kind and export SHA-256 and compares them with the stage table, the stage audit, the registered
+table and the ingest audit of every threshold. It also requires every submission to be checked (the
+case policy again). A failed recheck ends with an error message that has one line per problem, and
+`independent-check.json` is then not written; the result of a passed recheck is under `bindings`.
+
 ## Container provenance
 
 When run in a Linux container, the caller supplies the observed values (never inferred or invented):

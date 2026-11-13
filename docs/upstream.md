@@ -1,6 +1,6 @@
 # 上游导入、结构注册与显式选择（设计契约）
 
-状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`，2026-11-12 起 `rnp ingest stp --compounds` 接入它，2026-11-13 起案例入口 `scripts/case_run.py` 在给了提交日志时经由它们登记和核对结构（均未发布）。执行顺序见 [总规划](project-plan.zh-CN.md)。
+状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`，2026-11-12 起 `rnp ingest stp --compounds` 接入它，2026-11-13 起案例入口 `scripts/case_run.py` 在给了提交日志时经由它们登记和核对结构，案例核查器 `scripts/case_check.py` 在给了提交日志时再从原始输入独立复核提交绑定（均未发布）。执行顺序见 [总规划](project-plan.zh-CN.md)。
 实现时先增加 JSON Schema、跨表约束及正反例，再修改 CLI；不通过文档宣称接口已经可用。
 
 ## 1. 输入边界
@@ -74,7 +74,7 @@ Cytoscape 后续以 compound:<id>、gene:<id>、disease:<id> 连接，Label 与 
 [RDKit 标准化接口](https://www.rdkit.org/docs/source/rdkit.Chem.MolStandardize.rdMolStandardize.html)；
 [Meeko 配体准备](https://meeko.readthedocs.io/en/develop/lig_prep_basic.html)。
 
-## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`；2026-11-12 `ingest stp --compounds`；2026-11-13 案例入口）
+## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`；2026-11-12 `ingest stp --compounds`；2026-11-13 案例入口；2026-11-13 案例核查器的绑定复核）
 
 本节把第 2、3、6 节落到入口 A 的第一个可实现切片。命令 `rnp ingest compounds`（2026-11-11 起，未发布）读写下列产物，
 并用库 `rnp.structures`（`src/rnp/structures/`）完成登记、绑定和校验；这些产物有 JSON Schema（`schemas/`）和契约测试
@@ -123,6 +123,10 @@ Cytoscape 后续以 compound:<id>、gene:<id>、disease:<id> 连接，Label 与 
 - 从结果页重建的导出（`reconstructed_from_result_page`）必须在日志里保留不是 `not_saved` 的 `job_id` 和完整行数
   `result_rows`；原生导出的 `result_rows` 可选。日志没有声明 `result_sha256` 不算错误，记 `submission_hash_not_declared`
   警告，实算哈希仍写入 `compound_structures.tsv`。日志里对应不到任何化合物行的行，记 `log_row_without_compound` 警告。
+- 读表与清洗：表格按 UTF-8 读取（容忍 BOM），分隔符按表头行判定（制表符不少于逗号时取制表符），空行跳过，短行补空，
+  比表头列数多的行是错误。化合物表的 `name`、`group`（缺省 `all`）、`stp_file`、`pubchem_cid` 做空白折叠（不换行空格视为
+  空格，连续空白合成一个）；`smiles` 和日志里的每个单元格只去首尾空白。名称、`stp_file`、`pubchem_cid`、`smiles` 的比较都在
+  清洗之后进行。这些规则写在这里，是为了让案例核查器（8.10）不引用结构库也能独立复刻本节的绑定。
 
 ### 8.4 行状态、阶段状态和问题代码
 
@@ -175,7 +179,7 @@ Schema 表达不了的约束由库实现并测试：
 状态：设计、Schema 和契约测试已完成（2026-11-09）；库 `rnp.structures` 和命令 `rnp ingest compounds` 已实现、未发布
 （2026-11-10、2026-11-11）。命令把阶段输出写进 `<outputs.dir>/<run_id>_compounds/`，`run.schema.json` 有了新键
 `inputs.submission_log` 和 `inputs.structure_registry`；结构模式下运行命令需要可选依赖 `chem`（见 8.7）。
-`rnp ingest stp --compounds`（下游接入）已实现、未发布（2026-11-12，见 8.8）；案例入口 `scripts/case_run.py` 给了提交日志时经由它们核对结构，已实现、未发布（2026-11-13，见 8.9）。
+`rnp ingest stp --compounds`（下游接入）已实现、未发布（2026-11-12，见 8.8）；案例入口 `scripts/case_run.py` 给了提交日志时经由它们核对结构，已实现、未发布（2026-11-13，见 8.9）；案例核查器 `scripts/case_check.py` 给了提交日志时从原始输入独立复核提交绑定，已实现、未发布（2026-11-13，见 8.10）。
 
 ### 8.7 命令 `rnp ingest compounds`（2026-11-11；未发布）
 
@@ -230,3 +234,27 @@ Schema 表达不了的约束由库实现并测试：
   计数；链跑完阶段后 `inputs.compounds_stage` 记每个阈值的目录和审计、表的 SHA-256。`case_provenance` 的 Schema 不变（`inputs` 是自由对象）。
 - **比旧版更严：**RDKit 解析不了的 SMILES、含空白的 SMILES、缺 `submitted_date` 列的日志，现在被拒绝。
 - **需要 RDKit。**给了 `--log` 的案例需要可选依赖 `chem`；没有时预检以退出码非 0 失败，并原样带出命令的安装提示。
+
+### 8.10 案例核查器的绑定复核 `scripts/case_check.py`（2026-11-13；未发布）
+
+给了提交日志时，案例核查器在原有的集合与统计复核之外，再从原始输入独立复核每个阈值的化合物阶段；不给时一字不变。
+
+- **选项。**`--compound-table`（化合物表）、`--stp-dir`、`--log`、`--species`（运行配置的 `species`，如 `Homo_sapiens`）和
+  `--stage LABEL=DIR`（每个 `--run` 一个，标签相同）：要么全给，要么全不给；只给一部分时退出并指名缺哪几个。
+  `scripts/case_run.py` 给了 `--log` 时传入它们，核查通过后把 `inputs.log.binding_recheck`（`tool`、`rule`、`result: passed`）
+  写进 `case_provenance.json`。
+- **独立。**绑定复核只用标准库，不导入 `rnp.structures`、`rnp.analysis` 或 RDKit；读表与清洗规则见 8.3。
+- **推导。**对化合物表的每一行（按行序），按 8.3 的规则从日志、导出文件和 `species` 推出提交状态、`export_kind` 和
+  `export_sha256`：没有 `smiles` 的行是 `not_checked`，没有日志行的行是 `not_recorded`，有任何不符的行是 `rejected`（原因按
+  `compound`、`pubchem_cid`、`submitted_structure`、`species`、`stp_file`、`result_sha256` 的顺序列出）。
+- **比对。**每个阈值：阶段表的行数、顺序和每行的 `name`、`group`、`stp_file`、`smiles`、`submission_status`、`export_kind`、
+  `export_sha256` 与推导一致；审计里的输入哈希和行数、`files_hashed`、`compound_structures_sha256`、`summary` 的各个计数与推导和
+  实算一致；`compounds_registered.tsv` 的 `name`、`group`、`stp_file` 与化合物表一致，`compound_id`、`structure_id`、
+  `structure_status` 与阶段表一致，`stp_audit.json` 的 `compounds_registered_sha256` 等于实算；各阈值的阶段表逐字节相同。
+  结构层（`structure_id`、`inchikey`）要 RDKit 才能重算，这里只检查格式和不重复。
+- **案例策略。**复核自己再执行一遍：每个化合物的推导状态必须是 `verified`、`verified_kind_unstated` 或 `reconstructed`，没有
+  缺日志行、没有无化合物的日志行，日志声明了 `result_sha256`；每一行的 `row_status` 是 `accepted`、`structure_status` 是
+  `registered`；审计的 `identity_mode` 是 `structure`、`stage_status` 是 `complete`、`summary.errors` 是 0。
+- **输出。**每个问题一行，格式 `<阈值>: <文件>: [entry '<名称>' (<stp_file>) ]<字段>: expected <值> from <来源>, found <值>`，
+  全部问题一次报出；有问题时退出码非 0，且不写 `independent-check.json`。通过时 `independent-check.json` 多一个键 `bindings`
+  （`rule: case-binding-recheck-v1`、化合物表和日志的哈希、行数、各提交状态的计数、比对的列、每个阈值的阶段表哈希）。

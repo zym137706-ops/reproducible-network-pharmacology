@@ -14,6 +14,20 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### `scripts/case_check.py` rechecks the submission bindings — 2026-11-13
+
+- With a submission log, the independent check also rechecks the compounds stage of every threshold.
+  From the compound table, the log and the STP exports alone (standard library only: no RDKit and none
+  of the structure code of `rnp`) it derives each compound's submission status, export kind and export
+  hash, and compares them with `compound_structures.tsv`, `compounds_audit.json`,
+  `compounds_registered.tsv` and `stp_audit.json`. It applies the case policy again: a compound without
+  a checked submission, a missing or unused log row and an undeclared hash fail the run. Every problem
+  is one line naming the threshold, the file, the compound and the field.
+- New options of `scripts/case_check.py`, all or none: `--compound-table`, `--stp-dir`, `--log`,
+  `--species` and `--stage LABEL=DIR` (one per `--run`). `scripts/case_run.py` passes them when `--log`
+  is given and records `inputs.log.binding_recheck` once the check passed. Without `--log` nothing
+  changes; `independent-check.json` gets the key `bindings` only when the recheck ran.
+
 ### `scripts/case_run.py` checks the submission log with `rnp ingest compounds` — 2026-11-13
 
 - With `--log`, the case entry no longer compares structures, names, species and hashes itself. The

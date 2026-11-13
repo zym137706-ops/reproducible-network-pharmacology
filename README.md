@@ -135,8 +135,10 @@ submitted structures (needs RDKit, extra `chem`), fixes both threshold configs, 
 chain (`ingest compounds` and `ingest stp --compounds` when a log is supplied), invokes
 [`scripts/case_check.py`](scripts/case_check.py) and records
 `case_provenance.json`; the overall status is `complete` only after the analysis, both manifest checks
-and the independent set/p-value/BH check succeed. Source hashes use the versioned
-`case-source-hash-v2` scope (case-relevant source + entrypoints + locks, not the whole package).
+and the independent set/p-value/BH check succeed (with a log, that check also re-derives the
+submission bindings from the raw inputs and compares them with the compounds stage). Source hashes
+use the versioned `case-source-hash-v2` scope (case-relevant source + entrypoints + locks, not the
+whole package).
 See [docs/case-run.md](docs/case-run.md). This is an orchestrator only: business logic remains in `rnp`.
 
 Windows note: make sure `python` resolves to Python 3. A common trap on workstations with
@@ -157,7 +159,7 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 | `rnp mcode` | 🚧 later extension | Module enrichment from Cytoscape MCODE exports; independent of hub ranking |
 | `rnp report` | ✅ | Markdown report from verified stage audits + tables; hash-checked; no claims beyond the evidence |
 | `scripts/case_run.py` | ✅ local case entry | Portable preflight + full CLI chain for user-supplied inputs; records source/config/container provenance; with `--log` it registers and checks the structures through `rnp ingest compounds` (needs RDKit, extra `chem`) |
-| `scripts/case_check.py` | ✅ independent check | Re-derives T_r/foreground and recomputes hypergeometric/BH from result tables |
+| `scripts/case_check.py` | ✅ independent check | Re-derives T_r/foreground and recomputes hypergeometric/BH from result tables; with a submission log it also re-derives every compound's submission status and export hash from the raw inputs and compares them with the compounds stage |
 | `rnp metabolites import` | 🚧 v0.2 | Import processed metabolomics annotations; confirmed compound lists also supported |
 | `rnp structures resolve` | 🚧 v0.2.0 | Resolve names / InChIKeys to structures (PubChem cache) |
 | `rnp compounds annotate/select` | 🚧 v0.2 design | Properties plus explicit inclusion/exclusion decisions; all original candidates retained |
