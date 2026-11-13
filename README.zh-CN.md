@@ -29,7 +29,7 @@
 > `docs/case-entry-clean-run-2026-10-22.md` 与 `docs/case-clean-run-2026-10-21.md`。
 > 维护入口：[发布后规划 v4](docs/project-plan.zh-CN.md)；[案例冻结](examples/demo/CASE-FREEZE.yaml)；
 > [公开案例来源清单](docs/public-case-sources.md)；[环境记录](docs/environment.md)。
-> 组内试用材料：[需求与结果使用问卷](docs/group-user-questionnaire-2026-11.md)、[组内快速上手指南](docs/group-quickstart-zh.md)（已起草并发放到组内群；截至 2026-11-10 没有收到答卷，但已有 1 位同门自行按 Windows 指南试用，遇到 2 条安装/操作问题，修正后成功完成测试，见[试用问题记录](docs/group-trial-issues-2026-11-09.md)；收集暂缓，不影响 v0.2/v0.3 开发）。
+> 组内试用材料：[需求与结果使用问卷](docs/group-user-questionnaire-2026-11.md)、[组内快速上手指南](docs/group-quickstart-zh.md)（已起草并发放到组内群；截至 2026-11-11 试用收尾，据作者说明共有 5 人按 Windows 指南完成了教学假数据流程（validate → ingest → intersect → network，不等于完整科研复现），遇到的安装/操作问题已记入[试用问题记录](docs/group-trial-issues-2026-11-09.md)，指南已据此修订；问卷只收到 1 份，见[问卷汇总](docs/group-feedback-summary-2026-11-10.md)，是单例定性反馈，不是正式用户验证；不再等待更多问卷，也不影响 v0.2/v0.3 开发）。
 
 ## 为什么做这个
 
