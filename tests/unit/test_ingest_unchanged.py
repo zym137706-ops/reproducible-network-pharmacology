@@ -2,10 +2,12 @@
 
 Two small scenarios are run. Their three deterministic artifacts are compared with fingerprints
 taken from the code before the `--compounds` option was added: `compounds_registered.tsv` and
-`targets.tsv` byte for byte, `stp_audit.json` after the machine-dependent fields (the paths, and
-the hash of the run config that contains them) are normalised. A compound table that has the
-structure columns of the compounds stage (smiles, pubchem_cid, ...) must give the same artifacts
-as the plain table: only the explicit option makes `ingest stp` look at them.
+`targets.tsv` byte for byte, `stp_audit.json` after the machine-dependent fields (the paths with
+their separators, and the hash of the run config that contains them) are normalised. The input
+files are written with LF on every platform, so the hashes of the exports in the audit are the
+same everywhere. A compound table that has the structure columns of the compounds stage (smiles,
+pubchem_cid, ...) must give the same artifacts as the plain table: only the explicit option makes
+`ingest stp` look at them.
 """
 
 from __future__ import annotations
@@ -45,12 +47,12 @@ GOLDEN = {
     "partial": {
         "registered": "2c8ef8cf80b398cb240c4392723ce13e8a6f9c9c2c3b3fdf214261c2c5090857",
         "targets": "674be399d6d99fef383b67f154effeb2e0bae64e983c27eeaeb62382561a342f",
-        "audit": "42abd7f55d90c5341e0e7f7df8b5edd80f737fadbdc29d18d8f6fc2ac51bd49c",
+        "audit": "cc56d622370ff4a89cb26c490c8c2f5ddde2f04c3e3f9aa63e9c9ffcad98a4cc",
     },
     "clean": {
         "registered": "8777b5aaa0f757839dd7399849820c5bdaeee4bdecaac0f401e6711cbe738ad6",
         "targets": "c1083bd1220bc9967971253a72025a2406a2ecab880be25ff6bd1e1cad93314a",
-        "audit": "f070a9e22da4a88570a4d0b11a6fd0d2c66b71281ee44caef90f18e3f00a1445",
+        "audit": "175ac994142c675957a799d8d6ff06c6873f442c5a75a9c0570b1167bee0a004",
     },
 }
 
@@ -64,9 +66,11 @@ def run(tmp_path: Path, table: str, names: list[str]) -> tuple[Path, str]:
     inputs = tmp_path / "inputs"
     stp = inputs / "stp"
     stp.mkdir(parents=True)
-    (inputs / "compounds.tsv").write_text(table, encoding="utf-8")
+    # LF on every platform: the exports are hashed into the audit, and `write_text` would turn
+    # "\n" into the line ending of the platform (CRLF on Windows) and change those hashes.
+    (inputs / "compounds.tsv").write_text(table, encoding="utf-8", newline="\n")
     for name in names:
-        (stp / name).write_text(HEADER + EXPORTS[name], encoding="utf-8")
+        (stp / name).write_text(HEADER + EXPORTS[name], encoding="utf-8", newline="\n")
     data = {
         "project": "unchanged-fixture",
         "species": "Homo_sapiens",
@@ -93,7 +97,9 @@ def normalised_audit(run_dir: Path, root: str) -> str:
     audit = json.loads((run_dir / "stp_audit.json").read_text(encoding="utf-8"))
     audit["config"]["sha256"] = "<config sha256>"
     text = json.dumps(audit, sort_keys=True, ensure_ascii=False)
-    return text.replace(root, "<root>").replace(root.replace("\\", "\\\\"), "<root>")
+    text = text.replace(root, "<root>").replace(root.replace("\\", "\\\\"), "<root>")
+    # what is left of a path after the root is a relative path: write its separators as "/"
+    return text.replace("\\\\", "/")
 
 
 def fingerprints(run_dir: Path, root: str) -> dict[str, str]:
