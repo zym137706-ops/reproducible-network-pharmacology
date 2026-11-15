@@ -2,7 +2,7 @@
 
 Fixed implementation commit: `2b6fb52ea8b55ae9b639917f4e5ad8335fc11354` (`2b6fb52`), the last of the five
 commits that make `scripts/case_run.py` call `rnp ingest compounds` (unreleased code on local `main`, after
-v0.1.0; not pushed).
+v0.1.0; not yet pushed when the run was made).
 Clean clone: a local `git clone --no-hardlinks` of the repository checked out at that commit;
 `git status --porcelain` was empty before and after the runs.
 Inputs: the `rnp-case-v0.1.0-2026-10-21` case package, extracted outside the clone. Its 35 payload files match
