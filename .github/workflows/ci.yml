@@ -49,6 +49,96 @@ jobs:
           uv run rnp manifest --run-dir results/quickstart --check-inputs
       - name: Offline synthetic demo
         run: uv run python scripts/synthetic_demo.py --out .demo
+      - name: Selection end-to-end on synthetic inputs
+        run: |
+          uv run python - <<'PY'
+          import json
+          import subprocess
+          import sys
+          import tempfile
+          from pathlib import Path
+
+          import yaml
+
+          root = Path.cwd()
+          source = root / "tests/fixtures/run/inputs"
+          with tempfile.TemporaryDirectory() as raw:
+              tmp = Path(raw)
+              (tmp / "compounds.tsv").write_text(
+                  "name\tstp_file\nQuercetin\tcompound_a.csv\nKaempferol\tcompound_b.csv\n",
+                  encoding="utf-8",
+              )
+              (tmp / "decisions.tsv").write_text(
+                  "compound\tdecision\treason_codes\trules_version\treviewer\n"
+                  "Quercetin\tinclude\t\tci-v1\tci\n"
+                  "Kaempferol\texclude\tout_of_scope\tci-v1\tci\n",
+                  encoding="utf-8",
+              )
+              config = {
+                  "project": "selection-ci",
+                  "species": "Homo_sapiens",
+                  "inputs": {
+                      "compounds": str(tmp / "compounds.tsv"),
+                      "stp_dir": str(source / "stp"),
+                      "disease_genes": str(source / "disease_genes.txt"),
+                      "hgnc_map": str(root / "tests/fixtures/hgnc/hgnc_map.tsv"),
+                      "selection": str(tmp / "decisions.tsv"),
+                  },
+                  "thresholds": {"stp_probability": 0.10},
+                  "enrichment": {"engine": "r", "gene_sets": "GO_BP"},
+                  "network": {"disease_label": "Fixture disease"},
+                  "outputs": {"dir": str(tmp / "results")},
+              }
+              (tmp / "run.yaml").write_text(
+                  yaml.safe_dump(config, sort_keys=False), encoding="utf-8"
+              )
+              base = ["--config", str(tmp / "run.yaml")]
+
+              def rnp(*args):
+                  done = subprocess.run(
+                      [sys.executable, "-m", "rnp.cli", *args],
+                      cwd=root,
+                      capture_output=True,
+                      text=True,
+                  )
+                  assert done.returncode == 0, (args, done.returncode, done.stderr)
+                  return json.loads(done.stdout)
+
+              rnp("validate", *base)
+              compounds = rnp("ingest", "compounds", *base, "--run-id", "s")["run_dir"]
+              selection = rnp(
+                  "compounds", "select", *base, "--compounds", compounds, "--run-id", "sel"
+              )["run_dir"]
+              ingest = rnp(
+                  "ingest",
+                  "stp",
+                  *base,
+                  "--run-id",
+                  "i1",
+                  "--compounds",
+                  compounds,
+                  "--selection",
+                  selection,
+              )
+              assert ingest["stage_status"] == "complete", ingest
+              run = Path(ingest["run_dir"])
+              audit = json.loads((run / "stp_audit.json").read_text(encoding="utf-8"))
+              assert audit["schema_version"] == "1.2", audit["schema_version"]
+              assert audit["summary"]["files_not_selected"] == 1, audit["summary"]
+              header = (run / "compounds_registered.tsv").read_text(encoding="utf-8").splitlines()[0]
+              assert header.endswith("\tselection_status"), header
+              targets = (run / "targets.tsv").read_text(encoding="utf-8").splitlines()[1:]
+              assert {line.split("\t")[3] for line in targets} == {"compound_a.csv"}, targets
+              intersect = rnp("intersect", *base, "--targets", str(run / "targets.tsv"))
+              assert intersect["groups"]["all"]["compounds"] == 1, intersect
+              rnp("network", *base, "--intersect", str(run / "intersect"))
+              rnp("report", *base, "--run-dir", str(run))
+              report = next((run / "report").glob("*.md")).read_text(encoding="utf-8")
+              line = "- Compound selection: 1 selected, 1 excluded, 0 needs review or quarantined"
+              assert line in report, report
+              assert rnp("manifest", "--run-dir", str(run), "--check-inputs")["drift"] == []
+          print("selection end-to-end ok")
+          PY
       - name: Build wheel and check packaged resources
         if: matrix.python-version == '3.12'
         run: |
