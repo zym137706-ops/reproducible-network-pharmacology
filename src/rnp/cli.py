@@ -27,6 +27,7 @@ from .analysis.ingest import run_ingest
 from .analysis.intersect import run_intersect
 from .analysis.network import run_network
 from .analysis.report import run_report
+from .analysis.selection import run_selection
 from .config import RunConfig, load_config, validate_document
 from .errors import InputError, RnpError, exit_code_for
 from .provenance import sha256_file, utc_now_iso
@@ -55,6 +56,8 @@ def _require_inputs(config: RunConfig) -> dict[str, str]:
         checks["hgnc_map"] = config.input_path("hgnc_map")
     if "submission_log" in config.data["inputs"]:
         checks["submission_log"] = config.input_path("submission_log")
+    if "selection" in config.data["inputs"]:
+        checks["selection"] = config.input_path("selection")
     problems = []
     for name, path in checks.items():
         expected = "dir" if name == "stp_dir" else "file"
@@ -105,6 +108,15 @@ def cmd_ingest_stp(args: argparse.Namespace) -> int:
 def cmd_ingest_compounds(args: argparse.Namespace) -> int:
     config = load_config(args.config)
     summary = run_compounds(config, run_id=args.run_id, force=args.force)
+    _emit(summary)
+    return 0 if summary["stage_status"] == "complete" else 3
+
+
+def cmd_compounds_select(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    summary = run_selection(
+        config, compounds=args.compounds, run_id=args.run_id, force=args.force
+    )
     _emit(summary)
     return 0 if summary["stage_status"] == "complete" else 3
 
@@ -366,6 +378,23 @@ def build_parser() -> argparse.ArgumentParser:
         "(output of 'rnp ingest compounds')",
     )
 
+    compounds = sub.add_parser("compounds", help="decide which candidate compounds are used")
+    compounds_sub = compounds.add_subparsers(dest="compounds_command", required=True)
+    compounds_select = compounds_sub.add_parser(
+        "select",
+        help="record the selection decisions on the candidate compounds (upstream entry A)",
+    )
+    compounds_select.add_argument("--config", required=True, help="path to run.yaml")
+    compounds_select.add_argument(
+        "--compounds",
+        required=True,
+        metavar="DIR",
+        help="the stage directory written by 'rnp ingest compounds'",
+    )
+    compounds_select.add_argument("--run-id", default=None, help=argparse.SUPPRESS)
+    compounds_select.add_argument(
+        "--force", action="store_true", help="replace an existing run directory"
+    )
     intersect = sub.add_parser(
         "intersect", help="map target genes and intersect them with the disease gene set"
     )
@@ -479,6 +508,7 @@ _DISPATCH = {
     ("validate", None): cmd_validate,
     ("ingest", "stp"): cmd_ingest_stp,
     ("ingest", "compounds"): cmd_ingest_compounds,
+    ("compounds", "select"): cmd_compounds_select,
     ("intersect", None): cmd_intersect,
     ("network", None): cmd_network,
     ("enrich", None): cmd_enrich,
@@ -491,7 +521,10 @@ _DISPATCH = {
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    key = (args.command, getattr(args, "ingest_command", None))
+    key = (
+        args.command,
+        getattr(args, "ingest_command", None) or getattr(args, "compounds_command", None),
+    )
     handler = _DISPATCH.get(key)
     if handler is None:  # pragma: no cover - argparse prevents this
         parser.error(f"unknown command: {args.command}")
