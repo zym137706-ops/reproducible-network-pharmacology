@@ -8,7 +8,7 @@ Keep decisions and their evidence separate from approval to perform ordinary eng
 
 | Gate | Scientific decision | Existing evidence / target recording |
 |---|---|---|
-| G1 | Which compounds are in scope and why | Current compound list; explicit include/exclude/needs_review decisions with content-derived decision IDs in `selection_decisions.tsv` (`rnp compounds select`, implemented, unreleased; the analysis stages do not read them yet) |
+| G1 | Which compounds are in scope and why | Current compound list; explicit include/exclude/needs_review decisions with content-derived decision IDs in `selection_decisions.tsv` (`rnp compounds select`, implemented, unreleased; `rnp ingest stp --selection` and the stages after it use only the selected compounds) |
 | G2 | Prediction threshold and rationale | Current run config; planned threshold/invalid/no-result states and sensitivity records |
 | G3 | Resolve ambiguous/retired symbols and symbol–UniProt conflicts | Current gene_mapping_conflicts.tsv and exclusions; accepted resolutions need traceable decision references |
 | G4 | Treatment of composite/multi-symbol targets | Current target_exclusions.tsv; no probability distributed to subunits |
@@ -21,7 +21,7 @@ Keep decisions and their evidence separate from approval to perform ordinary eng
 | Gate | Decision and stopping condition | Target recording |
 |---|---|---|
 | G8 | Structure identity, MSI evidence, salt/stereo/charge policy; unresolved identity cannot become a confirmed structure automatically | Structure registry, transformations and evidence references; see upstream.md |
-| G9 | Explicit candidate inclusion/exclusion; property rules do not silently delete original records | Selection decisions, rules version, rationale and reviewer/method: `selection_decisions.tsv` of `rnp compounds select` (implemented, unreleased); a candidate without a decision is held for review, not selected |
+| G9 | Explicit candidate inclusion/exclusion; property rules do not silently delete original records | Selection decisions, rules version, rationale and reviewer/method: `selection_decisions.tsv` of `rnp compounds select` (implemented, unreleased); a candidate without a decision is held for review, not selected; `rnp ingest stp --selection` parses only the exports of selected compounds and records the others as not selected |
 | G10 | Which compound–protein pairs and receptor/site/control are suitable | candidate_pairs.tsv plus eligibility and decision references; see docking.md |
 | G11 | Preparation, sampling budget, redocking/QC acceptance and reporting | Locked protocol, per-check outputs, actual commands/logs and acceptance decision |
 

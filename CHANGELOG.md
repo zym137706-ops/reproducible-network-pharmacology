@@ -14,6 +14,31 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### `rnp ingest stp --selection` and selected-only counts — 2026-11-16
+
+- `rnp ingest stp --config run.yaml --compounds DIR --selection DIR2 [--force]` (unreleased) reads the
+  stage directory of `rnp compounds select` and parses only the exports of the compounds that the
+  researcher selected. The export of an excluded compound is recorded as `not_selected` with the reason
+  `compound_excluded`, that of a compound held for review as `not_selected` with
+  `compound_needs_review`; neither is parsed, and a quarantined compound's export stays quarantined. The
+  stage is `partial` (exit code 3) while a compound is held for review or quarantined; an excluded
+  compound is decided, so it does not make the stage partial and a missing export of it is not an
+  error. When no compound was selected there is no usable export (exit code 2). `--selection` needs
+  `--compounds`, and a selection stage that is not current (changed audit, table, list or decision
+  table, another run config, another compounds stage) is refused before anything is written. Without
+  `--selection` the outputs are byte for byte what they were.
+- With `--selection`, `stp_audit.json` is schema 1.2 (1.1 audits stay valid): the file status
+  `not_selected`, `summary.files_not_selected` and a `selection_stage_applied` note.
+  `compounds_registered.tsv` gets a last column `selection_status`, and the manifest names
+  `compounds select` as a second parent.
+- With that column `rnp intersect` and `rnp network` count and list only the selected compounds: an
+  excluded compound is no longer a compound without edges, and a group without a selected compound is
+  not listed. `rnp report` adds one line with the counts of selected, excluded and unresolved
+  compounds. "Selected" only means kept by the recorded decision; it says nothing about activity or
+  efficacy.
+- CI: a step of the lint-and-test job runs `rnp ingest compounds`, `compounds select`,
+  `ingest stp --selection`, `intersect`, `network`, `report` and `manifest` on synthetic inputs.
+
 ### `rnp compounds select` command and selection library — 2026-11-15
 
 - New command `rnp compounds select --config run.yaml --compounds DIR [--force]` and library

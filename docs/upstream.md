@@ -1,6 +1,6 @@
 # 上游导入、结构注册与显式选择（设计契约）
 
-状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`，2026-11-12 起 `rnp ingest stp --compounds` 接入它，2026-11-13 起案例入口 `scripts/case_run.py` 在给了提交日志时经由它们登记和核对结构，案例核查器 `scripts/case_check.py` 在给了提交日志时再从原始输入独立复核提交绑定，2026-11-15 起命令 `rnp compounds select` 记录选择决定（均未发布；`rnp ingest stp` 还不读取选择决定，见 8.11）。执行顺序见 [总规划](project-plan.zh-CN.md)。
+状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`，2026-11-12 起 `rnp ingest stp --compounds` 接入它，2026-11-13 起案例入口 `scripts/case_run.py` 在给了提交日志时经由它们登记和核对结构，案例核查器 `scripts/case_check.py` 在给了提交日志时再从原始输入独立复核提交绑定，2026-11-15 起命令 `rnp compounds select` 记录选择决定，2026-11-16 起 `rnp ingest stp --selection` 只解析已选化合物的导出，`rnp intersect`、`rnp network` 和 `rnp report` 只数已选化合物（均未发布，见 8.11、8.12）。执行顺序见 [总规划](project-plan.zh-CN.md)。
 实现时先增加 JSON Schema、跨表约束及正反例，再修改 CLI；不通过文档宣称接口已经可用。
 
 ## 1. 输入边界
@@ -74,7 +74,7 @@ Cytoscape 后续以 compound:<id>、gene:<id>、disease:<id> 连接，Label 与 
 [RDKit 标准化接口](https://www.rdkit.org/docs/source/rdkit.Chem.MolStandardize.rdMolStandardize.html)；
 [Meeko 配体准备](https://meeko.readthedocs.io/en/develop/lig_prep_basic.html)。
 
-## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`；2026-11-12 `ingest stp --compounds`；2026-11-13 案例入口；2026-11-13 案例核查器的绑定复核；2026-11-15 选择决定 `rnp compounds select`）
+## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`；2026-11-12 `ingest stp --compounds`；2026-11-13 案例入口；2026-11-13 案例核查器的绑定复核；2026-11-15 选择决定 `rnp compounds select`；2026-11-16 `ingest stp --selection`）
 
 本节把第 2、3、6 节落到入口 A 的第一个可实现切片。命令 `rnp ingest compounds`（2026-11-11 起，未发布）读写下列产物，
 并用库 `rnp.structures`（`src/rnp/structures/`）完成登记、绑定和校验；这些产物有 JSON Schema（`schemas/`）和契约测试
@@ -174,12 +174,11 @@ Schema 表达不了的约束由库实现并测试：
 
 ### 8.6 本切片不做，以及状态
 
-不做：入口 B、性质标注、联网查询、结构标准化、“提交结构与当前结构不同但研究者显式接受”、跨组出现表、配体态、
-`ingest stp` 对选择决定的接入（选择决定表本身见 8.11）。
+不做：入口 B、性质标注、联网查询、结构标准化、“提交结构与当前结构不同但研究者显式接受”、跨组出现表、配体态。
 状态：设计、Schema 和契约测试已完成（2026-11-09）；库 `rnp.structures` 和命令 `rnp ingest compounds` 已实现、未发布
 （2026-11-10、2026-11-11）。命令把阶段输出写进 `<outputs.dir>/<run_id>_compounds/`，`run.schema.json` 有了新键
 `inputs.submission_log` 和 `inputs.structure_registry`；结构模式下运行命令需要可选依赖 `chem`（见 8.7）。
-`rnp ingest stp --compounds`（下游接入）已实现、未发布（2026-11-12，见 8.8）；案例入口 `scripts/case_run.py` 给了提交日志时经由它们核对结构，已实现、未发布（2026-11-13，见 8.9）；案例核查器 `scripts/case_check.py` 给了提交日志时从原始输入独立复核提交绑定，已实现、未发布（2026-11-13，见 8.10）。
+`rnp ingest stp --compounds`（下游接入）已实现、未发布（2026-11-12，见 8.8）；案例入口 `scripts/case_run.py` 给了提交日志时经由它们核对结构，已实现、未发布（2026-11-13，见 8.9）；案例核查器 `scripts/case_check.py` 给了提交日志时从原始输入独立复核提交绑定，已实现、未发布（2026-11-13，见 8.10）；选择决定表 `rnp compounds select` 和它在 `rnp ingest stp --selection` 里的接入已实现、未发布（2026-11-15、2026-11-16，见 8.11、8.12）。
 
 ### 8.7 命令 `rnp ingest compounds`（2026-11-11；未发布）
 
@@ -263,7 +262,7 @@ Schema 表达不了的约束由库实现并测试：
 
 `rnp compounds select --config run.yaml --compounds DIR [--force]`：`DIR` 是 `rnp ingest compounds` 的阶段目录。研究者在决定表里为
 每个候选化合物写下纳入、排除或待审，命令把全候选和所选名单分开保存。“所选”只表示按研究者的记录决定保留用于分析，不表示活性、药效
-或任何验证；命令不看化合物的性质，也不替研究者判断。`rnp ingest stp` 还不读取选择决定（下一个切片）。
+或任何验证；命令不看化合物的性质，也不替研究者判断。`rnp ingest stp --selection` 读取它（见 8.12）。
 
 - **输入。**新的可选输入 `inputs.selection`（TSV 或 CSV；`run.schema.json` 有这个键，`rnp validate` 检查文件存在）。每个候选化合物一行，
   列：`compound`（名称）、`group`（缺省 `all`）、`decision`（`include`、`exclude` 或 `needs_review`）、`reason_codes`、`rules_version`、
@@ -298,4 +297,36 @@ Schema 表达不了的约束由库实现并测试：
 - **阶段状态与退出码。**每个候选都是 `selected` 或 `excluded` 时阶段是 `complete`（退出码 0）；有 `needs_review` 或 `quarantined` 时是
   `partial`（退出码 3，输出已写，打印的摘要列出 `unresolved`）；决定表或化合物阶段有表级问题时退出码 2、什么都不写；内部错误 1。没有决定的
   候选是待审，不是纳入。
-- **不做。**性质标注和按性质自动判定、联网、跨运行的决定登记表、`ingest stp` 和案例入口对选择的接入。
+- **不做。**性质标注和按性质自动判定、联网、跨运行的决定登记表、案例入口对选择的接入。
+
+### 8.12 命令 `rnp ingest stp --compounds DIR --selection DIR2`（2026-11-16；未发布）
+
+`rnp ingest stp --config run.yaml --compounds DIR --selection DIR2 [--force]`：`DIR2` 是 `rnp compounds select` 的阶段目录，`DIR` 是它所依据的
+`rnp ingest compounds` 的阶段目录。只给 `--selection`、不给 `--compounds` 是表级错误（退出码 2，什么都不写）。给了 `--selection`，
+`ingest stp` 按每个候选的 `selection_status` 处理它的导出；不给，`ingest stp` 的产物与以前逐字节相同（回归测试锁着这一点）。
+
+- **处理：**
+
+  | `selection_status` | 导出的记录（`stp_audit.json` 的 `files`） | 对阶段状态的影响 |
+  |---|---|---|
+  | `selected` | 照常解析，进 `targets.tsv` | 无 |
+  | `excluded` | `status: not_selected`、`reason: compound_excluded`，不解析 | 无（研究者已决定）；它的导出缺失也不算错误 |
+  | `needs_review` | `status: not_selected`、`reason: compound_needs_review`，不解析 | partial（退出码 3） |
+  | `quarantined` | `status: quarantined`、`reason: compound_quarantined`，不解析 | partial（退出码 3） |
+
+  选择阶段的状态取代化合物阶段的隔离集合：化合物阶段隔离、但研究者写了 `exclude` 的化合物是 `excluded`，隔离造成的 partial 随之消解。
+  一个化合物也没有被选中时没有可用的导出，是表级错误（退出码 2，报错说明“没有任何化合物被选中”）。
+- **记录：**`stp_audit.json` 升到 Schema 1.2（只在给了 `--selection` 时；1.1 的审计仍然合法）：文件状态多 `not_selected`，`summary` 多
+  `files_not_selected`（紧跟 `files_quarantined`），`files_bound` 不含隔离的和未选择的导出，`quarantine` 只列隔离的；`notes` 在
+  `compounds_stage_applied` 之后多一条 `selection_stage_applied`（带各状态的计数）。`compounds_registered.tsv` 末尾多一列
+  `selection_status`（结构模式在 `structure_id`、`structure_status` 之后）。`run_manifest.json` 的 `parents` 多一项 `compounds select`，
+  `args` 多 `selection`，`inputs` 末尾多选择阶段的审计、全候选表、所选名单和决定表。
+- **阶段必须是当前的**，否则表级错误（退出码 2，什么都不写）：目录和审计存在且合 `selection_audit` Schema；审计记录的运行配置哈希等于现在的；
+  全候选表和所选名单的哈希等于审计里的，且全候选表每行合 `selection_decisions_row` Schema，候选与化合物阶段的相同、顺序相同；`inputs.selection`
+  的决定表文件的哈希等于审计里的；审计记录的化合物阶段审计哈希等于给的 `--compounds` 的。改了决定，只重跑 `rnp compounds select`，再重跑这一步。
+- **下游：**`compounds_registered.tsv` 有 `selection_status` 列时，`rnp intersect` 和 `rnp network` 只数、只列 `selected` 的化合物
+  （交集审计每组的 `compounds`、`compounds_without_edges` 和组名，网络的 `mol_list.tsv`、`compounds_total`、组目录，以及化合物名与基因符号撞名的检查）：
+  被排除的化合物不再出现在“没有边的化合物”里，没有已选化合物的组不再出现。`rnp report` 在 “Compounds registered” 一行之后多一行
+  `- Compound selection: N selected, N excluded, N needs review or quarantined`。没有这一列时三个命令的输出与以前逐字节相同。
+  待审或隔离使阶段是 partial，往下走需要 `--allow-partial`，和现在隔离的处理一样。
+- **不做。**案例入口 `scripts/case_run.py` 和 `scripts/case_check.py` 对选择的接入。
