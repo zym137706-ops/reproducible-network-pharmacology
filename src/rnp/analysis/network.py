@@ -102,6 +102,8 @@ def run_network(
     compounds = _read_required(
         parent_compounds_path, {"compound_id", "group", "name"}
     )
+    if any("selection_status" in row for row in compounds):
+        compounds = [row for row in compounds if row.get("selection_status") == "selected"]
 
     label = (
         clean_text(disease_label)

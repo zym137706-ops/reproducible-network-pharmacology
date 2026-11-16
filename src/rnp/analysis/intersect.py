@@ -87,6 +87,21 @@ def _read_compounds(path: Path) -> dict[str, dict[str, str]]:
     return {clean_text(row["compound_id"]): row for row in rows}
 
 
+def _counted_compounds(compounds: dict[str, dict[str, str]]) -> set[str]:
+    """Ids of the compounds the analysis still counts.
+
+    Without a `selection_status` column every registered compound counts. With it, only the
+    selected ones do; `excluded`, `needs_review` and `quarantined` are not candidates.
+    """
+    if any("selection_status" in row for row in compounds.values()):
+        return {
+            compound_id
+            for compound_id, row in compounds.items()
+            if row.get("selection_status") == "selected"
+        }
+    return set(compounds)
+
+
 def _classify(row: dict[str, Any], mapper: GeneMapper) -> tuple[MapResult | None, str]:
     if _truthy(row.get("is_complex")):
         return None, "composite_target"
@@ -187,6 +202,7 @@ def run_intersect(
     mapper = GeneMapper(hgnc_path)
     targets = _read_targets(targets_path)
     compounds = _read_compounds(compounds_path)
+    counted = _counted_compounds(compounds)
     disease_audit = map_disease_genes(disease_path, mapper)
     disease_genes = sorted({row["gene_symbol"] for row in disease_audit if row["gene_symbol"]})
     disease_set = set(disease_genes)
@@ -260,7 +276,8 @@ def run_intersect(
         key=lambda edge: (edge["group"].casefold(), edge["compound"].casefold(), edge["gene"]),
     )
     groups = sorted(
-        {edge["group"] for edge in edges} | {row["group"] for row in compounds.values()}
+        {edge["group"] for edge in edges}
+        | {compounds[compound_id]["group"] for compound_id in counted}
     )
 
     group_stats: dict[str, dict[str, Any]] = {}
@@ -268,7 +285,11 @@ def run_intersect(
     intersection_rows: list[dict[str, Any]] = []
     for group in groups:
         group_edges = [edge for edge in edges if edge["group"] == group]
-        group_compounds = [row for row in compounds.values() if row.get("group") == group]
+        group_compounds = [
+            row
+            for compound_id, row in compounds.items()
+            if compound_id in counted and row.get("group") == group
+        ]
         genes = sorted({edge["gene"] for edge in group_edges})
         intersection = sorted(set(genes) & disease_set)
         linked = sorted({edge["compound_id"] for edge in group_edges})
