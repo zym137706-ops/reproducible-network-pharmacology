@@ -404,13 +404,17 @@ def test_a_log_row_that_declares_no_hash_is_refused(tmp_path) -> None:
 
 def test_a_missing_export_file_makes_the_submission_rejected(tmp_path) -> None:
     case = make_case(tmp_path)
+    old = sha256_of(case.export(2))
     case.export(2).unlink()
-    lines = problems(case)
-    assert rejected_line(2, "stp_file") in lines
-    assert (
-        f"{LABEL}: {AUDIT}: inputs.stp_dir.files_hashed: expected 2 from the inputs, found 3"
-        in lines
-    )
+    audit = f"{LABEL}: {AUDIT}: "
+    assert problems(case) == [
+        rejected_line(2, "stp_file"),
+        stage_line(2, "submission_status", "rejected", "verified_kind_unstated"),
+        stage_line(2, "export_sha256", "", old),
+        audit + "inputs.stp_dir.files_hashed: expected 2 from the inputs, found 3",
+        audit + "summary.submissions_verified: expected 2 from the inputs, found 3",
+        audit + "summary.submissions_rejected: expected 1 from the inputs, found 0",
+    ]
 
 
 def test_an_export_kind_the_rules_do_not_know_is_refused(tmp_path) -> None:
@@ -695,6 +699,37 @@ def test_a_missing_file_of_one_threshold_does_not_distort_the_report_of_the_othe
         f"0.05: {STAGE}: not found in {case.stages['0.05']}",
         f"0.10: {STAGE}: {entry(1)} name: expected 'Compound 1' from the inputs, found 'Other'",
     ]
+
+
+def test_a_compound_table_without_a_pubchem_cid_column_still_binds(tmp_path) -> None:
+    case = make_case(tmp_path)
+
+    def drop(header, rows) -> None:
+        header.remove("pubchem_cid")
+        for row in rows:
+            del row["pubchem_cid"]
+
+    edit_compounds(case, drop)
+    reseal_inputs(case)
+    assert recheck(case)["rows"] == 3
+
+
+def test_a_compound_table_without_a_stp_file_column_binds_nothing(tmp_path) -> None:
+    case = make_case(tmp_path)
+
+    def drop(header, rows) -> None:
+        header.remove("stp_file")
+        for row in rows:
+            del row["stp_file"]
+
+    edit_compounds(case, drop)
+    reseal_inputs(case)
+    lines = problems(case)
+    for number in (1, 2, 3):
+        assert (
+            f"log.tsv: entry 'Compound {number}' () stp_file: "
+            "no submission log row belongs to this compound"
+        ) in lines
 
 
 # --- the command line --------------------
