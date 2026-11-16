@@ -25,6 +25,7 @@ from ..output import staged_output, write_table_atomic
 from ..provenance import build_manifest, sha256_file, utc_now_iso, write_json
 from .compounds_link import check_exports, check_identities, load_compounds_stage
 from .parents import parent_record
+from .selection_link import load_selection_stage
 
 EXPORT_SUFFIXES = {".csv", ".tsv", ".txt", ".xlsx"}
 COMPOUND_COLUMNS = [
@@ -52,7 +53,11 @@ def _run_id(config: RunConfig, override: str | None) -> str:
 
 
 def _stage_status(file_entries: list[dict[str, Any]], missing: list[dict[str, Any]]) -> str:
-    parsed = [entry for entry in file_entries if entry["status"] not in {"quarantined", "error"}]
+    parsed = [
+        entry
+        for entry in file_entries
+        if entry["status"] not in {"quarantined", "error", "not_selected"}
+    ]
     if not parsed:
         return "failed"
     has_problem = any(
@@ -61,18 +66,49 @@ def _stage_status(file_entries: list[dict[str, Any]], missing: list[dict[str, An
     return "partial" if has_problem or missing else "complete"
 
 
+def _not_selected_entry(
+    path: Path, compound_id: str, group: str, reason: str
+) -> dict[str, Any]:
+    """Return the audit entry of an export whose compound was not selected."""
+    return {
+        "path": path.name,
+        "format": "xlsx" if path.suffix.lower() == ".xlsx" else "csv",
+        "sha256": sha256_file(path),
+        "status": "not_selected",
+        "compound_id": compound_id,
+        "group": group,
+        "reason": reason,
+        "warnings": [],
+        "errors": [],
+        "rows_total": 0,
+        "rows_valid": 0,
+        "rows_invalid": 0,
+        "rows_below_threshold": 0,
+        "rows_used": 0,
+    }
+
+
 def run_ingest(
     config: RunConfig,
     *,
     run_id: str | None = None,
     force: bool = False,
     compounds: str | Path | None = None,
+    selection: str | Path | None = None,
 ) -> dict[str, Any]:
     """Parse the bound STP exports and write a staged, auditable target table.
 
     When ``compounds`` names a compounds stage directory, its decisions are applied after the
-    stage is verified to still describe the compound table and the exports.
+    stage is verified to still describe the compound table and the exports. When ``selection``
+    names a selection stage directory, only the exports of the selected compounds are parsed.
     """
+    if selection is not None and compounds is None:
+        raise InputError(
+            "--selection needs --compounds",
+            details=[
+                "the selection stage belongs to a compounds stage: give both directories"
+            ],
+        )
     compounds_path = config.input_path("compounds")
     stp_dir = config.input_path("stp_dir")
     if not stp_dir.is_dir():
@@ -81,6 +117,9 @@ def run_ingest(
         load_compounds_stage(compounds, config, compounds_path)
         if compounds is not None
         else None
+    )
+    selection_stage = (
+        load_selection_stage(selection, config, stage) if selection is not None else None
     )
     threshold = float(config.data["thresholds"]["stp_probability"])
     allow_filename_match = bool(config.data["inputs"].get("allow_filename_match", False))
@@ -91,7 +130,15 @@ def run_ingest(
     )
     if stage is not None:
         check_identities(stage, records)
-    quarantined = stage.quarantined if stage is not None else set()
+    statuses = selection_stage.statuses if selection_stage is not None else {}
+    if selection_stage is not None:
+        quarantined = {
+            compound_id
+            for compound_id, status in statuses.items()
+            if status == "quarantined"
+        }
+    else:
+        quarantined = stage.quarantined if stage is not None else set()
     files = sorted(
         path
         for path in stp_dir.iterdir()
@@ -109,6 +156,8 @@ def run_ingest(
     missing: list[dict[str, Any]] = []
     present = {path.name for path in files}
     for compound in records:
+        if statuses.get(compound.compound_id) == "excluded":
+            continue
         if compound.stp_file and compound.stp_file not in present:
             missing.append(
                 {
@@ -122,7 +171,13 @@ def run_ingest(
     unbound_reasons = {item["path"]: item["reason"] for item in unbound}
     for path in files:
         compound = bindings.get(path.name)
-        if compound is not None and compound.compound_id in quarantined:
+        if compound is not None and (
+            (
+                selection_stage is not None
+                and statuses[compound.compound_id] == "quarantined"
+            )
+            or (selection_stage is None and compound.compound_id in quarantined)
+        ):
             file_entries.append(
                 {
                     "path": path.name,
@@ -142,6 +197,16 @@ def run_ingest(
                 }
             )
             continue
+        if compound is not None and selection_stage is not None:
+            status = statuses[compound.compound_id]
+            if status in {"excluded", "needs_review"}:
+                reason = (
+                    "compound_excluded" if status == "excluded" else "compound_needs_review"
+                )
+                file_entries.append(
+                    _not_selected_entry(path, compound.compound_id, compound.group, reason)
+                )
+                continue
         if compound is None:
             file_entries.append(
                 {
@@ -200,18 +265,26 @@ def run_ingest(
             stage, records, {entry["path"]: entry["sha256"] for entry in file_entries}
         )
     stage_status = _stage_status(file_entries, missing)
-    if stage_status == "complete" and quarantined:
-        stage_status = "partial"
+    if stage_status == "complete":
+        unresolved = selection_stage is not None and any(
+            status in {"needs_review", "quarantined"} for status in statuses.values()
+        )
+        if unresolved or (selection_stage is None and quarantined):
+            stage_status = "partial"
     if stage_status == "failed":
         problems = [
             f"{entry['path']}: {entry['status']}"
             for entry in file_entries
             if entry["status"] == "error"
         ]
-        raise InputError(
-            "ingest produced no usable export",
-            details=problems or ["no export could be parsed"],
-        )
+        if selection_stage is not None and "selected" not in statuses.values():
+            details = [
+                "no compound was selected: every candidate is excluded, "
+                "held for review or quarantined"
+            ]
+        else:
+            details = problems or ["no export could be parsed"]
+        raise InputError("ingest produced no usable export", details=details)
 
     run = _run_id(config, run_id)
     run_dir = config.output_dir / run
@@ -239,6 +312,12 @@ def run_ingest(
                 }
                 for row, structure in zip(registered_rows, stage.rows, strict=True)
             ]
+        if selection_stage is not None:
+            registered_columns.append("selection_status")
+            registered_rows = [
+                {**row, "selection_status": statuses[record.compound_id]}
+                for row, record in zip(registered_rows, records, strict=True)
+            ]
         write_table(work / "compounds_registered.tsv", registered_rows, registered_columns)
         stp_io.write_targets_tsv(targets, work / "targets.tsv")
         compounds_sha = sha256_file(work / "compounds_registered.tsv")
@@ -250,22 +329,32 @@ def run_ingest(
             for entry in file_entries
             if entry["status"] == "quarantined"
         ]
+        not_selected = [
+            entry for entry in file_entries if entry["status"] == "not_selected"
+        ]
         summary = {
             "files": len(file_entries),
-            "files_bound": len(file_entries) - len(quarantine),
+            "files_bound": len(file_entries) - len(quarantine) - len(not_selected),
             "files_quarantined": len(quarantine),
-            "files_missing": len(missing),
-            "rows_total": sum(entry["rows_total"] for entry in file_entries),
-            "rows_valid": sum(entry["rows_valid"] for entry in file_entries),
-            "rows_invalid": sum(entry["rows_invalid"] for entry in file_entries),
-            "rows_below_threshold": sum(
-                entry["rows_below_threshold"] for entry in file_entries
-            ),
-            "rows_used": len(targets),
-            "compounds_registered": len(records),
-            "warnings": sum(len(entry["warnings"]) for entry in file_entries),
-            "errors": sum(len(entry["errors"]) for entry in file_entries) + len(missing),
         }
+        if selection_stage is not None:
+            summary["files_not_selected"] = len(not_selected)
+        summary.update(
+            {
+                "files_missing": len(missing),
+                "rows_total": sum(entry["rows_total"] for entry in file_entries),
+                "rows_valid": sum(entry["rows_valid"] for entry in file_entries),
+                "rows_invalid": sum(entry["rows_invalid"] for entry in file_entries),
+                "rows_below_threshold": sum(
+                    entry["rows_below_threshold"] for entry in file_entries
+                ),
+                "rows_used": len(targets),
+                "compounds_registered": len(records),
+                "warnings": sum(len(entry["warnings"]) for entry in file_entries),
+                "errors": sum(len(entry["errors"]) for entry in file_entries)
+                + len(missing),
+            }
+        )
         if stage is not None:
             notes.append(
                 {
@@ -274,8 +363,20 @@ def run_ingest(
                     f"stage {stage.directory}",
                 }
             )
+        if selection_stage is not None:
+            notes.append(
+                {
+                    "code": "selection_stage_applied",
+                    "message": "selection decisions come from the selection stage "
+                    f"{selection_stage.directory}: "
+                    f"selected {selection_stage.count('selected')}, "
+                    f"excluded {selection_stage.count('excluded')}, "
+                    f"needs_review {selection_stage.count('needs_review')}, "
+                    f"quarantined {selection_stage.count('quarantined')}",
+                }
+            )
         audit = {
-            "schema_version": "1.1",
+            "schema_version": "1.2" if selection_stage is not None else "1.1",
             "generated_by": "rnp ingest stp",
             "stage_status": stage_status,
             "config": {"path": str(config.path), "sha256": config.sha256},
@@ -314,6 +415,25 @@ def run_ingest(
                     directory=stage.directory,
                     audit_path=stage.audit_path,
                     stage_status=stage.stage_status,
+                    override=False,
+                )
+            )
+        if selection_stage is not None:
+            args["selection"] = str(selection_stage.directory)
+            inputs.extend(
+                [
+                    selection_stage.audit_path,
+                    selection_stage.table_path,
+                    selection_stage.list_path,
+                    selection_stage.decisions_path,
+                ]
+            )
+            parents.append(
+                parent_record(
+                    stage="compounds select",
+                    directory=selection_stage.directory,
+                    audit_path=selection_stage.audit_path,
+                    stage_status=selection_stage.stage_status,
                     override=False,
                 )
             )

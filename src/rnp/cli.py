@@ -99,7 +99,11 @@ def cmd_validate(args: argparse.Namespace) -> int:
 def cmd_ingest_stp(args: argparse.Namespace) -> int:
     config = load_config(args.config)
     summary = run_ingest(
-        config, run_id=args.run_id, force=args.force, compounds=args.compounds
+        config,
+        run_id=args.run_id,
+        force=args.force,
+        compounds=args.compounds,
+        selection=args.selection,
     )
     _emit(summary)
     return 0 if summary["stage_status"] == "complete" else 3
@@ -376,6 +380,13 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="DIR",
         help="apply the decisions of a compounds stage directory "
         "(output of 'rnp ingest compounds')",
+    )
+    ingest_stp.add_argument(
+        "--selection",
+        default=None,
+        metavar="DIR",
+        help="parse only the exports of the compounds selected in a selection stage directory "
+        "(output of 'rnp compounds select'; needs --compounds)",
     )
 
     compounds = sub.add_parser("compounds", help="decide which candidate compounds are used")

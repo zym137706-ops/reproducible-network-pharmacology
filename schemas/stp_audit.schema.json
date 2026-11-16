@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/stp_audit.schema.json",
   "title": "SwissTargetPrediction ingest audit",
-  "description": "Per-file parse status, binding, quarantine and stage status. Distinguishes no predictions, below-threshold, invalid rows and partial runs.",
+  "description": "Per-file parse status, binding, quarantine and stage status. Distinguishes no predictions, below-threshold, invalid rows and partial runs. Version 1.2, written when a selection stage is applied, adds the file status not_selected and summary.files_not_selected.",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -21,7 +21,7 @@
     "compounds_registered_sha256"
   ],
   "properties": {
-    "schema_version": { "const": "1.1" },
+    "schema_version": { "enum": ["1.1", "1.2"] },
     "generated_by": { "type": "string" },
     "stage_status": { "enum": ["complete", "partial", "failed"] },
     "config": {
@@ -68,7 +68,8 @@
               "invalid_rows",
               "no_predictions",
               "error",
-              "quarantined"
+              "quarantined",
+              "not_selected"
             ]
           },
           "reason": { "type": "string" },
@@ -154,6 +155,7 @@
         "files": { "type": "integer", "minimum": 0 },
         "files_bound": { "type": "integer", "minimum": 0 },
         "files_quarantined": { "type": "integer", "minimum": 0 },
+        "files_not_selected": { "type": "integer", "minimum": 0 },
         "files_missing": { "type": "integer", "minimum": 0 },
         "rows_total": { "type": "integer", "minimum": 0 },
         "rows_valid": { "type": "integer", "minimum": 0 },
@@ -187,5 +189,28 @@
     },
     "targets_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "compounds_registered_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "required": ["schema_version"],
+        "properties": { "schema_version": { "const": "1.2" } }
+      },
+      "then": { "properties": { "summary": { "required": ["files_not_selected"] } } }
+    },
+    {
+      "if": {
+        "required": ["schema_version"],
+        "properties": { "schema_version": { "const": "1.1" } }
+      },
+      "then": {
+        "properties": {
+          "summary": { "not": { "required": ["files_not_selected"] } },
+          "files": {
+            "items": { "properties": { "status": { "not": { "const": "not_selected" } } } }
+          }
+        }
+      }
+    }
+  ]
 }
