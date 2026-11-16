@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/selection_input_row.schema.json",
+  "title": "Selection decision input row",
+  "description": "One row of the researcher's table of selection decisions (inputs.selection, a TSV or CSV): the decision for one candidate compound. Values are validated after cleaning: `compound`, `group`, `rules_version`, `reviewer` and `evidence_refs` have their whitespace folded, `group` is `all` when empty, `decision` and `reason_codes` are stripped. `reason_codes` is a semicolon-separated list of codes the researcher defines (lower-case letters, digits and underscores, starting with a letter); `exclude` and `needs_review` need at least one.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "compound",
+    "group",
+    "decision",
+    "reason_codes",
+    "rules_version",
+    "reviewer",
+    "evidence_refs"
+  ],
+  "properties": {
+    "compound": {
+      "type": "string",
+      "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+    },
+    "group": {
+      "type": "string",
+      "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+    },
+    "decision": {
+      "enum": [
+        "include",
+        "exclude",
+        "needs_review"
+      ]
+    },
+    "reason_codes": {
+      "type": "string",
+      "pattern": "^(?:[a-z][a-z0-9_]*(?:;[a-z][a-z0-9_]*)*)?$"
+    },
+    "rules_version": {
+      "type": "string",
+      "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+    },
+    "reviewer": {
+      "type": "string",
+      "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+    },
+    "evidence_refs": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision": {
+            "enum": [
+              "exclude",
+              "needs_review"
+            ]
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "then": {
+        "properties": {
+          "reason_codes": {
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

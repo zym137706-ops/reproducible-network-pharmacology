@@ -73,6 +73,7 @@ def test_the_existing_inputs_are_unchanged():
         "mcode_dir",
         "submission_log",
         "structure_registry",
+        "selection",
     } == set(properties)
     assert load_schema("run")["properties"]["inputs"]["required"] == [
         "compounds",

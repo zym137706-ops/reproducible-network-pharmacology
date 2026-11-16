@@ -1,0 +1,315 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/selection_decisions_row.schema.json",
+  "title": "Selection decisions table row",
+  "description": "One row of selection_decisions.tsv (and of selected_compounds.tsv), written by `rnp compounds select`: the decision for one candidate compound, in the order of the compound table. Every candidate has a row. `reason_codes` is sorted, unique and semicolon-joined; `issue_codes` is sorted, unique and semicolon-joined. The order of `properties` is the column order of the TSV.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision_id",
+    "compound_id",
+    "group",
+    "name",
+    "stp_file",
+    "structure_id",
+    "compound_row_status",
+    "decision",
+    "decision_source",
+    "selection_status",
+    "reason_codes",
+    "rules_version",
+    "reviewer",
+    "evidence_refs",
+    "issue_codes"
+  ],
+  "properties": {
+    "decision_id": {
+      "type": "string",
+      "pattern": "^DEC-[0-9a-f]{12}$"
+    },
+    "compound_id": {
+      "type": "string",
+      "pattern": "^[^\\s]+$"
+    },
+    "group": {
+      "type": "string",
+      "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+    },
+    "stp_file": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "structure_id": {
+      "type": "string",
+      "pattern": "^(?:STR[0-9]{4,})?$"
+    },
+    "compound_row_status": {
+      "enum": [
+        "accepted",
+        "quarantined",
+        "name_only"
+      ]
+    },
+    "decision": {
+      "enum": [
+        "include",
+        "exclude",
+        "needs_review"
+      ]
+    },
+    "decision_source": {
+      "enum": [
+        "recorded",
+        "not_recorded"
+      ]
+    },
+    "selection_status": {
+      "enum": [
+        "selected",
+        "excluded",
+        "needs_review",
+        "quarantined"
+      ]
+    },
+    "reason_codes": {
+      "type": "string",
+      "pattern": "^(?:[a-z][a-z0-9_]*(?:;[a-z][a-z0-9_]*)*)?$"
+    },
+    "rules_version": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "reviewer": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "evidence_refs": {
+      "type": "string",
+      "pattern": "^(?:[^\\s](?:[^\\t\\r\\n]*[^\\s])?)?$"
+    },
+    "issue_codes": {
+      "type": "string",
+      "pattern": "^(?:(?:no_decision_recorded|include_blocked_by_quarantine|quarantine_resolved_by_exclusion)(?:;(?:no_decision_recorded|include_blocked_by_quarantine|quarantine_resolved_by_exclusion))*)?$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "decision_source": {
+            "const": "recorded"
+          }
+        },
+        "required": [
+          "decision_source"
+        ]
+      },
+      "then": {
+        "properties": {
+          "rules_version": {
+            "minLength": 1
+          },
+          "reviewer": {
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision_source": {
+            "const": "recorded"
+          },
+          "decision": {
+            "enum": [
+              "exclude",
+              "needs_review"
+            ]
+          }
+        },
+        "required": [
+          "decision_source",
+          "decision"
+        ]
+      },
+      "then": {
+        "properties": {
+          "reason_codes": {
+            "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "decision_source": {
+            "const": "not_recorded"
+          }
+        },
+        "required": [
+          "decision_source"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "const": "needs_review"
+          },
+          "reason_codes": {
+            "const": ""
+          },
+          "rules_version": {
+            "const": ""
+          },
+          "reviewer": {
+            "const": ""
+          },
+          "evidence_refs": {
+            "const": ""
+          },
+          "issue_codes": {
+            "pattern": "(?:^|;)no_decision_recorded(?:;|$)"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selection_status": {
+            "const": "selected"
+          }
+        },
+        "required": [
+          "selection_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "const": "include"
+          },
+          "compound_row_status": {
+            "enum": [
+              "accepted",
+              "name_only"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selection_status": {
+            "const": "excluded"
+          }
+        },
+        "required": [
+          "selection_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "const": "exclude"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selection_status": {
+            "const": "needs_review"
+          }
+        },
+        "required": [
+          "selection_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "const": "needs_review"
+          },
+          "compound_row_status": {
+            "enum": [
+              "accepted",
+              "name_only"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "selection_status": {
+            "const": "quarantined"
+          }
+        },
+        "required": [
+          "selection_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "decision": {
+            "enum": [
+              "include",
+              "needs_review"
+            ]
+          },
+          "compound_row_status": {
+            "const": "quarantined"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "compound_row_status": {
+            "const": "name_only"
+          }
+        },
+        "required": [
+          "compound_row_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "structure_id": {
+            "const": ""
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "compound_row_status": {
+            "const": "accepted"
+          }
+        },
+        "required": [
+          "compound_row_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "structure_id": {
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,282 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/zym137706-ops/reproducible-network-pharmacology/schemas/selection_audit.schema.json",
+  "title": "Selection stage audit",
+  "description": "Stage audit of `rnp compounds select`: identity mode, inputs, rule version, counts, every issue with a stable code and the hashes of selection_decisions.tsv and selected_compounds.tsv. Totals must agree with the tables (checked by the library, not by this schema).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "generated_by",
+    "stage_status",
+    "identity_mode",
+    "config",
+    "inputs",
+    "rule_versions",
+    "summary",
+    "issues",
+    "notes",
+    "selection_decisions_sha256",
+    "selected_compounds_sha256"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "generated_by": {
+      "const": "rnp compounds select"
+    },
+    "stage_status": {
+      "enum": [
+        "complete",
+        "partial"
+      ]
+    },
+    "identity_mode": {
+      "enum": [
+        "structure",
+        "name_only"
+      ]
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "compounds_stage",
+        "selection"
+      ],
+      "properties": {
+        "compounds_stage": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "dir",
+            "audit_sha256",
+            "table_sha256",
+            "stage_status"
+          ],
+          "properties": {
+            "dir": {
+              "type": "string",
+              "minLength": 1
+            },
+            "audit_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "table_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "stage_status": {
+              "enum": [
+                "complete",
+                "partial"
+              ]
+            }
+          }
+        },
+        "selection": {
+          "$ref": "#/$defs/file_ref"
+        }
+      }
+    },
+    "rule_versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selection"
+      ],
+      "properties": {
+        "selection": {
+          "type": "string",
+          "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+-selection-rules$"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidates",
+        "selected",
+        "excluded",
+        "needs_review",
+        "quarantined",
+        "decisions_recorded",
+        "decisions_not_recorded",
+        "decisions_without_compound",
+        "warnings",
+        "rules_versions"
+      ],
+      "properties": {
+        "candidates": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "selected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "excluded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "needs_review": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "quarantined": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "decisions_recorded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "decisions_not_recorded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "decisions_without_compound": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warnings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rules_versions": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[^\\s](?:[^\\t\\r\\n]*[^\\s])?$"
+          }
+        }
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/issue"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "selection_decisions_sha256": {
+      "$ref": "#/$defs/sha256"
+    },
+    "selected_compounds_sha256": {
+      "$ref": "#/$defs/sha256"
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "file_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "sha256",
+        "rows"
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "code",
+        "source",
+        "row",
+        "compound_id",
+        "message"
+      ],
+      "properties": {
+        "level": {
+          "const": "warning"
+        },
+        "code": {
+          "enum": [
+            "no_decision_recorded",
+            "include_blocked_by_quarantine",
+            "quarantine_resolved_by_exclusion",
+            "decision_without_compound",
+            "no_compound_selected"
+          ]
+        },
+        "source": {
+          "enum": [
+            "compounds",
+            "selection"
+          ]
+        },
+        "row": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "compound_id": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

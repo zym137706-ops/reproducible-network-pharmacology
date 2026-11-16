@@ -32,6 +32,11 @@
           "minLength": 1,
           "description": "Persistent structure registry (TSV); default <outputs.dir>/registry/structure_registry.tsv; structure mode only."
         },
+        "selection": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Table of selection decisions (TSV or CSV) that 'rnp compounds select' reads: one row per candidate compound with its decision, reason codes, rules version and reviewer. Write the path here before the first 'rnp ingest compounds' run: the stages are tied together by the hash of the run config."
+        },
         "allow_filename_match": {
           "type": "boolean",
           "description": "Compatibility mode: bind exports by filename when no explicit stp_file is given. Recorded in the audit."
