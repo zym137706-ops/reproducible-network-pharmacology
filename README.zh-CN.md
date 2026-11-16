@@ -79,7 +79,8 @@ Windows 注意：确认 `python` 指向 Python 3。装了分子模拟工具的�
 | `rnp report` | ✅ v0.1 | 由已校验的阶段审计与表格生成 Markdown 报告；哈希校验；不超出证据作结论 |
 | `rnp metabolites import` | 🚧 v0.2 设计 | 已处理代谢组注释导入；同时支持已确认成分清单 |
 | `rnp structures resolve` | 🚧 v0.2 设计 | 结构注册、来源核验与转换历史 |
-| `rnp compounds annotate/select` | 🚧 v0.2 设计 | 性质标注与显式选择；保留全部候选 |
+| `rnp compounds select` | ✅ 已实现，未发布 | 记录研究者对候选化合物的选择决定（`include` / `exclude` / `needs_review`，附理由码、规则版本和决定者）：读 `inputs.selection` 和 `rnp ingest compounds` 的阶段目录，把全候选表 `selection_decisions.tsv`、所选名单 `selected_compounds.tsv`、`selection_audit.json` 和清单写进 `<outputs.dir>/<run id>_selection/`；没有决定的候选是待审、不是纳入，有未决候选时阶段是 partial（退出码 3）；不写注册表；`rnp ingest stp` 还不读取选择决定（[docs/upstream.md](docs/upstream.md) 8.11） |
+| `rnp compounds annotate` | 🚧 v0.2 设计 | 性质标注（Ro5、结构警示、可选 ADMET），与选择决定分开 |
 | `rnp acquire` | ✅ 已实现，未发布（[ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)） | 把所选 `PDB_ID:UNIPROT_ACCESSION` 的 RCSB/UniProt 记录冻结到新目录，并写出 `acquisition_record.json`（获取时间、HTTP 状态、大小、SHA-256、版本响应头）；`--verify DIR` 离线复核冻结目录；唯一在 Python 代码中联网的命令（`rnp enrich` 的可选 KEGG 富集由 R 联网，不在此列） |
 | `rnp dock prepare/run/qc` | 🚧 v0.3 设计 | 合适共晶体系、普通非共价小分子、对照与姿势质控 |
 

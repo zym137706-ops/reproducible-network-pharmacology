@@ -1,6 +1,6 @@
 # 上游导入、结构注册与显式选择（设计契约）
 
-状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`，2026-11-12 起 `rnp ingest stp --compounds` 接入它，2026-11-13 起案例入口 `scripts/case_run.py` 在给了提交日志时经由它们登记和核对结构，案例核查器 `scripts/case_check.py` 在给了提交日志时再从原始输入独立复核提交绑定（均未发布）。执行顺序见 [总规划](project-plan.zh-CN.md)。
+状态：2026-10-19 设计稿；2026-11-09 起入口 A 的最小切片有了 JSON Schema 和契约测试（第 8 节），2026-11-10 起有了库 `rnp.structures`，2026-11-11 起有了命令 `rnp ingest compounds`，2026-11-12 起 `rnp ingest stp --compounds` 接入它，2026-11-13 起案例入口 `scripts/case_run.py` 在给了提交日志时经由它们登记和核对结构，案例核查器 `scripts/case_check.py` 在给了提交日志时再从原始输入独立复核提交绑定，2026-11-15 起命令 `rnp compounds select` 记录选择决定（均未发布；`rnp ingest stp` 还不读取选择决定，见 8.11）。执行顺序见 [总规划](project-plan.zh-CN.md)。
 实现时先增加 JSON Schema、跨表约束及正反例，再修改 CLI；不通过文档宣称接口已经可用。
 
 ## 1. 输入边界
@@ -74,7 +74,7 @@ Cytoscape 后续以 compound:<id>、gene:<id>、disease:<id> 连接，Label 与 
 [RDKit 标准化接口](https://www.rdkit.org/docs/source/rdkit.Chem.MolStandardize.rdMolStandardize.html)；
 [Meeko 配体准备](https://meeko.readthedocs.io/en/develop/lig_prep_basic.html)。
 
-## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`；2026-11-12 `ingest stp --compounds`；2026-11-13 案例入口；2026-11-13 案例核查器的绑定复核）
+## 8. 入口 A 最小切片的契约（2026-11-09 Schema 和契约测试；2026-11-10 库；2026-11-11 命令 `rnp ingest compounds`；2026-11-12 `ingest stp --compounds`；2026-11-13 案例入口；2026-11-13 案例核查器的绑定复核；2026-11-15 选择决定 `rnp compounds select`）
 
 本节把第 2、3、6 节落到入口 A 的第一个可实现切片。命令 `rnp ingest compounds`（2026-11-11 起，未发布）读写下列产物，
 并用库 `rnp.structures`（`src/rnp/structures/`）完成登记、绑定和校验；这些产物有 JSON Schema（`schemas/`）和契约测试
@@ -175,7 +175,7 @@ Schema 表达不了的约束由库实现并测试：
 ### 8.6 本切片不做，以及状态
 
 不做：入口 B、性质标注、联网查询、结构标准化、“提交结构与当前结构不同但研究者显式接受”、跨组出现表、配体态、
-选择决定表（`selection_decisions`，下一个切片）。
+`ingest stp` 对选择决定的接入（选择决定表本身见 8.11）。
 状态：设计、Schema 和契约测试已完成（2026-11-09）；库 `rnp.structures` 和命令 `rnp ingest compounds` 已实现、未发布
 （2026-11-10、2026-11-11）。命令把阶段输出写进 `<outputs.dir>/<run_id>_compounds/`，`run.schema.json` 有了新键
 `inputs.submission_log` 和 `inputs.structure_registry`；结构模式下运行命令需要可选依赖 `chem`（见 8.7）。
@@ -258,3 +258,44 @@ Schema 表达不了的约束由库实现并测试：
 - **输出。**每个问题一行，格式 `<阈值>: <文件>: [entry '<名称>' (<stp_file>) ]<字段>: expected <值> from <来源>, found <值>`，
   全部问题一次报出；有问题时退出码非 0，且不写 `independent-check.json`。通过时 `independent-check.json` 多一个键 `bindings`
   （`rule: case-binding-recheck-v1`、化合物表和日志的哈希、行数、各提交状态的计数、比对的列、每个阈值的阶段表哈希）。
+
+### 8.11 选择决定 `rnp compounds select`（2026-11-15；未发布）
+
+`rnp compounds select --config run.yaml --compounds DIR [--force]`：`DIR` 是 `rnp ingest compounds` 的阶段目录。研究者在决定表里为
+每个候选化合物写下纳入、排除或待审，命令把全候选和所选名单分开保存。“所选”只表示按研究者的记录决定保留用于分析，不表示活性、药效
+或任何验证；命令不看化合物的性质，也不替研究者判断。`rnp ingest stp` 还不读取选择决定（下一个切片）。
+
+- **输入。**新的可选输入 `inputs.selection`（TSV 或 CSV；`run.schema.json` 有这个键，`rnp validate` 检查文件存在）。每个候选化合物一行，
+  列：`compound`（名称）、`group`（缺省 `all`）、`decision`（`include`、`exclude` 或 `needs_review`）、`reason_codes`、`rules_version`、
+  `reviewer`、`evidence_refs`；必需列是 `compound`、`decision`、`reason_codes`、`rules_version`、`reviewer`，其余列忽略并记入审计的 `notes`。
+  读表规则同 8.3；`compound`、`group`、`rules_version`、`reviewer`、`evidence_refs` 做空白折叠，`decision` 和 `reason_codes` 只去首尾空白。
+  按（名称，组）对应化合物：名称用 `name_key`（大小写和标点不敏感）比较，组逐字比较；同一（名称，组）两行是表级错误。`reason_codes` 是
+  分号分隔的代码（小写字母开头，字母、数字、下划线；词表由研究者自定），输出时排序、去重；`exclude` 和 `needs_review` 至少要有一个。
+  `rules_version`（预先声明的规则的版本名）和 `reviewer`（谁、或什么方法做的决定）每行必填。决定表的路径要在第一次 `rnp ingest compounds`
+  之前写进 run.yaml：阶段之间用 run.yaml 原始字节的哈希认亲，之后只改决定表的内容。
+- **输出。**阶段目录 `<outputs.dir>/<run_id>_selection/`：`selection_decisions.tsv`（每个候选一行，顺序同化合物表，一个都不丢）、
+  `selected_compounds.tsv`（其中 `selection_status` 为 `selected` 的行）、`selection_audit.json`、`run_manifest.json`。表和审计里没有时间戳。
+  命令不写任何注册表，不碰化合物阶段目录；改了决定，只重跑这一步。化合物阶段必须是当前的（沿用 8.8 的核对）。
+- **推导。**`selection_status` 由化合物阶段的 `row_status` 和决定推出：
+
+  | 化合物阶段 `row_status` | 决定 | `selection_status` | 问题代码 |
+  |---|---|---|---|
+  | `accepted` 或 `name_only` | `include` | `selected` | — |
+  | `accepted` 或 `name_only` | `exclude` | `excluded` | — |
+  | `accepted` 或 `name_only` | `needs_review` | `needs_review` | — |
+  | `accepted` 或 `name_only` | 没有决定 | `needs_review`（生成的一行，`decision_source` 为 `not_recorded`） | `no_decision_recorded` |
+  | `quarantined` | `include` | `quarantined` | `include_blocked_by_quarantine` |
+  | `quarantined` | `exclude` | `excluded` | `quarantine_resolved_by_exclusion` |
+  | `quarantined` | `needs_review` | `quarantined` | — |
+  | `quarantined` | 没有决定 | `quarantined`（生成的一行） | `no_decision_recorded` |
+
+- **决定 ID。**`decision_id` 由决定的内容算出：`DEC-` 加 12 位十六进制，取 `compound_id`、`structure_id`、`decision`、`decision_source`、
+  `reason_codes`、`rules_version`、`reviewer`、`evidence_refs` 以 U+001F 连接后的 SHA-256 的前 12 位。同一内容永远同一个 ID，与行序和运行
+  次数无关；任何一项变了就是新 ID。没有跨运行的持久决定登记表：历史靠每次运行各自的阶段目录和研究者自己保存的决定表。
+- **问题代码**（稳定词表，审计的 `issues` 和表里的 `issue_codes`；都是警告）：`no_decision_recorded`、`include_blocked_by_quarantine`、
+  `quarantine_resolved_by_exclusion`（这三个也出现在表的 `issue_codes` 里）；`decision_without_compound`（决定表里对应不到任何候选的行，
+  只在审计里）；`no_compound_selected`（没有任何候选被选中，只在审计里）。
+- **阶段状态与退出码。**每个候选都是 `selected` 或 `excluded` 时阶段是 `complete`（退出码 0）；有 `needs_review` 或 `quarantined` 时是
+  `partial`（退出码 3，输出已写，打印的摘要列出 `unresolved`）；决定表或化合物阶段有表级问题时退出码 2、什么都不写；内部错误 1。没有决定的
+  候选是待审，不是纳入。
+- **不做。**性质标注和按性质自动判定、联网、跨运行的决定登记表、`ingest stp` 和案例入口对选择的接入。

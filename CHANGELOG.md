@@ -14,6 +14,25 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### `rnp compounds select` command and selection library — 2026-11-15
+
+- New command `rnp compounds select --config run.yaml --compounds DIR [--force]` and library
+  `rnp.selection` (unreleased). The researcher writes a table of decisions (`inputs.selection`): one row
+  per candidate compound with `decision` (`include`, `exclude` or `needs_review`), `reason_codes`,
+  `rules_version`, `reviewer` and optional `group` and `evidence_refs`. The command reads that table and
+  the stage directory of `rnp ingest compounds` (which must still describe the compound table and the
+  run config) and writes `<outputs.dir>/<run_id>_selection/` with `selection_decisions.tsv` (every
+  candidate, in the order of the compound table), `selected_compounds.tsv`, `selection_audit.json` and
+  `run_manifest.json`. It writes no registry and does not touch the compounds stage, so changing a
+  decision means running this stage again and nothing else.
+- A candidate without a decision is held for review (`needs_review`), not selected. A compound that the
+  compounds stage quarantined cannot be selected, but an explicit `exclude` resolves it. The stage is
+  `partial` (exit code 3) while any candidate is `needs_review` or `quarantined`. Decision ids are
+  derived from the content of the decision (`DEC-` and 12 hex digits). The command reads no compound
+  properties and judges no compound: "selected" only means kept by the recorded decision.
+- New schemas `selection_input_row`, `selection_decisions_row` and `selection_audit`, and the run-config
+  key `inputs.selection` (checked by `rnp validate`). `rnp ingest stp` does not use the decisions yet.
+
 ### `scripts/case_check.py` rechecks the submission bindings — 2026-11-13
 
 - With a submission log, the independent check also rechecks the compounds stage of every threshold.
