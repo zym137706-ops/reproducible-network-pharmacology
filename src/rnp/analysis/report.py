@@ -164,6 +164,32 @@ def _verify_enrichment(run_dir: Path, audit: dict[str, Any]) -> list[dict[str, s
     return artifacts
 
 
+def _selection_counts(compounds_path: Path) -> dict[str, int] | None:
+    """Count the selection decisions of the registered compound table.
+
+    Returns `None` when the table has no `selection_status` column (no selection stage was
+    applied), so the report is exactly what it was before.
+    """
+    rows = read_table(compounds_path)
+    if not rows or "selection_status" not in rows[0]:
+        return None
+    counts = {"selected": 0, "excluded": 0, "unresolved": 0}
+    for row in rows:
+        status = row.get("selection_status", "")
+        if status == "selected":
+            counts["selected"] += 1
+        elif status == "excluded":
+            counts["excluded"] += 1
+        elif status in {"needs_review", "quarantined"}:
+            counts["unresolved"] += 1
+        else:
+            raise InputError(
+                "compounds_registered.tsv: unknown selection_status",
+                details=[f"{row.get('compound_id', '?')}: {status!r}"],
+            )
+    return counts
+
+
 def _verify_parent_links(
     stages: dict[str, dict[str, Any]], paths: dict[str, dict[str, Path]]
 ) -> None:
@@ -365,6 +391,12 @@ def run_report(
     lines.append("")
     ingest_summary = ingest_audit.get("summary", {})
     lines.append(f"- Compounds registered: {ingest_summary.get('compounds_registered', 'n/a')}")
+    selection_counts = _selection_counts(run_dir / "compounds_registered.tsv")
+    if selection_counts is not None:
+        lines.append(
+            "- Compound selection: {selected} selected, {excluded} excluded, "
+            "{unresolved} needs review or quarantined".format(**selection_counts)
+        )
     lines.append(
         "- STP exports: bound {bound}, quarantined {quarantined}, missing {missing}".format(
             bound=ingest_summary.get("files_bound", "n/a"),
