@@ -22,6 +22,7 @@
 > 调用 `scripts/case_check.py`、记录 `case_provenance.json`；只有分析 + manifest + 独立核查全部成功
 > 才标记 `complete`）。源码哈希使用版本化 `case-source-hash-v2` 范围（案例相关源码/入口/锁文件，
 > 不是完整仓库包）。业务逻辑仍在 `rnp`，入口只做编排；见 [docs/case-run.md](docs/case-run.md)。
+> 给了 `--log` 和 `--selection` 时，每个阈值在化合物阶段之后运行 `rnp compounds select`，`ingest stp` 只解析已选化合物的导出，选择由 `case_check.py` 独立复核。
 > Skill 已在最终提交上完成 Codex 真实会话验收（normal/missing/partial/tamper/zero；Linux enrichment/report
 > 由 Codex 调用 Docker；存在一个 PowerShell 退出码显示限制），另有一次 DSH 会话；见
 > `docs/skill-acceptance.md` 与 `docs/skill-agent-acceptance-2026-10-21.md`，不等同通用验证。

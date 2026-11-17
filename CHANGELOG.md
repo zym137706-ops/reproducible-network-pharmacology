@@ -14,6 +14,26 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ## [Unreleased]
 
+### `case_run.py --selection` and the independent recheck of the selection — 2026-11-17
+
+- `scripts/case_run.py --selection FILE` (unreleased; needs `--log`) applies a decision table to the
+  structure-mode chain. Before anything is written the preflight runs `rnp compounds select` on a copy
+  and holds the table to the case policy: every candidate is decided (include or exclude), every
+  decision belongs to a compound and at least one compound is included; a candidate held for review,
+  a missing decision, a decision for no compound or a selection of nobody stops the run. The run
+  configs name the table (`inputs.selection`, written before the first `ingest compounds`), every
+  threshold runs `rnp compounds select` after its compounds stage, `ingest stp` gets `--compounds` and
+  `--selection`, and the selection stage is checked with `manifest --check-inputs`.
+  `case_provenance.json` records the table (`inputs.selection`), the selection stage of every
+  threshold (`inputs.selection_stage`) and the recheck.
+- `scripts/case_check.py --selection FILE --selection-stage LABEL=DIR` (one for every `--run`,
+  together with the binding options) re-derives the selection from the decision table and the compound
+  table with the standard library only: the status and the id of every decision. It compares them with
+  the selection stage (tables and audit), the registered table and the ingest audit of every
+  threshold, `targets.tsv` (no row of a compound that was not selected) and the intersection audit
+  (the compounds of every group). The result is under `selection` in `independent-check.json`.
+- Without `--selection` nothing changes. The published case package and its records are not changed.
+
 ### `rnp ingest stp --selection` and selected-only counts — 2026-11-16
 
 - `rnp ingest stp --config run.yaml --compounds DIR --selection DIR2 [--force]` (unreleased) reads the

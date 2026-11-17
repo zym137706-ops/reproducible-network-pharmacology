@@ -84,6 +84,27 @@ the audit and of the table).
 A recorded run of this chain on the v0.1.0 case package is in
 [`case-entry-compounds-stage-run-2026-11-13.md`](case-entry-compounds-stage-run-2026-11-13.md).
 
+## Selection (`--selection`)
+
+`--selection FILE` applies a decision table (`include`, `exclude` or `needs_review` for every
+candidate compound, with reason codes, a rules version and the reviewer; see
+[docs/upstream.md](upstream.md) 8.11) to the structure-mode chain, so it needs `--log`. Write the table
+before the run: `case_run.py` writes its path into both run configs (`inputs.selection`) before the
+first `rnp ingest compounds`, because the stages are tied together by the hash of the run config.
+
+The preflight runs `rnp compounds select` on a copy of the inputs and holds the table to the case
+policy (every problem is one line of the error): every candidate is decided (`include` or `exclude`;
+a missing decision and `needs_review` stop the run), every decision belongs to a compound and at
+least one compound is included.
+
+With a selection the order becomes `validate → ingest compounds → compounds select → ingest stp`
+(with `--compounds <stage> --selection <selection stage>`) `→ …` for each threshold; the selection
+stage `<out>/<threshold>/run_selection/` is checked with a third `manifest --check-inputs`.
+`case_provenance.json` gets `inputs.selection` (the table, its hash, the counts and the recheck) and
+`inputs.selection_stage` (per threshold: the directory and the SHA-256 of the audit, the table and
+the selected list). A selection is the researcher's recorded decision; it says nothing about
+activity or efficacy.
+
 ## Independent check
 
 ```bash
@@ -109,6 +130,16 @@ export kind and export SHA-256 and compares them with the stage table, the stage
 table and the ingest audit of every threshold. It also requires every submission to be checked (the
 case policy again). A failed recheck ends with an error message that has one line per problem, and
 `independent-check.json` is then not written; the result of a passed recheck is under `bindings`.
+
+With a decision table (`case_run.py` does this whenever `--selection` is given) the check also
+rechecks the selection: add `--selection` (the decision table) and one
+`--selection-stage 0.10=/path/to/out/0.10/run_selection` for every `--run`, together with the binding
+options. From the decision table and the compound table alone, with the standard library, it derives
+the status and the id of every decision and compares them with the selection stage (both tables and
+the audit), the registered table and the ingest audit of every threshold, with `targets.tsv` (no row
+of a compound that was not selected) and with the intersection audit (the compounds of every group).
+It also holds the case to its policy (every candidate decided, one included). A passed recheck is
+under `selection` in `independent-check.json`.
 
 ## Container provenance
 
