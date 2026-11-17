@@ -61,6 +61,24 @@ STAGE_DIR_NAME = f"{STAGE_RUN_ID}_compounds"
 STAGE_AUDIT_NAME = "compounds_audit.json"
 STAGE_TABLE_NAME = "compound_structures.tsv"
 RECHECK_RULE = "case-binding-recheck-v1"
+# The selection stage of the case entry: the decision table applied to every compounds stage, and
+# the way the case policy judges it before anything is written.
+SELECTION_POLICY_VERSION = "case-selection-policy-v1"
+SELECTION_RECHECK_RULE = "case-selection-recheck-v1"
+SELECTION_VERIFIED_BY = "rnp compounds select"
+SELECTION_RUN_ID = "run"
+SELECTION_DIR_NAME = f"{SELECTION_RUN_ID}_selection"
+SELECTION_AUDIT_NAME = "selection_audit.json"
+SELECTION_TABLE_NAME = "selection_decisions.tsv"
+SELECTION_LIST_NAME = "selected_compounds.tsv"
+# What the case entry does with each problem code of a selection stage: every one stops the run.
+SELECTION_ISSUE_POLICY = {
+    "no_decision_recorded": "fatal",
+    "include_blocked_by_quarantine": "fatal",
+    "quarantine_resolved_by_exclusion": "fatal",
+    "decision_without_compound": "fatal",
+    "no_compound_selected": "fatal",
+}
 # What the case entry does with each problem code and each submission status of a compounds stage.
 # "fatal" stops the run before anything is written; "recorded" only goes into the provenance counts.
 ISSUE_POLICY = {
@@ -244,6 +262,15 @@ def _duplicates(values: list[str]) -> list[str]:
 
 def verify_inputs(args: argparse.Namespace) -> dict[str, Any]:
     """Fail before writing anything when bindings, hashes or structures are inconsistent."""
+    selection = getattr(args, "selection", None)
+    if selection is not None:
+        if args.log is None:
+            raise ValueError(
+                "--selection needs --log: the selection is applied to the compounds stage "
+                "of the structure-mode chain"
+            )
+        if not selection.is_file():
+            raise ValueError(f"selection table not found: {selection}")
     compounds = _read(args.compounds)
     if not compounds:
         raise ValueError(f"{args.compounds}: compounds table is empty")
@@ -371,6 +398,8 @@ def verify_inputs(args: argparse.Namespace) -> dict[str, Any]:
     }
     if args.log is not None:
         record["structures"] = structures
+    if selection is not None:
+        record["selection"] = selection_preflight(args)
     return record
 
 
@@ -393,6 +422,8 @@ def write_configs(args: argparse.Namespace, out: Path) -> dict[str, Path]:
         }
         if args.log is not None:
             data["inputs"]["submission_log"] = str(args.log.resolve())
+        if getattr(args, "selection", None) is not None:
+            data["inputs"]["selection"] = str(args.selection.resolve())
         data["thresholds"]["stp_probability"] = float(label)
         data["thresholds"]["note"] = f"case threshold {label}; sensitivity run independent"
         data["enrichment"]["universe_file"] = str(out / "backgrounds" / f"universe-{label}.txt")
@@ -497,6 +528,112 @@ def structure_preflight(args: argparse.Namespace) -> dict[str, Any]:
         )
 
 
+def judge_selection(
+    args: argparse.Namespace, returncode: int, stderr: str, stage_dir: Path
+) -> dict[str, Any]:
+    """Judge a finished selection stage with the case policy and return its provenance record."""
+    if returncode == 2:
+        raise ValueError(f"rnp compounds select rejected the inputs (exit 2): {stderr.strip()}")
+    if returncode not in (0, 3):
+        raise ValueError(f"rnp compounds select failed (exit {returncode}): {stderr.strip()}")
+    audit_path = stage_dir / SELECTION_AUDIT_NAME
+    table_path = stage_dir / SELECTION_TABLE_NAME
+    if not audit_path.is_file() or not table_path.is_file():
+        raise ValueError(f"rnp compounds select wrote no selection stage in {stage_dir}")
+
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    table = _read(table_path)
+    names = {row.get("compound_id", ""): row.get("name", "") for row in table}
+    problems: list[str] = []
+    named: set[str] = set()
+    for issue in audit.get("issues", []):
+        code = issue["code"]
+        if code not in SELECTION_ISSUE_POLICY:
+            raise ValueError(
+                f"rnp compounds select reported {code!r}, "
+                "which the case policy does not classify"
+            )
+        compound_id = issue.get("compound_id", "")
+        entry = f"entry {names[compound_id]!r} " if compound_id in names else ""
+        problems.append(f"{args.selection}: {entry}decision: {issue['message']} [{code}]")
+        named.add(compound_id)
+    for row in table:
+        status = row["selection_status"]
+        if status not in {"selected", "excluded"} and row.get("compound_id", "") not in named:
+            problems.append(
+                f"{args.selection}: entry {row.get('name', '')!r} decision: {status}, "
+                "not a decided candidate"
+            )
+    selected = sum(1 for row in table if row["selection_status"] == "selected")
+    if not selected and not problems:
+        problems.append(f"{args.selection}: no compound is selected")
+    if problems:
+        raise ValueError("\n".join(problems))
+    return {
+        "provided": True,
+        "path": str(args.selection.resolve()),
+        "sha256": sha256(args.selection),
+        "rows": audit["inputs"]["selection"]["rows"],
+        "selected": selected,
+        "excluded": sum(1 for row in table if row["selection_status"] == "excluded"),
+        "verified_by": SELECTION_VERIFIED_BY,
+        "policy": SELECTION_POLICY_VERSION,
+    }
+
+
+def selection_preflight(args: argparse.Namespace) -> dict[str, Any]:
+    """Run the selection command on a copy of the inputs and judge what it wrote."""
+    with tempfile.TemporaryDirectory(prefix="rnp-case-selection-") as temporary:
+        directory = Path(temporary)
+        configs = write_configs(args, directory)
+        label = sorted(configs, key=float)[0]
+        base = [sys.executable, "-m", "rnp.cli"]
+        result = subprocess.run(
+            base
+            + [
+                "ingest",
+                "compounds",
+                "--config",
+                str(configs[label]),
+                "--run-id",
+                STAGE_RUN_ID,
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env=dict(os.environ, PYTHONUTF8="1"),
+        )
+        if result.returncode != 0:
+            raise ValueError(
+                f"rnp ingest compounds failed (exit {result.returncode}): "
+                f"{result.stderr.strip()}"
+            )
+        result = subprocess.run(
+            base
+            + [
+                "compounds",
+                "select",
+                "--config",
+                str(configs[label]),
+                "--compounds",
+                str(directory / label / STAGE_DIR_NAME),
+                "--run-id",
+                SELECTION_RUN_ID,
+            ],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+            env=dict(os.environ, PYTHONUTF8="1"),
+        )
+        return judge_selection(
+            args, result.returncode, result.stderr, directory / label / SELECTION_DIR_NAME
+        )
+
+
 def run_command(command: list[str], cwd: Path, recorded: list[str] | None = None) -> None:
     print("+", " ".join(command), flush=True)
     if recorded is not None:
@@ -511,6 +648,8 @@ def _stage_name(command: list[str]) -> str:
         return "independent_check"
     if any(str(part).endswith("build_case_background.py") for part in command):
         return "backgrounds"
+    if "compounds" in command and "select" in command:
+        return "compounds_select"
     if "ingest" in command and "compounds" in command:
         return "ingest_compounds"
     for part in command:
@@ -536,6 +675,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--disease-genes", type=Path, required=True)
     parser.add_argument("--hgnc-map", type=Path, required=True)
     parser.add_argument("--log", type=Path, default=None)
+    parser.add_argument("--selection", type=Path, default=None)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--config-template", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--thresholds", nargs="+", default=["0.10", "0.05"])
@@ -547,6 +687,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
+    selection = getattr(args, "selection", None)
     out = args.out.resolve()
     if out.exists() and any(out.iterdir()):
         raise SystemExit(f"refusing to write into a non-empty output directory: {out}")
@@ -619,6 +760,8 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.log is not None:
             provenance["inputs"]["compounds_stage"] = {}
+            if selection is not None:
+                provenance["inputs"]["selection_stage"] = {}
             for label in labels:
                 run_command(
                     base
@@ -639,6 +782,29 @@ def main(argv: list[str] | None = None) -> int:
                     "audit_sha256": sha256(stage / STAGE_AUDIT_NAME),
                     "table_sha256": sha256(stage / STAGE_TABLE_NAME),
                 }
+                if selection is not None:
+                    run_command(
+                        base
+                        + [
+                            "compounds",
+                            "select",
+                            "--config",
+                            str(configs[label]),
+                            "--compounds",
+                            str(stage),
+                            "--run-id",
+                            SELECTION_RUN_ID,
+                        ],
+                        ROOT,
+                        provenance["commands"],
+                    )
+                    chosen = out / label / SELECTION_DIR_NAME
+                    provenance["inputs"]["selection_stage"][label] = {
+                        "dir": str(chosen),
+                        "audit_sha256": sha256(chosen / SELECTION_AUDIT_NAME),
+                        "table_sha256": sha256(chosen / SELECTION_TABLE_NAME),
+                        "list_sha256": sha256(chosen / SELECTION_LIST_NAME),
+                    }
         for label in labels:
             ingest_command = [
                 "ingest",
@@ -650,6 +816,8 @@ def main(argv: list[str] | None = None) -> int:
             ]
             if args.log is not None:
                 ingest_command += ["--compounds", str(out / label / STAGE_DIR_NAME)]
+            if selection is not None:
+                ingest_command += ["--selection", str(out / label / SELECTION_DIR_NAME)]
             run_command(base + ingest_command, ROOT, provenance["commands"])
         background_args = [sys.executable, str(BUILD_BACKGROUND)]
         for label in labels:
@@ -704,6 +872,18 @@ def main(argv: list[str] | None = None) -> int:
                     ROOT,
                     provenance["commands"],
                 )
+                if selection is not None:
+                    run_command(
+                        base
+                        + [
+                            "manifest",
+                            "--run-dir",
+                            str(out / label / SELECTION_DIR_NAME),
+                            "--check-inputs",
+                        ],
+                        ROOT,
+                        provenance["commands"],
+                    )
         check_command = [sys.executable, str(CASE_CHECK)]
         for label in labels:
             check_command += ["--run", f"{label}={out / label / 'run'}"]
@@ -731,6 +911,13 @@ def main(argv: list[str] | None = None) -> int:
             ]
             for label in labels:
                 check_command += ["--stage", f"{label}={out / label / STAGE_DIR_NAME}"]
+            if selection is not None:
+                check_command += ["--selection", str(selection.resolve())]
+                for label in labels:
+                    check_command += [
+                        "--selection-stage",
+                        f"{label}={out / label / SELECTION_DIR_NAME}",
+                    ]
         run_command(check_command, ROOT, provenance["commands"])
         if args.log is not None:
             provenance["inputs"]["log"]["binding_recheck"] = {
@@ -738,6 +925,12 @@ def main(argv: list[str] | None = None) -> int:
                 "rule": RECHECK_RULE,
                 "result": "passed",
             }
+            if selection is not None:
+                provenance["inputs"]["selection"]["recheck"] = {
+                    "tool": "scripts/case_check.py",
+                    "rule": SELECTION_RECHECK_RULE,
+                    "result": "passed",
+                }
     except CommandFailure as exc:
         provenance["status"] = "failed"
         provenance["failed_stage"] = _stage_name(exc.command)
