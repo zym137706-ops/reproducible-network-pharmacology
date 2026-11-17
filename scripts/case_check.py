@@ -15,6 +15,7 @@ import io
 import json
 import math
 import re
+from collections import Counter
 from pathlib import Path
 
 from rnp.io.tables import read_table
@@ -30,6 +31,35 @@ DERIVED_COLUMNS = (
     "submission_status",
     "export_kind",
     "export_sha256",
+)
+SELECTION_RULE = "case-selection-recheck-v1"
+SELECTION_COLUMNS = (
+    "decision_id",
+    "compound_id",
+    "group",
+    "name",
+    "stp_file",
+    "structure_id",
+    "compound_row_status",
+    "decision",
+    "decision_source",
+    "selection_status",
+    "reason_codes",
+    "rules_version",
+    "reviewer",
+    "evidence_refs",
+    "issue_codes",
+)
+SELECTION_DECISIONS = {"include": "selected", "exclude": "excluded", "needs_review": "needs_review"}
+DECISION_ID_FIELDS = (
+    "compound_id",
+    "structure_id",
+    "decision",
+    "decision_source",
+    "reason_codes",
+    "rules_version",
+    "reviewer",
+    "evidence_refs",
 )
 
 
@@ -552,6 +582,401 @@ def check_bindings(
     }
 
 
+def _selection_name_key(text: str) -> str:
+    """Fold a compound name to the key the core pairs a decision with."""
+    return re.sub(r"[^a-z0-9]+", "", _fold_binding_cell(text).casefold())
+
+
+def _selection_codes(text: str) -> str:
+    """Normalise reason codes the way the core records them."""
+    return ";".join(sorted({part.strip() for part in text.split(";") if part.strip()}))
+
+
+def _selection_id(row: dict[str, str]) -> str:
+    """`DEC-` and the first 12 hex digits of the eight decision fields joined by U+001F."""
+    text = "\x1f".join(row[field] for field in DECISION_ID_FIELDS)
+    return "DEC-" + hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
+
+
+def _read_decisions(decisions: Path) -> list[dict[str, str]]:
+    """Read the decision table with the binding rules and clean the fields it compares."""
+    header, rows = _read_binding_table(decisions)
+    required = ("compound", "decision", "reason_codes", "rules_version", "reviewer")
+    missing = [column for column in required if column not in header]
+    if missing:
+        raise AssertionError(
+            f"{decisions.name}: the decision table lacks required column(s): {', '.join(missing)}"
+        )
+    table = []
+    for row in rows:
+        table.append(
+            {
+                "compound": _fold_binding_cell(row.get("compound", "")),
+                "group": _fold_binding_cell(row.get("group", "")) or "all",
+                "decision": row.get("decision", "").strip(),
+                "reason_codes": _selection_codes(row.get("reason_codes", "")),
+                "rules_version": _fold_binding_cell(row.get("rules_version", "")),
+                "reviewer": _fold_binding_cell(row.get("reviewer", "")),
+                "evidence_refs": _fold_binding_cell(row.get("evidence_refs", "")),
+            }
+        )
+    return table
+
+
+def _selection_pairs(
+    source: str, compounds: list[dict[str, str]], decisions: list[dict[str, str]]
+) -> tuple[list[str], dict[int, int]]:
+    """Pair every decision with a compound and hold the table to the case policy."""
+    problems: list[str] = []
+    by_key: dict[tuple[str, str], int] = {}
+    for index, compound in enumerate(compounds):
+        key = (_selection_name_key(compound["name"]), compound["group"])
+        by_key.setdefault(key, index)
+    paired: dict[int, int] = {}
+    for number, decision in enumerate(decisions, start=1):
+        value = decision["decision"]
+        if value not in SELECTION_DECISIONS:
+            problems.append(
+                f"{source}: row {number} decision: {value!r} "
+                "is not include, exclude or needs_review"
+            )
+            continue
+        key = (_selection_name_key(decision["compound"]), decision["group"])
+        index = by_key.get(key)
+        if index is None:
+            problems.append(
+                f"{source}: row {number} compound: no compound row matches "
+                f"{decision['compound']!r} (group {decision['group']!r})"
+            )
+            continue
+        if index in paired:
+            problems.append(
+                f"{source}: row {number} compound: {decision['compound']!r} "
+                f"(group {decision['group']!r}) is decided more than once"
+            )
+            continue
+        paired[index] = number - 1
+    for index, compound in enumerate(compounds):
+        entry = f"entry {compound['name']!r} ({compound['stp_file']})"
+        if index not in paired:
+            problems.append(
+                f"{source}: {entry} decision: no decision is recorded, "
+                "so the candidate is held for review"
+            )
+        elif decisions[paired[index]]["decision"] == "needs_review":
+            problems.append(
+                f"{source}: {entry} decision: needs_review, not a decided candidate"
+            )
+    if not any(decisions[at]["decision"] == "include" for at in paired.values()):
+        problems.append(f"{source}: no compound is selected")
+    return problems, paired
+
+
+def _selection_expected(
+    compounds: list[dict[str, str]],
+    decisions: list[dict[str, str]],
+    paired: dict[int, int],
+    stage_rows: list[dict[str, str]],
+) -> list[dict[str, str]]:
+    """Derive the selection row of every compound from the inputs and its compounds stage."""
+    expected = []
+    for index, compound in enumerate(compounds):
+        stage = stage_rows[index] if index < len(stage_rows) else {}
+        at = paired.get(index)
+        row = {column: "" for column in SELECTION_COLUMNS}
+        row["compound_id"] = stage.get("compound_id", "")
+        row["structure_id"] = stage.get("structure_id", "")
+        row["compound_row_status"] = stage.get("row_status", "")
+        row["group"] = compound["group"]
+        row["name"] = compound["name"]
+        row["stp_file"] = compound["stp_file"]
+        if at is None:
+            row["decision"] = "needs_review"
+            row["decision_source"] = "not_recorded"
+            row["issue_codes"] = "no_decision_recorded"
+        else:
+            decision = decisions[at]
+            row["decision"] = decision["decision"]
+            row["decision_source"] = "recorded"
+            row["reason_codes"] = decision["reason_codes"]
+            row["rules_version"] = decision["rules_version"]
+            row["reviewer"] = decision["reviewer"]
+            row["evidence_refs"] = decision["evidence_refs"]
+        row["selection_status"] = SELECTION_DECISIONS.get(row["decision"], "needs_review")
+        row["decision_id"] = _selection_id(row)
+        expected.append(row)
+    return expected
+
+
+def _selection_cell_problems(
+    label: str,
+    filename: str,
+    entries: list[str],
+    columns: tuple[str, ...],
+    expected: list[dict[str, str]],
+    actual: list[dict[str, str]],
+    source: str,
+) -> list[str]:
+    """Compare the cells of the rows that both tables have."""
+    lines: list[str] = []
+    for index in range(min(len(expected), len(actual))):
+        for column in columns:
+            if actual[index].get(column) != expected[index][column]:
+                lines.append(
+                    f"{label}: {filename}: {entries[index]} {column}: "
+                    f"expected {expected[index][column]!r} from {source}, "
+                    f"found {actual[index].get(column)!r}"
+                )
+    return lines
+
+
+def _threshold_selection_problems(
+    label: str,
+    compounds: list[dict[str, str]],
+    decisions: Path,
+    decision_rows: list[dict[str, str]],
+    paired: dict[int, int],
+    stage_dir: Path,
+    selection_dir: Path,
+    run_dir: Path,
+) -> tuple[list[str], dict[str, str] | None]:
+    """Compare the files of one threshold with the derivation; return lines and hashes."""
+    files = (
+        ("compounds_audit.json", stage_dir / "compounds_audit.json"),
+        ("compound_structures.tsv", stage_dir / "compound_structures.tsv"),
+        ("selection_decisions.tsv", selection_dir / "selection_decisions.tsv"),
+        ("selected_compounds.tsv", selection_dir / "selected_compounds.tsv"),
+        ("selection_audit.json", selection_dir / "selection_audit.json"),
+        ("compounds_registered.tsv", run_dir / "compounds_registered.tsv"),
+        ("stp_audit.json", run_dir / "stp_audit.json"),
+        ("targets.tsv", run_dir / "targets.tsv"),
+        ("intersect_audit.json", run_dir / "intersect" / "intersect_audit.json"),
+    )
+    missing = [(name, path) for name, path in files if not path.is_file()]
+    if missing:
+        return [f"{label}: {name}: not found in {path.parent}" for name, path in missing], None
+
+    _, stage_rows = _read_binding_table(stage_dir / "compound_structures.tsv")
+    expected = _selection_expected(compounds, decision_rows, paired, stage_rows)
+    entries = [f"entry {compound['name']!r} ({compound['stp_file']})" for compound in compounds]
+    lines = []
+    table_path = selection_dir / "selection_decisions.tsv"
+    _, table_rows = _read_binding_table(table_path)
+    if len(table_rows) != len(expected):
+        lines.append(
+            f"{label}: selection_decisions.tsv: rows: expected {len(expected)} "
+            f"from the compound table, found {len(table_rows)}"
+        )
+    lines += _selection_cell_problems(
+        label,
+        "selection_decisions.tsv",
+        entries,
+        SELECTION_COLUMNS,
+        expected,
+        table_rows,
+        "the inputs",
+    )
+    chosen = [
+        (index, row)
+        for index, row in enumerate(expected)
+        if row["selection_status"] == "selected"
+    ]
+    chosen_path = selection_dir / "selected_compounds.tsv"
+    _, chosen_rows = _read_binding_table(chosen_path)
+    if len(chosen_rows) != len(chosen):
+        lines.append(
+            f"{label}: selected_compounds.tsv: rows: expected {len(chosen)} selected, "
+            f"found {len(chosen_rows)}"
+        )
+    lines += _selection_cell_problems(
+        label,
+        "selected_compounds.tsv",
+        [entries[index] for index, _ in chosen],
+        SELECTION_COLUMNS,
+        [row for _, row in chosen],
+        chosen_rows,
+        "the inputs",
+    )
+    counts = Counter(row["selection_status"] for row in expected)
+    audit = json.loads((selection_dir / "selection_audit.json").read_text(encoding="utf-8"))
+    table_sha256 = sha256(table_path)
+    chosen_sha256 = sha256(chosen_path)
+    checks = (
+        ("stage_status", "complete", "the case policy"),
+        ("identity_mode", "structure", "the case policy"),
+        ("inputs.selection.sha256", sha256(decisions), "the inputs"),
+        ("inputs.selection.rows", len(decision_rows), "the inputs"),
+        (
+            "inputs.compounds_stage.audit_sha256",
+            sha256(stage_dir / "compounds_audit.json"),
+            "the compounds stage",
+        ),
+        (
+            "inputs.compounds_stage.table_sha256",
+            sha256(stage_dir / "compound_structures.tsv"),
+            "the compounds stage",
+        ),
+        ("summary.candidates", len(compounds), "the inputs"),
+        ("summary.selected", counts.get("selected", 0), "the inputs"),
+        ("summary.excluded", counts.get("excluded", 0), "the inputs"),
+        ("summary.needs_review", counts.get("needs_review", 0), "the inputs"),
+        ("summary.quarantined", 0, "the case policy"),
+        ("summary.decisions_recorded", len(decision_rows), "the inputs"),
+        ("summary.decisions_not_recorded", 0, "the case policy"),
+        ("summary.decisions_without_compound", 0, "the case policy"),
+        ("summary.warnings", 0, "the case policy"),
+        ("issues", [], "the case policy"),
+        ("selection_decisions_sha256", table_sha256, "selection_decisions.tsv"),
+        ("selected_compounds_sha256", chosen_sha256, "selected_compounds.tsv"),
+    )
+    for field, value, source in checks:
+        actual = _binding_value(audit, field)
+        if actual != value:
+            lines.append(
+                f"{label}: selection_audit.json: {field}: expected {value!r} "
+                f"from {source}, found {actual!r}"
+            )
+    header, registered_rows = _read_binding_table(run_dir / "compounds_registered.tsv")
+    if "selection_status" not in header:
+        lines.append(f"{label}: compounds_registered.tsv: selection_status: the column is missing")
+    else:
+        if len(registered_rows) != len(expected):
+            lines.append(
+                f"{label}: compounds_registered.tsv: rows: expected {len(expected)} "
+                f"from the compound table, found {len(registered_rows)}"
+            )
+        for index in range(min(len(expected), len(registered_rows))):
+            for column in ("compound_id", "selection_status"):
+                actual = registered_rows[index].get(column)
+                if actual != expected[index][column]:
+                    lines.append(
+                        f"{label}: compounds_registered.tsv: {entries[index]} {column}: "
+                        f"expected {expected[index][column]!r} from the selection, found {actual!r}"
+                    )
+    ingest = json.loads((run_dir / "stp_audit.json").read_text(encoding="utf-8"))
+    ingest_checks = (
+        ("schema_version", "1.2", "the selection"),
+        ("summary.files_not_selected", counts.get("excluded", 0), "the inputs"),
+        ("summary.files_quarantined", 0, "the case policy"),
+    )
+    for field, value, source in ingest_checks:
+        actual = _binding_value(ingest, field)
+        if actual != value:
+            lines.append(
+                f"{label}: stp_audit.json: {field}: expected {value!r} from {source}, "
+                f"found {actual!r}"
+            )
+    notes = ingest.get("notes") if isinstance(ingest, dict) else None
+    codes = [
+        note.get("code") for note in notes if isinstance(note, dict)
+    ] if isinstance(notes, list) else []
+    if "selection_stage_applied" not in codes:
+        lines.append(f"{label}: stp_audit.json: notes: no selection_stage_applied note")
+    _, target_rows = _read_binding_table(run_dir / "targets.tsv")
+    selected_ids = {row["compound_id"] for row in expected if row["selection_status"] == "selected"}
+    selected_files = {row["stp_file"] for row in expected if row["selection_status"] == "selected"}
+    for number, row in enumerate(target_rows, start=1):
+        value = row.get("compound_id")
+        if value not in selected_ids:
+            lines.append(
+                f"{label}: targets.tsv: row {number} compound_id: {value!r} "
+                "is not a selected compound"
+            )
+        value = row.get("source_file")
+        if value not in selected_files:
+            lines.append(
+                f"{label}: targets.tsv: row {number} source_file: {value!r} "
+                "is not the export of a selected compound"
+            )
+    intersect_path = run_dir / "intersect" / "intersect_audit.json"
+    intersect = json.loads(intersect_path.read_text(encoding="utf-8"))
+    groups = intersect.get("groups") if isinstance(intersect, dict) else None
+    groups = groups if isinstance(groups, dict) else {}
+    wanted = sorted({row["group"] for row in expected if row["selection_status"] == "selected"})
+    found = sorted(groups)
+    if wanted != found:
+        lines.append(
+            f"{label}: intersect_audit.json: groups: expected {wanted} "
+            f"from the selected compounds, found {found}"
+        )
+    for group in wanted:
+        count = sum(
+            1
+            for row in expected
+            if row["selection_status"] == "selected" and row["group"] == group
+        )
+        entry = groups.get(group)
+        actual = entry.get("compounds") if isinstance(entry, dict) else None
+        if actual != count:
+            lines.append(
+                f"{label}: intersect_audit.json: groups.{group}.compounds: "
+                f"expected {count} from the selected compounds, found {actual!r}"
+            )
+    return lines, {
+        "selection_decisions.tsv": table_sha256,
+        "selected_compounds.tsv": chosen_sha256,
+    }
+
+
+def check_selection(
+    compounds: Path,
+    decisions: Path,
+    stages: dict[str, Path],
+    selection_stages: dict[str, Path],
+    runs: dict[str, Path],
+) -> dict[str, object]:
+    """Re-derive the selection from the decision table and compare every stage that used it."""
+    compound_rows = _compound_binding_rows(compounds)
+    decision_rows = _read_decisions(decisions)
+    problems, paired = _selection_pairs(decisions.name, compound_rows, decision_rows)
+    readable: dict[str, dict[str, str]] = {}
+    for label in sorted(selection_stages):
+        lines, hashes = _threshold_selection_problems(
+            label,
+            compound_rows,
+            decisions,
+            decision_rows,
+            paired,
+            stages[label],
+            selection_stages[label],
+            runs[label],
+        )
+        problems.extend(lines)
+        if hashes is not None:
+            readable[label] = hashes
+    ordered = sorted(readable)
+    if ordered:
+        first = ordered[0]
+        for label in ordered[1:]:
+            for filename in ("selection_decisions.tsv", "selected_compounds.tsv"):
+                if readable[label][filename] != readable[first][filename]:
+                    problems.append(
+                        f"{label}: {filename}: sha256: expected "
+                        f"{readable[first][filename]!r} from the selection stage of "
+                        f"threshold {first}, found {readable[label][filename]!r}"
+                    )
+    if problems:
+        raise AssertionError("\n".join(problems))
+    counts: dict[str, int] = {}
+    for index in range(len(compound_rows)):
+        decision = decision_rows[paired[index]]["decision"] if index in paired else ""
+        status = SELECTION_DECISIONS.get(decision, "needs_review")
+        counts[status] = counts.get(status, 0) + 1
+    return {
+        "rule": SELECTION_RULE,
+        "decisions_sha256": sha256(decisions),
+        "rows": len(decision_rows),
+        "status_counts": {status: counts[status] for status in sorted(counts)},
+        "thresholds": {
+            label: {
+                "selection_table_sha256": readable[label]["selection_decisions.tsv"],
+                "selected_list_sha256": readable[label]["selected_compounds.tsv"],
+            }
+            for label in sorted(readable)
+        },
+    }
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -570,6 +995,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--log", type=Path, default=None)
     parser.add_argument("--species", default=None)
     parser.add_argument("--stage", action="append", metavar="LABEL=DIR", default=None)
+    parser.add_argument("--selection", type=Path, default=None)
+    parser.add_argument("--selection-stage", action="append", metavar="LABEL=DIR", default=None)
     args = parser.parse_args(argv)
 
     options = {
@@ -584,6 +1011,14 @@ def main(argv: list[str] | None = None) -> int:
         raise SystemExit(
             "the binding recheck needs --compound-table, --stp-dir, --log, --species and "
             f"--stage together; missing: {', '.join(missing)}"
+        )
+    if not missing:
+        if args.selection_stage is not None and args.selection is None:
+            raise SystemExit("--selection-stage needs --selection")
+    elif args.selection is not None or args.selection_stage is not None:
+        raise SystemExit(
+            "the selection recheck needs the binding recheck: give --compound-table, --stp-dir, "
+            "--log, --species and --stage together with --selection and --selection-stage"
         )
 
     mapper = GeneMapper(args.hgnc_map)
@@ -631,6 +1066,23 @@ def main(argv: list[str] | None = None) -> int:
             stages,
             runs,
         )
+        if args.selection is not None:
+            selection_stages: dict[str, Path] = {}
+            for spec in args.selection_stage or []:
+                label, raw_path = spec.split("=", 1)
+                selection_stages[label] = Path(raw_path).resolve()
+            if sorted(selection_stages) != sorted(runs):
+                raise SystemExit(
+                    f"--run labels {sorted(runs)} and --selection-stage labels "
+                    f"{sorted(selection_stages)} must be the same"
+                )
+            result["selection"] = check_selection(
+                args.compound_table.resolve(),
+                args.selection.resolve(),
+                stages,
+                selection_stages,
+                runs,
+            )
     payload = json.dumps(result, indent=2, sort_keys=True) + "\n"
     if args.out:
         args.out.write_text(payload, encoding="utf-8")
