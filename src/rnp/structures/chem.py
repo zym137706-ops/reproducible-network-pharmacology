@@ -17,8 +17,8 @@ class ChemUnavailable(InputError):
             "RDKit is not installed, so a new structure cannot be registered",
             details=[
                 "install the optional extra with: uv sync --extra chem",
-                "or install the package with: pip install "
-                "'reproducible-network-pharmacology[chem]'",
+                "or, with an installed wheel, install it again with the extra: "
+                'pip install "<path to the wheel file>[chem]"',
             ],
         )
 

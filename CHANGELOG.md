@@ -18,6 +18,16 @@ this release: the processed-metabolomics entry, name-to-structure resolution, pr
 "selected" compound is one that the researcher's recorded decision kept for analysis; nothing here claims
 activity, mechanism or efficacy. See `docs/release-notes-v0.2.0.md`.
 
+### Installation hint of the missing-RDKit error — 2026-11-18
+
+- The error of the commands that register a structure (`rnp ingest compounds` on a table with a `smiles` column,
+  and the case entry with `--log`) when the optional extra `chem` is missing no longer suggests
+  `pip install 'reproducible-network-pharmacology[chem]'`. The project is distributed as release assets and is not
+  on PyPI: that name does not exist there (and could one day belong to someone else), so the command fails today
+  and could install a foreign package later. The hint now names `uv sync --extra chem` for a checkout and
+  `pip install "<path to the wheel file>[chem]"` for an installed wheel. Behaviour and exit code (2) are
+  unchanged. Found when the wheel of the release candidate was installed in a clean environment.
+
 ### v0.2.0 release candidate: documents, CI and the run record — 2026-11-17
 
 - The status wording of both READMEs, `docs/upstream.md`, the architecture, review-gate, citation, docking,

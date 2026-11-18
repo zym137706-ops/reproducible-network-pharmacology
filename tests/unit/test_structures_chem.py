@@ -187,6 +187,17 @@ def test_without_rdkit_describing_a_structure_is_a_clear_run_error(no_rdkit):
     assert "RDKit" in rendered and "chem" in rendered
 
 
+def test_the_installation_hint_names_no_package_index_name(no_rdkit):
+    # The project is distributed as release assets and is not on PyPI: a hint that names it as a
+    # package would fail today and could install somebody else's package later.
+    with pytest.raises(ChemUnavailable) as caught:
+        describe_smiles("CCO")
+    rendered = caught.value.render()
+    assert "uv sync --extra chem" in rendered
+    assert 'pip install "<path to the wheel file>[chem]"' in rendered
+    assert "reproducible-network-pharmacology" not in rendered
+
+
 def test_without_rdkit_the_toolkit_version_is_a_clear_run_error(no_rdkit):
     with pytest.raises(ChemUnavailable):
         toolkit_version()
