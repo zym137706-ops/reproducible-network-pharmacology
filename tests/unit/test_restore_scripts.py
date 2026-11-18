@@ -43,6 +43,7 @@ def test_powershell_restore_propagates_failure(tmp_path: Path) -> None:
         ],
         capture_output=True,
         text=True,
+        errors="replace",
         env=env,
         timeout=120,
     )
@@ -76,6 +77,7 @@ def test_powershell_restore_propagates_restore_failure(tmp_path: Path) -> None:
         ],
         capture_output=True,
         text=True,
+        errors="replace",
         env=env,
         timeout=120,
     )
