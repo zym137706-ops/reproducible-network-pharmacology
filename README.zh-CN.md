@@ -5,8 +5,12 @@
 输入：化合物清单 + SwissTargetPrediction 导出 + 疾病基因集。
 输出：可追溯的交集表、Cytoscape 网络表、富集结果、报告，以及一份记录输入哈希、参考库版本、参数与工具版本的运行清单。
 
-> 当前状态：**v0.1.0，已于 2026-11-02 发布**（包版本 0.1.0）。Release：
-> <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0>。导入/交集/网络/富集/报告已接通；包装层非零退出码、
+> 当前状态：**v0.2.0 候选，尚未发布**；已发布的最新版本是 **v0.1.0**（2026-11-02，包版本 0.1.0）：
+> <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0>。
+> v0.2.0 增加上游的第一个切片（入口 A：已确认化合物清单与提交给 SwissTargetPrediction 的实际结构、
+> 与全候选分开记录的显式选择，以及独立复核这两者的案例入口）和受体侧的 `rnp acquire`，见命令表、
+> [发布说明](docs/release-notes-v0.2.0.md) 和 [变更记录](CHANGELOG.md)。
+> v0.1.0 的导入/交集/网络/富集/报告已接通；包装层非零退出码、
 > engine 实际前景/背景集合与哈希已加固。Python 用 `uv.lock`、R 用 `renv.lock` 锁定，Linux CI
 > （当前 main run，见 badge）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
 > exit `0xC0000005` 导致 11 个 R 相关测试失败，非零退出保护保留、不忽略。公开 RA 案例（MeSH D001172）
@@ -46,6 +50,8 @@
 ```bash
 # 需要 Python 3.10+；富集功能另需 R 4.5.x（clusterProfiler / org.Hs.eg.db）
 uv sync --locked --extra dev
+# 结构模式（`rnp ingest compounds` 读含 `smiles` 列的化合物表、`scripts/case_run.py --log`）另需 RDKit：
+# 加 `--extra chem`；没装时这些命令会报错并指出该 extra
 
 # 恢复 R 锁，并使用脚本打印的精确绝对库路径
 bash scripts/restore_r.sh
@@ -72,17 +78,20 @@ Windows 注意：确认 `python` 指向 Python 3。装了分子模拟工具的�
 |---|---|---|
 | `rnp validate` | ✅ | 校验运行配置与所有声明的输入路径 |
 | `rnp ingest stp` | ✅ | 解析 STP 的 xlsx/csv 导出（合并标题行、多符号靶点、复合体），产出 `targets.tsv` + 审计文件 |
+| `rnp ingest compounds` | ✅ v0.2.0 | 登记化合物身份；化合物表有 `smiles` 列时同时登记结构（RDKit，可选 extra `chem`）和 STP 提交记录，把 `compound_structures.tsv`、`compounds_audit.json` 和清单写进 `<outputs.dir>/<run id>_compounds/`；没有登记到结构或提交记录被拒的行被隔离（退出码 3）；没有 `smiles` 列时为仅名称模式，不需要 RDKit；`rnp ingest stp --compounds DIR` 套用它的决定（被隔离化合物的导出同样被隔离，`compounds_registered.tsv` 多 `structure_id`、`structure_status` 两列）（[docs/upstream.md](docs/upstream.md) 第 8 节） |
 | `rnp manifest` | ✅ | 校验已有 `run_manifest.json` 并检测输入哈希漂移 |
 | `rnp intersect` | ✅ v0.1 | HGNC 归一化后的疾病交集；排除项与冲突写入审计表 |
 | `rnp network` | ✅ v0.1 | Cytoscape 节点/边/MOLlist 表 + Venny 数据；`--venn-plot` 可选出图 |
 | `rnp enrich` | ✅ v0.1 | 基于 R `clusterProfiler` 的分组 ORA，**必须显式背景**；完整检验表 + 显著性子表；无命中与服务失败分开 |
 | `rnp mcode` | 🚧 后续独立扩展 | MCODE 模块富集；不由 hub/RRA 排名替代 |
 | `rnp report` | ✅ v0.1 | 由已校验的阶段审计与表格生成 Markdown 报告；哈希校验；不超出证据作结论 |
-| `rnp metabolites import` | 🚧 v0.2 设计 | 已处理代谢组注释导入；同时支持已确认成分清单 |
-| `rnp structures resolve` | 🚧 v0.2 设计 | 结构注册、来源核验与转换历史 |
-| `rnp compounds select` | ✅ 已实现，未发布 | 记录研究者对候选化合物的选择决定（`include` / `exclude` / `needs_review`，附理由码、规则版本和决定者）：读 `inputs.selection` 和 `rnp ingest compounds` 的阶段目录，把全候选表 `selection_decisions.tsv`、所选名单 `selected_compounds.tsv`、`selection_audit.json` 和清单写进 `<outputs.dir>/<run id>_selection/`；没有决定的候选是待审、不是纳入，有未决候选时阶段是 partial（退出码 3）；不写注册表；`rnp ingest stp --compounds DIR --selection DIR2` 只解析已选化合物的导出，其余记为 `not_selected`（审计 Schema 1.2，`compounds_registered.tsv` 多一列 `selection_status`），`rnp intersect`、`rnp network`、`rnp report` 随之只数已选化合物（[docs/upstream.md](docs/upstream.md) 8.11、8.12） |
-| `rnp compounds annotate` | 🚧 v0.2 设计 | 性质标注（Ro5、结构警示、可选 ADMET），与选择决定分开 |
-| `rnp acquire` | ✅ 已实现，未发布（[ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)） | 把所选 `PDB_ID:UNIPROT_ACCESSION` 的 RCSB/UniProt 记录冻结到新目录，并写出 `acquisition_record.json`（获取时间、HTTP 状态、大小、SHA-256、版本响应头）；`--verify DIR` 离线复核冻结目录；唯一在 Python 代码中联网的命令（`rnp enrich` 的可选 KEGG 富集由 R 联网，不在此列） |
+| `scripts/case_run.py` | ✅ 本地案例入口 | 面向用户自备输入的可移植预检 + 全 CLI 链；记录源码/配置/容器溯源；给了 `--log` 时经 `rnp ingest compounds` 登记并核对结构（需要 RDKit，extra `chem`）；再给 `--selection`（需要 `--log`）时还套用决定表：每个化合物阶段之后运行 `rnp compounds select`，`ingest stp` 带 `--compounds --selection` |
+| `scripts/case_check.py` | ✅ 独立核查 | 从结果表重新推导 T_r/前景并重算超几何/BH；给了提交日志时还从原始输入重新推导每个化合物的提交状态和导出哈希，与化合物阶段对照；给了 `--selection` 时从决定表重新推导每个化合物的选择状态和决定 ID，与选择阶段、登记表、ingest 审计、`targets.tsv` 和交集审计对照 |
+| `rnp metabolites import` | 🚧 后续，不在 v0.2.0 | 已处理代谢组注释导入；同时支持已确认成分清单 |
+| `rnp structures resolve` | 🚧 后续，不在 v0.2.0 | 把名称/InChIKey 解析为结构（PubChem 缓存） |
+| `rnp compounds select` | ✅ v0.2.0 | 记录研究者对候选化合物的选择决定（`include` / `exclude` / `needs_review`，附理由码、规则版本和决定者）：读 `inputs.selection` 和 `rnp ingest compounds` 的阶段目录，把全候选表 `selection_decisions.tsv`、所选名单 `selected_compounds.tsv`、`selection_audit.json` 和清单写进 `<outputs.dir>/<run id>_selection/`；没有决定的候选是待审、不是纳入，有未决候选时阶段是 partial（退出码 3）；不写注册表；`rnp ingest stp --compounds DIR --selection DIR2` 只解析已选化合物的导出，其余记为 `not_selected`（审计 Schema 1.2，`compounds_registered.tsv` 多一列 `selection_status`），`rnp intersect`、`rnp network`、`rnp report` 随之只数已选化合物（[docs/upstream.md](docs/upstream.md) 8.11、8.12） |
+| `rnp compounds annotate` | 🚧 后续，不在 v0.2.0 | 性质标注（Ro5、结构警示、可选 ADMET），与选择决定分开 |
+| `rnp acquire` | ✅ v0.2.0（[ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)） | 把所选 `PDB_ID:UNIPROT_ACCESSION`（PDB 编号只接受 4 位）的 RCSB/UniProt 记录冻结到新目录，并写出 `acquisition_record.json`（获取时间、HTTP 状态、大小、SHA-256、版本响应头）；`--verify DIR` 离线复核冻结目录；唯一在 Python 代码中联网的命令（`rnp enrich` 的可选 KEGG 富集由 R 联网，不在此列） |
 | `rnp dock prepare/run/qc` | 🚧 v0.3 设计 | 合适共晶体系、普通非共价小分子、对照与姿势质控 |
 
 ## 输入契约
@@ -90,6 +99,7 @@ Windows 注意：确认 `python` 指向 Python 3。装了分子模拟工具的�
 | 输入 | 格式 | 必需内容 | 说明 |
 |---|---|---|---|
 | 化合物表 | TSV/CSV | `name`（可选 `smiles`、`source`、`group`、`stp_file`） | 重名直接报错；`group` 拆分多组网络，`stp_file` 指定对应导出，否则按文件名匹配 |
+| 选择决定表（`inputs.selection`，可选） | TSV/CSV | `compound`、`decision`（`include` / `exclude` / `needs_review`）、`reason_codes`、`rules_version`、`reviewer`；可选 `group`、`evidence_refs` | 由 `rnp compounds select` 读取，每个候选一行；首次运行 `rnp ingest compounds` 之前就要把路径写进运行配置（各阶段靠配置哈希串在一起）；`exclude` 和 `needs_review` 需要理由码；没有行的候选记为待审 |
 | STP 导出目录 | `.csv` / `.xlsx` | 表头须出现在前 10 行内 | xlsx 首行是合并标题、第 2 行才是表头——已处理 |
 | 疾病基因集 | 每行一个符号，或含 `gene` 列的 TSV | 基因符号 | 无法解析的符号直接中止；来源与日期写入配置 |
 | HGNC 映射表 | HGNC complete-set TSV | `hgnc_id,symbol,status,prev_symbol,alias_symbol,uniprot_ids,entrez_id,locus_group` | 只索引 `Approved`；别名用 `|` 分隔 |
@@ -114,14 +124,19 @@ Windows 注意：确认 `python` 指向 Python 3。装了分子模拟工具的�
 
 ## 可复现性
 
-已有基础包括 Schema、确定性排序、输入哈希和单元/契约测试。发布前仍需闭合：
+已落地的基础：
 
-1. 实际生成并验证 Python 锁文件和受控的 R/Bioconductor/注释环境。
-2. 将参考文件及父产物绑定到哈希，不能只填写版本文字。
-3. 定义阶段状态与溯源关系，默认阻止 incomplete/partial 进入正式下游。
-4. 完成可独立核算的合成 demo 和超几何/BH 数值基准。
-5. 在源码目录以外验证 wheel 安装后的 schemas/R 资源。
-6. 记录实际测试通过、失败、跳过及支持平台，不沿用旧报告。
+1. 化合物↔导出绑定与隔离：未绑定的文件不会悄悄变成边。
+2. 阶段状态（`complete` / `partial` / `empty` / `partial_override`）与父级审计/哈希链接；下游阶段拒绝不完整的上游，除非记录了覆盖。
+3. 分开记录**代码身份**（本仓库版本/提交）和**配置身份**（配置路径、SHA-256 和配置所在仓库的状态）。
+4. 通过持久化注册表得到稳定的 `compound_id`：显式 ID 优先保留并持久化，冲突的重新分配会被拒绝。
+5. 机器可读表保留全精度概率，展示用的舍入另行处理。
+6. 离线合成 demo，带手算预期值与失败场景。
+7. `rnp report` 渲染前重新校验它读取的每个产物和父阶段审计哈希；缺失的阶段显示“未运行”，partial 阶段需要覆盖。
+8. Python 依赖由 `uv.lock`（`uv sync --locked`）锁定；R 依赖由 `renv.lock` 锁定，CI 按该锁恢复（每次运行也记录实际版本）。
+9. R 进程的非零状态不会被看起来正常的 meta 文件掩盖；引擎实际前景/背景集合连同哈希和计数一并写出。
+
+v0.2.0 的上游切片另外做到：结构歧义只记录、不改写；STP 导出与提交的结构逐行绑定，案例核查器从原始输入独立重推；选择决定与全候选表分开保存，下游只数所选化合物。
 
 详见 [架构与待闭合缺口](docs/architecture.md)。
 
@@ -137,7 +152,8 @@ GeneCards、OMIM、KEGG 等受限数据库**不再分发**，只提供下载说�
 |---|---|---|
 | v0.0.1 | 骨架：包、schema、CLI、测试、CI、文档 | ✅ 完成 |
 | **v0.1.0** | `intersect` · `network` · `enrich`（R）· `report` · 运行溯源 · 公开案例 Release 资产 | **2026-11-02 已发布** |
-| v0.2 | 已确认清单/代谢组注释 → 结构注册 → 性质标注 → 显式选择 | 计划中 |
+| **v0.2.0** | 上游第一个切片（入口 A）：已确认化合物清单 → 结构登记 → STP 提交记录绑定 → 显式选择 → 案例入口独立复核；受体侧 `rnp acquire` | 候选，尚未发布 |
+| v0.2.x / 后续 | 已处理代谢组注释入口、名称→结构解析、性质标注 | 计划中 |
 | v0.3 | 最小对接：候选对、准备、控制、回对接与 pose QC | 计划中 |
 | 后续 | PPI 拓扑/RRA、MCODE、预测结构和历史批量迁移 | 独立验收 |
 | v1.0 | 稳定契约、兼容性与复现案例 | 按实际证据验收 |

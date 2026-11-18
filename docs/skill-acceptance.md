@@ -19,6 +19,11 @@ commit `49f0996` plus a dirty worktree. Enrichment was intentionally skipped bec
 `0xC0000005`; no enrichment result is claimed. This is one model/session and is not a general
 validation claim.
 
+Scope note (2026-11-17): the commands and options added after v0.1.0 (`rnp ingest compounds`,
+`rnp compounds select`, `rnp acquire`, `rnp ingest stp --compounds/--selection`, and the `--log` and
+`--selection` options of `scripts/case_run.py`) are not part of the Skill and were not part of any Agent-session
+acceptance above. The acceptance covers the v0.1.0 command set only.
+
 ## Recorded decisions reused
 
 The scenarios reuse the decisions recorded in the supplied config / `examples/demo/CASE-FREEZE.yaml`

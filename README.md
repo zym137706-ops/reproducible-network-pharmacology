@@ -8,10 +8,15 @@ Turn a folder of prediction exports and a disease gene list into a **traceable, 
 compound–target–disease analysis. Every run records its inputs, reference-data versions, parameters
 and hashes, and every output can be regenerated from a single config file.
 
-> Status: **v0.1.0, published 2026-11-02** (package version 0.1.0). Release:
-> <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0>. The
-> pipeline and the wrapper-layer exit-code guard, engine-effective gene sets and hash-checked report
-> are implemented.
+> Status: **v0.2.0 release candidate, unreleased.** The latest published release is **v0.1.0**
+> (2026-11-02, package version 0.1.0):
+> <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0>.
+> v0.2.0 adds the first slice of the upstream side (entry A: a confirmed compound list with the exact
+> structures submitted to SwissTargetPrediction, explicit selection decisions kept apart from the full
+> candidate list, and a case entry that rechecks both) and the receptor-side `rnp acquire`; see the
+> commands table, the [release notes](docs/release-notes-v0.2.0.md) and the
+> [changelog](CHANGELOG.md). The v0.1.0 pipeline and the wrapper-layer exit-code guard,
+> engine-effective gene sets and hash-checked report are implemented.
 > Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (current main run; see badge).
 > Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
 > guard is intentionally kept. The public RA case (MeSH D001172) is **locally computed** in Linux for
@@ -77,6 +82,8 @@ flowchart LR
 ```bash
 # Python 3.10+ and R 4.5.x (R only needed for the enrichment step)
 uv sync --locked --extra dev
+# structure mode (`rnp ingest compounds` on a table with a `smiles` column, `scripts/case_run.py --log`)
+# also needs RDKit: add `--extra chem`; without it those commands stop and name the extra
 
 # restore the R lock and use the exact absolute library it prints
 bash scripts/restore_r.sh
@@ -123,8 +130,8 @@ reproduced from a clean clone**. STP's eight native tables are **CC BY 4.0-confi
 attribution/no-modification requirements; CTD ticket **#8545** confirms the requested **public
 non-profit research** use (including GitHub) with CTD citation and a data date-stamp. PubChem
 source/terms/citation review is complete with a residual third-party-rights caveat. The complete
-candidate is prepared outside Git, but **publication is pending the researcher's decision** on final
-file inclusion, visibility and release. Its data access/reproduction guide is
+case package is published as the v0.1.0 release asset and is not duplicated in Git. Its data
+access/reproduction guide is
 [examples/demo/DATA-ACCESS.md](examples/demo/DATA-ACCESS.md); data/license checklist is in
 [docs/public-case-checklist.md](docs/public-case-checklist.md); STP exports are produced by hand.
 The synthetic demo is an engineering test, not a scientific result.
@@ -151,7 +158,7 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 |---|---|---|
 | `rnp validate` | ✅ | Validate a run config and every declared input path |
 | `rnp ingest stp` | ✅ | Bind compounds to exports, parse xlsx/csv (merged title rows, multi-symbol targets, complexes) into `targets.tsv`; quarantine unbound exports; classify file status; stage status |
-| `rnp ingest compounds` | ✅ implemented, unreleased | Register compound identities and, when the compound table has a `smiles` column, structures (RDKit, optional extra `chem`) and the STP submission log; writes `compound_structures.tsv`, `compounds_audit.json` and a manifest into `<outputs.dir>/<run id>_compounds/`; rows without a registered structure or with a refused submission are quarantined (exit code 3); without a `smiles` column it runs in name-only mode and needs no RDKit; `rnp ingest stp --compounds DIR` applies its decisions (the export of a quarantined compound is quarantined too; `compounds_registered.tsv` gets `structure_id` and `structure_status`) ([docs/upstream.md](docs/upstream.md), section 8) |
+| `rnp ingest compounds` | ✅ v0.2.0 | Register compound identities and, when the compound table has a `smiles` column, structures (RDKit, optional extra `chem`) and the STP submission log; writes `compound_structures.tsv`, `compounds_audit.json` and a manifest into `<outputs.dir>/<run id>_compounds/`; rows without a registered structure or with a refused submission are quarantined (exit code 3); without a `smiles` column it runs in name-only mode and needs no RDKit; `rnp ingest stp --compounds DIR` applies its decisions (the export of a quarantined compound is quarantined too; `compounds_registered.tsv` gets `structure_id` and `structure_status`) ([docs/upstream.md](docs/upstream.md), section 8) |
 | `rnp manifest` | ✅ | Validate a run manifest and detect drift in recorded input hashes |
 | `rnp intersect` | ✅ | HGNC-normalized intersection; refuses partial upstream by default; exclusions and conflicts in audit tables |
 | `rnp network` | ✅ | Cytoscape node/edge/MOLlist tables + Venny data; optional R Venn plot (`--venn-plot`); valid empty network for zero hits |
@@ -160,12 +167,12 @@ or `uv run` explicitly. See [docs/limitations.md](docs/limitations.md).
 | `rnp report` | ✅ | Markdown report from verified stage audits + tables; hash-checked; no claims beyond the evidence |
 | `scripts/case_run.py` | ✅ local case entry | Portable preflight + full CLI chain for user-supplied inputs; records source/config/container provenance; with `--log` it registers and checks the structures through `rnp ingest compounds` (needs RDKit, extra `chem`); with `--selection` (needs `--log`) it also applies a decision table: `rnp compounds select` after every compounds stage and `ingest stp --compounds --selection` |
 | `scripts/case_check.py` | ✅ independent check | Re-derives T_r/foreground and recomputes hypergeometric/BH from result tables; with a submission log it also re-derives every compound's submission status and export hash from the raw inputs and compares them with the compounds stage; with `--selection` it re-derives every compound's selection status and decision id from the decision table and compares them with the selection stage, the registered table, the ingest audit, `targets.tsv` and the intersection audit |
-| `rnp metabolites import` | 🚧 v0.2 | Import processed metabolomics annotations; confirmed compound lists also supported |
-| `rnp structures resolve` | 🚧 v0.2.0 | Resolve names / InChIKeys to structures (PubChem cache) |
-| `rnp compounds select` | ✅ implemented, unreleased | Record the researcher's selection decisions (`include` / `exclude` / `needs_review`, with reason codes, a rules version and the reviewer) on the candidate compounds of a compounds stage: reads `inputs.selection` and the stage directory of `rnp ingest compounds` and writes `selection_decisions.tsv` (every candidate), `selected_compounds.tsv`, `selection_audit.json` and a manifest into `<outputs.dir>/<run id>_selection/`; a candidate without a decision is held for review, not selected, and the stage is partial (exit code 3) while any candidate is unresolved; writes no registry; `rnp ingest stp --compounds DIR --selection DIR2` parses only the exports of the selected compounds and records the others as `not_selected` (audit schema 1.2, a `selection_status` column in `compounds_registered.tsv`), and `rnp intersect`, `rnp network` and `rnp report` then count only the selected compounds ([docs/upstream.md](docs/upstream.md), sections 8.11 and 8.12) |
-| `rnp compounds annotate` | 🚧 v0.2 design | Properties (Ro5, structural alerts, optional ADMET) kept apart from the decisions |
+| `rnp metabolites import` | 🚧 later, not in v0.2.0 | Import processed metabolomics annotations; confirmed compound lists also supported |
+| `rnp structures resolve` | 🚧 later, not in v0.2.0 | Resolve names / InChIKeys to structures (PubChem cache) |
+| `rnp compounds select` | ✅ v0.2.0 | Record the researcher's selection decisions (`include` / `exclude` / `needs_review`, with reason codes, a rules version and the reviewer) on the candidate compounds of a compounds stage: reads `inputs.selection` and the stage directory of `rnp ingest compounds` and writes `selection_decisions.tsv` (every candidate), `selected_compounds.tsv`, `selection_audit.json` and a manifest into `<outputs.dir>/<run id>_selection/`; a candidate without a decision is held for review, not selected, and the stage is partial (exit code 3) while any candidate is unresolved; writes no registry; `rnp ingest stp --compounds DIR --selection DIR2` parses only the exports of the selected compounds and records the others as `not_selected` (audit schema 1.2, a `selection_status` column in `compounds_registered.tsv`), and `rnp intersect`, `rnp network` and `rnp report` then count only the selected compounds ([docs/upstream.md](docs/upstream.md), sections 8.11 and 8.12) |
+| `rnp compounds annotate` | 🚧 later, not in v0.2.0 | Properties (Ro5, structural alerts, optional ADMET) kept apart from the decisions |
 | `rnp hubs compute` | 🚧 later extension | Centrality/rank aggregation; not a replacement for MCODE |
-| `rnp acquire` | ✅ implemented, unreleased ([ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)) | Freeze the RCSB/UniProt records of chosen receptor IDs (`PDB_ID:UNIPROT_ACCESSION`) into a new directory together with an `acquisition_record.json` (retrieval times, HTTP status, sizes, SHA-256 hashes, version headers); `--verify DIR` re-checks a frozen directory offline; the only command whose Python code uses the network |
+| `rnp acquire` | ✅ v0.2.0 ([ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)) | Freeze the RCSB/UniProt records of chosen receptor IDs (`PDB_ID:UNIPROT_ACCESSION`; four-character PDB IDs only) into a new directory together with an `acquisition_record.json` (retrieval times, HTTP status, sizes, SHA-256 hashes, version headers); `--verify DIR` re-checks a frozen directory offline; the only command whose Python code uses the network |
 | `rnp dock prepare/run/qc` | 🚧 v0.3 design | Suitable co-crystal systems and ordinary noncovalent small molecules, controls and pose QC |
 
 In `rnp`'s own Python code only `rnp acquire` uses the network: it contacts `files.rcsb.org`,
@@ -246,12 +253,9 @@ Implemented in this slice:
 9. A non-zero R process status is never masked by a plausible meta file; engine-effective
    foreground/background sets are written with hashes and counts.
 
-Still required before calling v0.1.0 released:
-
-- researcher approval of the complete public-case candidate, final file inclusion,
-  repository visibility and versioned release (checklist in
-  [docs/public-case-checklist.md](docs/public-case-checklist.md));
-- the final `v0.1.0` tag/release created only after that approval; a green CI run is not a release.
+v0.1.0 was published on 2026-11-02; the checklist that gated it is
+[docs/public-case-checklist.md](docs/public-case-checklist.md). A tag and a release are created only on
+the researcher's explicit decision; a green CI run is not a release.
 
 See [architecture](docs/architecture.md) for current gaps and target contracts.
 
@@ -274,7 +278,8 @@ instructions and an adapter; users obtain the data under their own license. See
 |---|---|---|
 | v0.0.1 | Scaffold: package, schemas, CLI, tests, CI, docs | ✅ done |
 | **v0.1.0** | Core hardening; `enrich`; `report`; Skill; public case as release asset | **published 2026-11-02** |
-| v0.2 | Confirmed lists / metabolomics → structure registry → annotation → explicit selection | planned |
+| **v0.2.0** | Upstream, first slice (entry A): confirmed compound list → structure registry → STP submission bindings → explicit selection → case-entry recheck; receptor-side `rnp acquire` | release candidate, unreleased |
+| v0.2.x / later | Processed-metabolomics entry, name → structure resolution, property annotation | planned |
 | v0.3 | Minimal docking: reviewed pairs, preparation, controls, redocking and pose QC | planned |
 | Later | PPI topology/RRA, MCODE, predicted receptors and historical batch migration | independently scoped |
 | v1.0 | Stable contracts, declared compatibility and reproducible cases | evidence-gated |
@@ -288,8 +293,7 @@ a roadmap, video or DOI is not evidence that a capability works. Detailed design
 本项目把网络药理学的「成分 → 靶点 → 疾病 → 通路」分析，从手工点网站变成可校验、可复现的
 命令行工具 + Agent 技能层。核心设计：**CLI 是唯一事实来源**（不用 Agent 也能跑），每个子命令
 校验输入、显式报错、写审计文件；每次运行生成带哈希与版本信息的 `run_manifest.json`；公开数据
-demo 将用可独立核验的预期结果守住数值；受限数据库不再分发。当前是 v0.1.0 正式发布版本、
-其案例数据作为 Release 资产分发（包版本 0.1.0），新增设计不代表命令已实现。完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
+demo 将用可独立核验的预期结果守住数值；受限数据库不再分发。最新已发布版本是 v0.1.0（其案例数据作为 Release 资产分发）；v0.2.0（上游第一个切片和 `rnp acquire`）是候选，尚未发布；新增设计不代表命令已实现。完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
 
 ## License
 

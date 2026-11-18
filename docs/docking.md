@@ -26,7 +26,7 @@ v0.3 首版：有适合该问题的共晶参照、普通非共价小分子、固
 
 ## 3. 结构与准备记录
 
-受体与序列事实只来自显式获取步骤冻结的记录（`rnp acquire`，见 [ADR-0005](adr/0005-structure-acquisition-boundary.md)，已实现、未发布）；准备与对接不联网。
+受体与序列事实只来自显式获取步骤冻结的记录（`rnp acquire`，见 [ADR-0005](adr/0005-structure-acquisition-boundary.md)，已实现，属 v0.2.0）；准备与对接不联网。
 
 获取记录的 JSON Schema（由 `rnp acquire` 写出）：[`schemas/acquisition_record.schema.json`](../schemas/acquisition_record.schema.json)。
 

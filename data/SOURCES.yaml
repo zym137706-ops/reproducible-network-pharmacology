@@ -24,8 +24,7 @@ pubchem:
   - ConnectivitySMILES
   field_provenance: computed by OEChem references from PubChem PUG View; see docs/pubchem-structure-review-2026-10-27.md
   review_record: docs/pubchem-structure-review-2026-10-27.md
-  note: Local candidate only; not committed. No STP/CTD reply clears PubChem. Publication
-    decision remains with researcher.
+  note: Not committed to Git. The case package that contains the PubChem-derived tables was published as the v0.1.0 release asset. No STP/CTD reply clears PubChem.
 rcsb_pdb:
   name: RCSB Protein Data Bank (wwPDB archive and RCSB PDB programmatic APIs)
   url: https://www.rcsb.org/
@@ -40,7 +39,7 @@ rcsb_pdb:
   - https://www.rcsb.org/pages/policies
   - https://www.rcsb.org/pages/usage-policy
   terms_checked: '2026-11-07'
-  note: Planned source (ADR-0005); nothing is frozen yet. The RCSB policies page adds an exception for API data from integrated external resources that the shorter usage-policy page omits; the stricter statement is recorded. Record the entry ID, retrieval time and hash for every structure used.
+  note: Retrieved at run time by `rnp acquire` (v0.2.0, ADR-0005); no retrieved record is committed or shipped. The RCSB policies page adds an exception for API data from integrated external resources that the shorter usage-policy page omits; the stricter statement is recorded. Record the entry ID, retrieval time and hash for every structure used.
 uniprot:
   name: UniProt Knowledgebase
   url: https://www.uniprot.org/
@@ -53,7 +52,7 @@ uniprot:
   terms_urls:
   - https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/LICENSE
   terms_checked: '2026-11-07'
-  note: Planned source (ADR-0005); nothing is frozen yet. Record the UniProt release (response header x-uniprot-release) with every record.
+  note: Retrieved at run time by `rnp acquire` (v0.2.0, ADR-0005); no retrieved record is committed or shipped. Record the UniProt release (response header x-uniprot-release) with every record.
 go:
   name: Gene Ontology
   url: https://geneontology.org/docs/download-ontology/
@@ -93,8 +92,7 @@ ctd:
   permission_record: docs/ctd-permission-2026-10-26.md
   permission_ticket: '#8545'
   candidate_path: CASE-PKG-2026-10-21
-  note: Local CTD subset used for the RA case; not yet committed. Cite CTD and date-stamp;
-    notify CTD when public.
+  note: Local CTD subset used for the RA case; not committed to Git (it is inside the v0.1.0 case package, a release asset). Cite CTD and date-stamp; the post-publication notification is recorded in docs/ctd-permission-2026-10-26.md.
   release_asset: rnp-case-v0.1.0-2026-10-21.zip
 kegg:
   name: KEGG pathways
@@ -138,6 +136,5 @@ swisstargetprediction:
     date and Daina & Zoete 2024; do not modify original tables'
   permission_record: docs/stp-permission-2026-10-23.md
   candidate_path: CASE-PKG-2026-10-21
-  note: Manual submission only; never automate STP submissions. Candidate is outside
-    Git and not published.
+  note: Manual submission only; never automate STP submissions. The tables are inside the v0.1.0 case package, a release asset, and outside Git.
   release_asset: rnp-case-v0.1.0-2026-10-21.zip

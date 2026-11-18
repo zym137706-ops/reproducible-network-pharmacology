@@ -15,8 +15,9 @@ record enough metadata to reconstruct what happened.
 ## 2. Non-goals
 
 - No online prediction, no scraping of third-party services, no hidden-form replaying. The `rnp acquire` step ([ADR-0005](adr/0005-structure-acquisition-boundary.md)) only retrieves records from documented public endpoints and freezes them; it is none of these.
-- v0.1 core remains post-prediction. v0.2 adds confirmed-list/processed-metabolomics identity,
-  annotation and explicit selection; v0.3 adds limited, controlled noncovalent docking.
+- v0.1 core remains post-prediction. v0.2.0 adds the first slice of the upstream side (confirmed-list
+  identity, structure registration, submission bindings and explicit selection); processed-metabolomics
+  identity and annotation come later; v0.3 adds limited, controlled noncovalent docking.
 - No raw LC-MS processing, ADMET model training, QSAR or broad receptor/chemistry support in these releases.
 - No claims of biological validation; the output is *predicted association* and *annotation overlap*.
 
@@ -185,17 +186,19 @@ The workstation this was developed on has MGLTools first on `PATH`, so bare `pyt
 Python 2.7. Use `py -3.12`, `uv run`, or the virtual environment interpreter explicitly. R lives at
 `<R_HOME>\bin\Rscript.exe`; pass `RNP_RSCRIPT` to tests if it is not on `PATH`.
 
-## 13. Accepted extension contracts (not implemented)
+## 13. Accepted extension contracts (partly implemented)
 
 - v0.2: confirmed lists and processed annotations converge on stable compound/structure identity,
   separate feature/group occurrences, transformation history and explicit selection. See upstream.md.
+  v0.2.0 implements the confirmed-list slice of it (upstream.md section 8); the processed-metabolomics
+  side stays a contract.
 - A reviewed candidate-pair table binds target identity, evidence, suitable receptor/site and controls.
 - v0.3: suitable co-crystal systems and ordinary noncovalent small molecules only; preparation,
   actual seeded executions, redocking and pose plausibility are recorded separately.
 - No native reference means redocking is not applicable; predicted structures need separately
   validated protocols. pLDDT is not sufficient docking eligibility evidence.
 - RRA consensus ranks nodes; MCODE identifies modules. Neither substitutes for the other.
-- Structure acquisition ([ADR-0005](adr/0005-structure-acquisition-boundary.md)) is implemented and unreleased (library in `rnp.acquire`, command `rnp acquire`). What stays a contract is the rule that receptor and sequence facts come only from records that command froze, so no other module, in particular `rnp dock *`, uses the network. Discovery tools stay optional, read-only and ID-only.
+- Structure acquisition ([ADR-0005](adr/0005-structure-acquisition-boundary.md)) is implemented in v0.2.0 (library in `rnp.acquire`, command `rnp acquire`). What stays a contract is the rule that receptor and sequence facts come only from records that command froze, so no other module, in particular `rnp dock *`, uses the network. Discovery tools stay optional, read-only and ID-only.
 
 ## 14. Release checks: closed in the 2026-10-19 slice, and still pending
 

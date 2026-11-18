@@ -1,6 +1,6 @@
 # ADR 0005 — Structure acquisition boundary
 
-- Status: accepted; the acquire library and the `rnp acquire` command are implemented and unreleased; the construct check and the candidate-pair tables are pending
+- Status: accepted; the acquire library and the `rnp acquire` command are implemented (v0.2.0); the construct check and the candidate-pair tables are pending (see Amendments)
 - Date: 2026-11-07
 - Relates to: [ADR-0004](0004-staged-upstream-and-docking.md) (items 4, 5 and 7), [docking design](../docking.md) §3, [upstream design](../upstream.md) §3
 
@@ -44,7 +44,7 @@ re-checkable.
    `data.rcsb.org` and `rest.uniprot.org`); adding a host requires amending this ADR. This is data retrieval, not
    online prediction, scraping or form replay, so the non-goals in [architecture.md](../architecture.md) §2 still
    hold.
-3. **It is the only command that uses the network.** No module other than `rnp.acquire` may import a networking
+3. **It is the only command whose Python code uses the network (see Amendment 1).** No module other than `rnp.acquire` may import a networking
    library, and `rnp dock *` never goes online. A guard test enforces this by inspecting imports.
 4. **Failure is explicit.** An unknown ID, an inactive or secondary accession, a non-2xx response, an empty body,
    an error reported inside an HTTP 200 response, or a hash mismatch on offline verification is an error that
@@ -91,3 +91,21 @@ scoring.
 - `docs/data-licenses.md` and `data/SOURCES.yaml` gain RCSB PDB and UniProt rows now; `docs/citations.md` gains
   their entries when `rnp acquire` ships.
 - A discovery tool can be replaced or removed without touching any result.
+
+## Amendments
+
+### 2026-11-17 (v0.2.0)
+
+1. **Scope of "the only command that uses the network".** Decision 3 is about this project's Python code: no
+   module other than `rnp.acquire` imports a networking library, and a guard test enforces it. It does not
+   cover the optional KEGG enrichment of `rnp enrich`, which reaches its service from inside R; GO enrichment
+   and every other command are offline.
+2. **State.** The acquisition-record schema, the `rnp.acquire` library and the `rnp acquire` command are
+   implemented (v0.2.0). The construct check and the candidate-pair tables remain pending.
+3. **PDB ID format.** The RCSB identifier policy
+   (<https://www.rcsb.org/docs/general-help/identifiers-in-pdb>, read 2026-11-17) gives every entry an extended
+   ID of the form `pdb_00001abc` and says that entries deposited before 2027-07-21 additionally have a
+   four-character ID; entries deposited from that date on therefore have only the extended ID. `rnp acquire`
+   accepts four-character IDs only (`^[0-9][A-Z0-9]{3}$`), so it cannot freeze such an entry. A later slice has to
+   accept the extended form and decide how it is recorded and used in folder names; v0.2.0 does not relax the
+   check.

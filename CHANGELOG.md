@@ -3,20 +3,44 @@
 All notable changes to this project are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [SemVer](https://semver.org/).
 
-## [0.1.0] - 2026-11-02
-
-First formal v0.1.0 release of the audited network-pharmacology CLI and thin Skill. Code is MIT.
-The complete RA case is distributed separately as `rnp-case-v0.1.0-2026-10-21.zip`; real case data
-is not duplicated in the Git tree. Data terms remain source-specific: STP CC BY 4.0, CTD public
-non-profit research permission (ticket #8545), HGNC CC0, and PubChem source/NCBI-policy caveat; the
-mixed-source package is not MIT/CC BY as a whole. See `docs/release-notes-v0.1.0.md` /
-the GitHub Release and `examples/demo/DATA-ACCESS.md`.
-
 ## [Unreleased]
+
+## [0.2.0] - unreleased
+
+Release candidate: the first slice of the upstream side (entry A) and the receptor-side `rnp acquire`. Code is
+MIT. The v0.1 core pipeline, the R bridge, `renv.lock` and the Skill are unchanged, and the published v0.1.0 case
+package and its records are not re-frozen. Added: structure registration (`rnp ingest compounds`, optional extra
+`chem` = RDKit), the STP submission log bound to the registered structures (`rnp ingest stp --compounds`),
+explicit selection decisions kept apart from the full candidate list (`rnp compounds select`,
+`rnp ingest stp --selection`, selected-only counts downstream), the case entry with `--log` / `--selection` and
+the independent recheck in `scripts/case_check.py`, and `rnp acquire` for receptor-side records (ADR-0005). Not in
+this release: the processed-metabolomics entry, name-to-structure resolution, property annotation and docking. A
+"selected" compound is one that the researcher's recorded decision kept for analysis; nothing here claims
+activity, mechanism or efficacy. See `docs/release-notes-v0.2.0.md`.
+
+### v0.2.0 release candidate: documents, CI and the run record — 2026-11-17
+
+- The status wording of both READMEs, `docs/upstream.md`, the architecture, review-gate, citation, docking,
+  limitation, data-license, environment and planning documents and `data/SOURCES.yaml` now says what v0.2.0
+  contains and what it does not (no metabolomics entry, name-to-structure resolution, property annotation or
+  docking). Statements from before the v0.1.0 publication that contradicted the published state (for example that
+  the publication of the case package was still pending) were corrected. The Chinese README gained the command
+  rows and the input contract that only the English one had.
+- ADR-0005 has two amendments: the scope of "the only command that uses the network" (the optional KEGG enrichment
+  runs from R), and RCSB's extended 12-character PDB IDs, which `rnp acquire` does not accept (entries deposited
+  from 2027-07-21 on have no four-character ID). `docs/limitations.md` lists the limits of v0.2.0.
+- New documents: `docs/release-notes-v0.2.0.md` (candidate) and `docs/case-entry-selection-run-2026-11-17.md`, a
+  local record of the case entry with `--log` and `--selection` on the published v0.1.0 case package with real
+  RDKit and R. The decision tables in it are verification inputs, not scientific selections.
+- CI: the job `r-contract` gained a step that runs `scripts/case_run.py --log --selection` on synthetic inputs
+  (one included and one excluded compound; the excluded compound's two disease-gene targets must not be counted).
+  Like the other steps of that job it runs on `main` and on manual dispatch.
+- This file: the entries since v0.1.0 are now under `[0.2.0]` and the older entries under `[0.1.0]`;
+  `[Unreleased]` is empty. No code and no dependency changed.
 
 ### `case_run.py --selection` and the independent recheck of the selection — 2026-11-17
 
-- `scripts/case_run.py --selection FILE` (unreleased; needs `--log`) applies a decision table to the
+- `scripts/case_run.py --selection FILE` (needs `--log`) applies a decision table to the
   structure-mode chain. Before anything is written the preflight runs `rnp compounds select` on a copy
   and holds the table to the case policy: every candidate is decided (include or exclude), every
   decision belongs to a compound and at least one compound is included; a candidate held for review,
@@ -36,7 +60,7 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ### `rnp ingest stp --selection` and selected-only counts — 2026-11-16
 
-- `rnp ingest stp --config run.yaml --compounds DIR --selection DIR2 [--force]` (unreleased) reads the
+- `rnp ingest stp --config run.yaml --compounds DIR --selection DIR2 [--force]` reads the
   stage directory of `rnp compounds select` and parses only the exports of the compounds that the
   researcher selected. The export of an excluded compound is recorded as `not_selected` with the reason
   `compound_excluded`, that of a compound held for review as `not_selected` with
@@ -62,7 +86,7 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 ### `rnp compounds select` command and selection library — 2026-11-15
 
 - New command `rnp compounds select --config run.yaml --compounds DIR [--force]` and library
-  `rnp.selection` (unreleased). The researcher writes a table of decisions (`inputs.selection`): one row
+  `rnp.selection`. The researcher writes a table of decisions (`inputs.selection`): one row
   per candidate compound with `decision` (`include`, `exclude` or `needs_review`), `reason_codes`,
   `rules_version`, `reviewer` and optional `group` and `evidence_refs`. The command reads that table and
   the stage directory of `rnp ingest compounds` (which must still describe the compound table and the
@@ -213,6 +237,15 @@ the GitHub Release and `examples/demo/DATA-ACCESS.md`.
   official terms pages on 2026-11-07; nothing from either source is redistributed by this change.
 - Linked ADR-0005 from the architecture and docking designs, the plan and both READMEs; listed the
   planned `rnp acquire` as a design-stage command.
+
+## [0.1.0] - 2026-11-02
+
+First formal v0.1.0 release of the audited network-pharmacology CLI and thin Skill. Code is MIT.
+The complete RA case is distributed separately as `rnp-case-v0.1.0-2026-10-21.zip`; real case data
+is not duplicated in the Git tree. Data terms remain source-specific: STP CC BY 4.0, CTD public
+non-profit research permission (ticket #8545), HGNC CC0, and PubChem source/NCBI-policy caveat; the
+mixed-source package is not MIT/CC BY as a whole. See `docs/release-notes-v0.1.0.md` /
+the GitHub Release and `examples/demo/DATA-ACCESS.md`.
 
 ### Public-release hygiene — 2026-10-28
 

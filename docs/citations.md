@@ -9,7 +9,7 @@ Zhu Y. *reproducible-network-pharmacology* v0.1.0 (published 2026-11-02). MIT-li
 Release: https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0
 No DOI is assigned.
 
-Optional software (extra `chem`, used by the structure library `rnp.structures`; implemented, unreleased):
+Optional software (extra `chem`, used by the structure library `rnp.structures`; v0.2.0):
 
 - RDKit: open-source cheminformatics, <https://www.rdkit.org/>; source <https://github.com/rdkit/rdkit>.
   License BSD-3-Clause (PyPI metadata of rdkit 2026.9.1, read 2026-11-10). The installed version is
@@ -68,7 +68,7 @@ Optional software (extra `chem`, used by the structure library `rnp.structures`;
 ### RCSB Protein Data Bank (RCSB PDB / wwPDB)
 
 - Website: <https://www.rcsb.org/>; worldwide PDB: <https://www.wwpdb.org/>
-- Used only by `rnp acquire` (implemented, unreleased), not by the published v0.1.0 case. Each retrieval
+- Used only by `rnp acquire` (v0.2.0), not by the published v0.1.0 case. Each retrieval
   records the entry ID, retrieval time and SHA-256; the frozen files stay in the git-ignored `data/local/`
   and are not redistributed here.
 - Berman HM, Westbrook J, Feng Z, Gilliland G, Bhat TN, Weissig H, Shindyalov IN, Bourne PE. The Protein
@@ -90,7 +90,7 @@ Optional software (extra `chem`, used by the structure library `rnp.structures`;
 ### UniProt
 
 - Website: <https://www.uniprot.org/>
-- Used only by `rnp acquire` (implemented, unreleased), not by the published v0.1.0 case. The UniProt
+- Used only by `rnp acquire` (v0.2.0), not by the published v0.1.0 case. The UniProt
   release is recorded with each retrieval when the response carries `x-uniprot-release`; the frozen
   records stay in the git-ignored `data/local/` and are not redistributed here.
 - The UniProt Consortium. UniProt: the Universal Protein Knowledgebase in 2025. *Nucleic Acids Research*

@@ -4,6 +4,9 @@ Updated 2026-11-02 for the published v0.1.0 release. **Linux CI is the verified 
 environment. Windows is not verified** because of a native R exit (`0xC0000005`) that is still open;
 the non-zero exit guard stays in place.
 
+Updated 2026-11-17: the install and CI sections below also cover the optional `chem` extra (RDKit) and the CI
+steps added since v0.1.0. The evidence table is the v0.1.0 evidence; it has not been re-run for v0.2.0.
+
 ## Authoritative status
 
 | Environment | Result | Status |
@@ -26,7 +29,14 @@ Python:
 
 ```bash
 uv sync --locked --extra dev
+# or, with RDKit for the structure mode (rdkit>=2026.3.1,<2027, locked in uv.lock):
+uv sync --locked --extra dev --extra chem
 ```
+
+RDKit is an optional extra: `import rnp` never imports it, and `rnp ingest compounds` on a table with a `smiles`
+column (and `scripts/case_run.py --log`) stops with an error that names the extra when it is missing. Name-only
+mode and the v0.1 commands need no RDKit. The Linux CI jobs install the extra and the test job sets
+`RNP_REQUIRE_CHEM=1`, so the RDKit tests cannot be skipped there.
 
 R (Linux/macOS):
 
@@ -107,11 +117,13 @@ root cause is fixed; keep the failures visible.
 
 ## GitHub Actions
 
-- `lint-test`: Ubuntu, Python 3.10/3.11/3.12, `uv sync --locked --extra dev`.
+- `lint-test`: Ubuntu, Python 3.10/3.11/3.12, `uv sync --locked --extra dev --extra chem`, `RNP_REQUIRE_CHEM=1`.
 - `r-contract`: Ubuntu, R 4.5; **calls `bash scripts/restore_r.sh "$RUNNER_TEMP/rlib"`** from
   `renv.lock`, exports the exact absolute path it prints as `R_LIBS`, verifies a Python-launched
-  `Rscript` sees that library, then runs live bridge/enrichment/report tests and the full quickstart.
-  The CI path is the same script documented for users, not a separate inline restore.
+  `Rscript` sees that library, then runs live bridge/enrichment/report tests, the full quickstart and the
+  portable case entry on synthetic inputs (plain, with a submission log, with a submission log and a selection,
+  and refusing a wrong submitted structure). The CI path is the same script documented for users, not a
+  separate inline restore.
 
 CI records the observed R versions in `enrichment_meta.json` on every run; `renv.lock` is the
 declared version set.

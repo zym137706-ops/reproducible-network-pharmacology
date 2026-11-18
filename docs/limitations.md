@@ -1,6 +1,6 @@
 # Limitations
 
-Updated 2026-10-29. Implemented behavior and planned safeguards are distinguished below.
+Updated 2026-11-17. Implemented behavior and planned safeguards are distinguished below.
 The accepted extension scope is documented in [ADR-0004](adr/0004-staged-upstream-and-docking.md).
 
 This project is deliberately narrow. The most important limitations are listed here and in the
@@ -59,13 +59,39 @@ report template, so that a result cannot be read as more than it is.
 ## What this repository does not do
 
 - no online prediction or website automation;
-- no docking in v0.1; v0.3 design initially supports suitable co-crystal systems and ordinary
+- no docking in v0.1 or v0.2; v0.3 design initially supports suitable co-crystal systems and ordinary
   noncovalent small molecules, with controls and pose QC;
 - no ADMET modelling, QSAR, or generative design;
 - no clinical or experimental claims;
 - no redistribution of restricted reference databases.
 
-## Upstream and docking interpretation (planned extensions)
+## v0.2.0: upstream slice and `rnp acquire`
+
+- **Structure mode needs RDKit.** `rnp ingest compounds` on a compound table with a `smiles` column, and
+  `scripts/case_run.py --log`, need the optional extra `chem` (`rdkit>=2026.3.1,<2027`); without it they stop
+  with an error that names the extra. Name-only mode and the v0.1 commands need no RDKit.
+- **A registered structure is the structure that was submitted, not a verified identity.** The registry records
+  what the researcher submitted to SwissTargetPrediction and flags ambiguity (shared structures, undefined or
+  differing stereochemistry, several fragments, charge). It does not standardize, repair or choose a structure,
+  and it does not show that the structure is the intended compound.
+- **The submission log is the researcher's record.** The tool binds each STP export to a log row and its hash and
+  re-derives the binding from the raw inputs; it cannot know what was actually entered in the web form. STP
+  exports are still submitted by hand; nothing in this release automates a submission.
+- **"Selected" means kept by a recorded decision.** It says nothing about activity, potency or relevance. Reason
+  codes, rules version and reviewer are the researcher's; the tool records them and judges none of them.
+- **The case entry is stricter than the core.** With `--selection`, every candidate must be decided (`include` or
+  `exclude`) and at least one must be included; the core also accepts `needs_review` and then reports a partial
+  stage.
+- **`rnp acquire` uses the network and accepts four-character PDB IDs only.** RCSB says that entries deposited
+  before 2027-07-21 additionally have a four-character ID, so entries deposited from that date on have only the
+  extended 12-character ID (`pdb_00001abc`) and cannot be frozen until a later release accepts that form
+  ([ADR-0005](adr/0005-structure-acquisition-boundary.md), Amendment 3). A hash identifies one retrieval, not one
+  query, and a frozen record is not a validated structure.
+- **Not in v0.2.0:** processed-metabolomics import, name → structure resolution, property annotation
+  (`rnp compounds annotate`), candidate-pair tables, the construct check and docking. The Skill was not extended
+  or re-accepted for the new commands ([skill acceptance](skill-acceptance.md)).
+
+## Upstream and docking interpretation (partly implemented in v0.2.0, the rest planned)
 
 - Processed metabolomics annotations and confirmed compound lists have different identity evidence.
   Accurate mass/formula agreement does not resolve isomers; MSI levels require actual evidence.
