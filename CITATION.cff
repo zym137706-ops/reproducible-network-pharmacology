@@ -12,8 +12,8 @@ authors:
   - family-names: "Zhu"
     given-names: "Yiming"
 license: MIT
-version: "0.1.0"
-date-released: "2026-11-02"
+version: "0.2.0"
+date-released: "2026-11-18"
 repository-code: "https://github.com/zym137706-ops/reproducible-network-pharmacology"
 keywords:
   - network pharmacology

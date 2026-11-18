@@ -5,9 +5,9 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versioning: [S
 
 ## [Unreleased]
 
-## [0.2.0] - unreleased
+## [0.2.0] - 2026-11-18
 
-Release candidate: the first slice of the upstream side (entry A) and the receptor-side `rnp acquire`. Code is
+The first slice of the upstream side (entry A) and the receptor-side `rnp acquire`. Code is
 MIT. The v0.1 core pipeline, the R bridge, `renv.lock` and the Skill are unchanged, and the published v0.1.0 case
 package and its records are not re-frozen. Added: structure registration (`rnp ingest compounds`, optional extra
 `chem` = RDKit), the STP submission log bound to the registered structures (`rnp ingest stp --compounds`),

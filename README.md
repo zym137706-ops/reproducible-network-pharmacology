@@ -8,7 +8,7 @@ Turn a folder of prediction exports and a disease gene list into a **traceable, 
 compound–target–disease analysis. Every run records its inputs, reference-data versions, parameters
 and hashes, and every output can be regenerated from a single config file.
 
-> Status: **v0.2.0 release candidate, unreleased.** The latest published release is **v0.1.0**
+> Status: **v0.2.0 release candidate, unreleased** (package version 0.2.0). The latest published release is **v0.1.0**
 > (2026-11-02, package version 0.1.0):
 > <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0>.
 > v0.2.0 adds the first slice of the upstream side (entry A: a confirmed compound list with the exact
