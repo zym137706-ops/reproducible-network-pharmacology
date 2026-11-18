@@ -2,44 +2,19 @@
 
 [![ci](https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/zym137706-ops/reproducible-network-pharmacology/actions/workflows/ci.yml)
 
-**Reproducible network-pharmacology workflows — as a command-line tool and an agent skill.**
+**[v0.2.0](https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.2.0)** published 2026-11-18.
 
-Turn a folder of prediction exports and a disease gene list into a **traceable, re-runnable**
-compound–target–disease analysis. Every run records its inputs, reference-data versions, parameters
-and hashes, and every output can be regenerated from a single config file.
+Use the `rnp` CLI to turn a compound list, SwissTargetPrediction exports, and a disease gene list
+into compound–target networks, enrichment tables, and a report backed by a run manifest. An optional
+agent skill guides review and runs the same CLI.
 
-> Status: **v0.2.0 release candidate, unreleased** (package version 0.2.0). The latest published release is **v0.1.0**
-> (2026-11-02, package version 0.1.0):
-> <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0>.
-> v0.2.0 adds the first slice of the upstream side (entry A: a confirmed compound list with the exact
-> structures submitted to SwissTargetPrediction, explicit selection decisions kept apart from the full
-> candidate list, and a case entry that rechecks both) and the receptor-side `rnp acquire`; see the
-> commands table, the [release notes](docs/release-notes-v0.2.0.md) and the
-> [changelog](CHANGELOG.md). The v0.1.0 pipeline and the wrapper-layer exit-code guard,
-> engine-effective gene sets and hash-checked report are implemented.
-> Python is locked by `uv.lock`; R by `renv.lock`, restored in Linux CI (current main run; see badge).
-> Windows is **not verified**: an R native exit `0xC0000005` still fails 11 R-dependent tests and the
-> guard is intentionally kept. The public RA case (MeSH D001172) is **locally computed** in Linux for
-> 0.10 and 0.05, with independent hypergeometric/BH checks. STP confirmed on 2026-10-23 that the eight
-> native XLSX tables are **CC BY 4.0** (attribution/no modification). CTD ticket **#8545** (2026-10-26)
-> confirms public non-profit research including GitHub for the requested 179-gene subset/derived
-> outputs, with CTD citation and a data date-stamp; commercial use is separate. The complete case
-> package is **published as the v0.1.0 release asset**, not duplicated in Git. PubChem source/terms
-> review is complete with a residual third-party caveat; HGNC is frozen (CC0). See
-> `docs/stp-permission-2026-10-23.md`, `docs/ctd-permission-2026-10-26.md`, and
-> `docs/public-candidate-reproduction-2026-10-28.md`.
-> The thin Skill has a final-revision Codex real-agent acceptance (normal/missing/partial/tamper/zero;
-> Linux enrichment/report via Docker; one shell-wrapper caveat) plus a separate DSH session; see
-> `docs/skill-acceptance.md` and `docs/skill-agent-acceptance-2026-10-21.md`. This is not a general
-> validation. The current final case reproduction is recorded in
-> `docs/public-candidate-reproduction-2026-10-28.md`; earlier runs remain historical at
-> `docs/case-entry-clean-run-2026-10-22.md` and `docs/case-clean-run-2026-10-21.md`. See the
-> [maintained plan](docs/project-plan.zh-CN.md),
-> [case freeze](examples/demo/CASE-FREEZE.yaml),
-> [public-case sources](docs/public-case-sources.md), [data access](examples/demo/DATA-ACCESS.md) and
-> [environment record](docs/environment.md).
+- **Try it** with the [synthetic quickstart](#quickstart). Use Python 3.10+ and Linux with R 4.5.x
+  for enrichment. [Environment details](docs/environment.md)
+- **Reproduce the RA case** using the [public dataset and guide](examples/demo/DATA-ACCESS.md).
+- **Explore v0.2.0** for submitted-structure registration, explicit compound selection, and receptor
+  record acquisition. [Commands](#commands) · [Changelog](CHANGELOG.md)
 
----
+[中文说明](README.zh-CN.md)
 
 ## Why this exists
 
@@ -134,6 +109,8 @@ case package is published as the v0.1.0 release asset and is not duplicated in G
 access/reproduction guide is
 [examples/demo/DATA-ACCESS.md](examples/demo/DATA-ACCESS.md); data/license checklist is in
 [docs/public-case-checklist.md](docs/public-case-checklist.md); STP exports are produced by hand.
+See the [case reproduction record](docs/public-candidate-reproduction-2026-10-28.md) and the
+[source and permission records](docs/public-case-sources.md).
 The synthetic demo is an engineering test, not a scientific result.
 
 For a user-supplied real case, [`scripts/case_run.py`](scripts/case_run.py) verifies explicit
@@ -257,7 +234,8 @@ v0.1.0 was published on 2026-11-02; the checklist that gated it is
 [docs/public-case-checklist.md](docs/public-case-checklist.md). A tag and a release are created only on
 the researcher's explicit decision; a green CI run is not a release.
 
-See [architecture](docs/architecture.md) for current gaps and target contracts.
+See [architecture](docs/architecture.md) for current gaps and target contracts and the
+[Skill acceptance record](docs/skill-acceptance.md) for the tested agent scenarios.
 
 ## Scope and limitations
 
@@ -278,7 +256,7 @@ instructions and an adapter; users obtain the data under their own license. See
 |---|---|---|
 | v0.0.1 | Scaffold: package, schemas, CLI, tests, CI, docs | ✅ done |
 | **v0.1.0** | Core hardening; `enrich`; `report`; Skill; public case as release asset | **published 2026-11-02** |
-| **v0.2.0** | Upstream, first slice (entry A): confirmed compound list → structure registry → STP submission bindings → explicit selection → case-entry recheck; receptor-side `rnp acquire` | release candidate, unreleased |
+| **v0.2.0** | Upstream, first slice (entry A): confirmed compound list → structure registry → STP submission bindings → explicit selection → case-entry recheck; receptor-side `rnp acquire` | [published 2026-11-18](https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.2.0) |
 | v0.2.x / later | Processed-metabolomics entry, name → structure resolution, property annotation | planned |
 | v0.3 | Minimal docking: reviewed pairs, preparation, controls, redocking and pose QC | planned |
 | Later | PPI topology/RRA, MCODE, predicted receptors and historical batch migration | independently scoped |
@@ -293,7 +271,7 @@ a roadmap, video or DOI is not evidence that a capability works. Detailed design
 本项目把网络药理学的「成分 → 靶点 → 疾病 → 通路」分析，从手工点网站变成可校验、可复现的
 命令行工具 + Agent 技能层。核心设计：**CLI 是唯一事实来源**（不用 Agent 也能跑），每个子命令
 校验输入、显式报错、写审计文件；每次运行生成带哈希与版本信息的 `run_manifest.json`；公开数据
-demo 将用可独立核验的预期结果守住数值；受限数据库不再分发。最新已发布版本是 v0.1.0（其案例数据作为 Release 资产分发）；v0.2.0（上游第一个切片和 `rnp acquire`）是候选，尚未发布；新增设计不代表命令已实现。完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
+案例按独立预期结果核查。公开 RA 案例数据随 v0.1.0 Release 分发。完整中文说明见 [README.zh-CN.md](README.zh-CN.md)。
 
 ## License
 

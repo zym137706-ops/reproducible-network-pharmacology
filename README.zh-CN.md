@@ -1,40 +1,15 @@
 # reproducible-network-pharmacology（可复现网络药理学工具包）
 
-**把网络药理学分析从"手工点网站"变成"可校验、可复现、带人工审核节点"的命令行工具与 Agent 技能。**
+**[v0.2.0](https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.2.0)** 已于 2026-11-18 发布。
 
-输入：化合物清单 + SwissTargetPrediction 导出 + 疾病基因集。
-输出：可追溯的交集表、Cytoscape 网络表、富集结果、报告，以及一份记录输入哈希、参考库版本、参数与工具版本的运行清单。
+用 `rnp` 命令行工具把成分清单、SwissTargetPrediction 导出和疾病基因集变成成分–靶点网络、富集表和报告，
+运行清单记录输入哈希和参数。可选 Agent 技能调用同一套 CLI，并引导人工审核。
 
-> 当前状态：**v0.2.0 候选，尚未发布**（包版本 0.2.0）；已发布的最新版本是 **v0.1.0**（2026-11-02，包版本 0.1.0）：
-> <https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.1.0>。
-> v0.2.0 增加上游的第一个切片（入口 A：已确认化合物清单与提交给 SwissTargetPrediction 的实际结构、
-> 与全候选分开记录的显式选择，以及独立复核这两者的案例入口）和受体侧的 `rnp acquire`，见命令表、
-> [发布说明](docs/release-notes-v0.2.0.md) 和 [变更记录](CHANGELOG.md)。
-> v0.1.0 的导入/交集/网络/富集/报告已接通；包装层非零退出码、
-> engine 实际前景/背景集合与哈希已加固。Python 用 `uv.lock`、R 用 `renv.lock` 锁定，Linux CI
-> （当前 main run，见 badge）已通过 `renv.lock` 恢复与完整合成 quickstart。**Windows 尚未验证**：R native
-> exit `0xC0000005` 导致 11 个 R 相关测试失败，非零退出保护保留、不忽略。公开 RA 案例（MeSH D001172）
-> 已在 Linux Docker 本地完成 0.10/0.05 计算与独立超几何/BH 核查；STP 已于 2026-10-23 书面确认
-> 八份原生 XLSX 表适用 **CC BY 4.0**（需署名、原表不修改）。CTD 工单 **#8545**（2026-10-26）确认
-> 本项目请求的 179 基因子集/派生物可用于公开非营利研究（含 GitHub），需引用 CTD 并注明数据日期；
-> 商业用途另走官方渠道。完整候选包已随 v0.1.0 Release 作为版本化资产发布，未重复提交到 Git；
-> PubChem 来源/字段/条款/引用核查已完成（NCBI 无限制声明 + 第三方权利保留）。
-> HGNC 已按 CC0 冻结。见
-> `docs/stp-permission-2026-10-23.md`、`docs/ctd-permission-2026-10-26.md` 与
-> `docs/public-candidate-reproduction-2026-10-28.md`。
-> 可移植真实案例入口：`scripts/case_run.py`（严格校验日志结构/CID/哈希、固定双阈值配置、跑全链、
-> 调用 `scripts/case_check.py`、记录 `case_provenance.json`；只有分析 + manifest + 独立核查全部成功
-> 才标记 `complete`）。源码哈希使用版本化 `case-source-hash-v2` 范围（案例相关源码/入口/锁文件，
-> 不是完整仓库包）。业务逻辑仍在 `rnp`，入口只做编排；见 [docs/case-run.md](docs/case-run.md)。
-> 给了 `--log` 和 `--selection` 时，每个阈值在化合物阶段之后运行 `rnp compounds select`，`ingest stp` 只解析已选化合物的导出，选择由 `case_check.py` 独立复核。
-> Skill 已在最终提交上完成 Codex 真实会话验收（normal/missing/partial/tamper/zero；Linux enrichment/report
-> 由 Codex 调用 Docker；存在一个 PowerShell 退出码显示限制），另有一次 DSH 会话；见
-> `docs/skill-acceptance.md` 与 `docs/skill-agent-acceptance-2026-10-21.md`，不等同通用验证。
-> 当前最终案例复现记录见 `docs/public-candidate-reproduction-2026-10-28.md`；较早记录保留为
-> `docs/case-entry-clean-run-2026-10-22.md` 与 `docs/case-clean-run-2026-10-21.md`。
-> 维护入口：[发布后规划 v4](docs/project-plan.zh-CN.md)；[案例冻结](examples/demo/CASE-FREEZE.yaml)；
-> [公开案例来源清单](docs/public-case-sources.md)；[环境记录](docs/environment.md)。
-> 组内试用材料：[组内快速上手指南](docs/group-quickstart-zh.md)（已发放到组内群）。问卷、问卷汇总、试用问题记录和 Windows 安装指南是组内材料，不随仓库发布。截至 2026-11-11 试用收尾，据作者说明共有 5 人按 Windows 指南完成了教学假数据流程（validate → ingest → intersect → network，不等于完整科研复现），遇到的安装/操作问题已用于修订指南；问卷只收到 1 份，是单例定性反馈，不是正式用户验证；不再等待更多问卷，也不影响 v0.2/v0.3 开发。
+- **快速试跑**可用[合成数据示例](#快速开始)。需要 Python 3.10+，富集请使用 Linux 和 R 4.5.x。
+  [环境说明](docs/environment.md)
+- **复现 RA 案例**可用[公开数据包与复现指南](examples/demo/DATA-ACCESS.md)。
+- **查看 v0.2.0 功能**，包括登记已提交的结构、记录化合物选择决定和获取受体记录。
+  [命令表](#已实现--计划中) · [变更记录](CHANGELOG.md)
 
 ## 为什么做这个
 
@@ -138,7 +113,7 @@ Windows 注意：确认 `python` 指向 Python 3。装了分子模拟工具的�
 
 v0.2.0 的上游切片另外做到：结构歧义只记录、不改写；STP 导出与提交的结构逐行绑定，案例核查器从原始输入独立重推；选择决定与全候选表分开保存，下游只数所选化合物。
 
-详见 [架构与待闭合缺口](docs/architecture.md)。
+详见 [架构与待闭合缺口](docs/architecture.md)、[案例复现记录](docs/public-candidate-reproduction-2026-10-28.md)和 [Skill 验收范围](docs/skill-acceptance.md)。
 
 ## 边界
 
@@ -152,13 +127,15 @@ GeneCards、OMIM、KEGG 等受限数据库**不再分发**，只提供下载说�
 |---|---|---|
 | v0.0.1 | 骨架：包、schema、CLI、测试、CI、文档 | ✅ 完成 |
 | **v0.1.0** | `intersect` · `network` · `enrich`（R）· `report` · 运行溯源 · 公开案例 Release 资产 | **2026-11-02 已发布** |
-| **v0.2.0** | 上游第一个切片（入口 A）：已确认化合物清单 → 结构登记 → STP 提交记录绑定 → 显式选择 → 案例入口独立复核；受体侧 `rnp acquire` | 候选，尚未发布 |
+| **v0.2.0** | 上游第一个切片（入口 A）：已确认化合物清单 → 结构登记 → STP 提交记录绑定 → 显式选择 → 案例入口独立复核；受体侧 `rnp acquire` | [2026-11-18 已发布](https://github.com/zym137706-ops/reproducible-network-pharmacology/releases/tag/v0.2.0) |
 | v0.2.x / 后续 | 已处理代谢组注释入口、名称→结构解析、性质标注 | 计划中 |
 | v0.3 | 最小对接：候选对、准备、控制、回对接与 pose QC | 计划中 |
 | 后续 | PPI 拓扑/RRA、MCODE、预测结构和历史批量迁移 | 独立验收 |
 | v1.0 | 稳定契约、兼容性与复现案例 | 按实际证据验收 |
 
 先交付可验证核心，再扩展模块。契约变化需要显式版本迁移；路线图、视频或 DOI 不代替运行证据。
+维护与试用记录见[项目规划](docs/project-plan.zh-CN.md)和[组内快速上手指南](docs/group-quickstart-zh.md)。
+
 专项设计：[上游](docs/upstream.md)、[对接](docs/docking.md)、[ADR-0004](docs/adr/0004-staged-upstream-and-docking.md)、[ADR-0005](docs/adr/0005-structure-acquisition-boundary.md)。
 
 ## 许可
